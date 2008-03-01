@@ -1,0 +1,276 @@
+#+TAGS: test(t) benchmark(b) doc(d) cov(c) feature(f)
+= Notes on doodle
+
+See also [[file:~/doodle-bugs.mm]]
+
+== Initialization
+
+=== Notes
+Something I've just realised (which should have been obvious of
+course) is that definitions made in the singleton scope cannot use any
+of the features enabled during initialization (for example, validation
+& defaults).
+
+I've put in a class_init method which does a basic initializaton after
+calling the block - but don't want to repeat initialize_from_hash -
+(but borks on arg_order if I call that)
+
+=== DONE :init => value/proc {} ?
+
+   Do I need an initialize with default method? i.e. set an initial
+value - a different concept to the default value? i.e. set only once
+if no other value supplied.
+
+This came up as I was using generated ids - I had to do this:
+
+  symbol :identifier
+  
+  def initialize(*a, &b)
+    self.identifier = "#{self.class}##{self.class.new_id}"
+    super
+  end
+
+See [[file:~/interactive-fiction/world-model/world-model.rb::symbol%20identifier][file:~/interactive-fiction/world-model/world-model.rb::symbol identifier]]
+
+where I think I'd rather do this:
+
+  symbol :identifier, :init => proc { "#{self.class}##{self.class.new_id}" }
+
+Note, this is not the same as the :default (which only gets 'realised'
+when accessed). Perhaps I need to change the way :default works. Also
+note, this has the same problem as :default in singletons - it won't
+happen because there is no :initialize call (except that I can
+interpret it on definition in singleton classes - but then I need to
+know that I'm being executed in context of singleton class - that one
+again... hmmm)
+
+=== DONE Positional args																									:test:
+
+Positional args should follow order in which attributes have been
+defined. Doesn't seem to be doing that at the moment. So I need tests
+
+Added =arg_order= to specify order of args in initialize()
+
+Fixed [[file:lib/doodle.rb::def%20parents][parents]] & [[file:lib/doodle.rb::def%20collect_inherited%20message][collect_inherited]] to return inherited classes in
+right order
+
+=== TODO Fix parents and collect_inherited
+Fix [[file:lib/doodle.rb::def%20parents][parents]] & [[file:lib/doodle.rb::def%20collect_inherited%20message][collect_inherited]] - they are a mess - need to tidy
+up/refactor/rethink/clarify/etc.
+=== TODO Optional args																										:test:
+What to do about optional arguments? 
+
+==== reject
+raise error if unrecognised arguments in init
+
+==== accept
+stash away somewhere so can be retrieved later
+
+==== ignore
+quietly discard - this is probably the least appealing option - don't
+want to lose info without raising alert
+
+=== TODO Inherited attributes                                             :test:
+
+Need better tests of inherited attributes - last two problems were to
+do with this
+
+=== TODO Benchmarking																								 :benchmark:
+
+Profiling and benchmarking 
+- how much does this cost? 
+- where can I improve it?
+
+Added profile task to rake:
+  $ rake profile
+
+=== TODO Document how it works                                             :doc:
+
+In particular, the way inheritance works (mainly for my own benefit :).
+
+=== TODO Get 100% coverage																						:test:cov:
+
+- [ ] need to test inherited validations and conversions
+
+=== TODO Validation of defaults
+See [[file:lib/doodle.rb::bump%20off%20validate%20for%20Attributes%20maybe%20better%20way%20of%20doing][Attribute validation in doodle.rb]]
+
+- Defaults are not validated - should they be?
+- Also, because defaults are set on access, validation sets them - do
+  I want this? means that e.g. setting a variable after initialization
+  can cause validation error (see "should allow changing start_date without
+  changing end_date" in spec/validation_2.rb) because now start_date >
+  end_date (rather than just updating start_date and leaving end_date
+  as default derived value) - this might be quite tricky to fix
+- if I don't set default on access, then array defaults can be updated
+  without setting instance_variable (which means the update is lost)
+
+=== TODO validate array members
+
+- do I want to enforce kind of array members? 'typesafe' containers?
+  - e.g. ensure that all members of array are Things
+
+=== DONE singleton attribute defaults
+
+- because singleton objects do not have an initialize which is called,
+  defaults don't work (I think this is the reason) - fix this
+
+- now use class_init which will initialise from :init => values
+
+=== TODO Conversions in initialization
+
+I have Thing.from(other) - perhaps I could apply conversions in
+initialization so I can do Thing.new(other)
+- would need to be careful about infinite regression
+- need to test conversions on input
+
+=== TODO factory functions
+
+Some wrinkles with factory functions - not always defined properly?
+Anonymous classes, etc. Need to test in modules, etc.
+
+==== What is a factory function?
+
+A factory function is a function that has the same name as
+a class which acts just like class.new. For example:
+
+  Cat(:name => 'Ren')
+
+is the same as:
+
+  Cat.new(:name => 'Ren')
+
+As the notion of a factory function is somewhat contentious [xref
+ruby-talk], you need to explicitly ask for them by including Factory
+in your base class:
+
+  class Base < Doodle::Root
+    include Factory
+  end
+
+  class Dog < Base
+  end
+
+  stimpy = Dog(:name => 'Stimpy')
+
+etc.
+
+
+== what else?
+
+=== purpose of Attribute class
+
+- defines constraints on an object when a member of class
+- not standalone - rules it has to follow as member of set
+- maybe Constraint would be a better name
+- whereas object_validation is about whole object validity
+- attribute validity is as part of another object
+
+=== initialization [3/3]
+
+- [X] block init
+- [X] init from hash - error handling
+- [X] positional args
+
+=== attribute accessors [2/2]
+
+- [X] getter_setter
+- [X] default set on access
+-- or not?
+
+=== defaults [4/4]
+
+Unless a default is specified, an attribute is assumed to be required.
+You can specify a default of nil if that is what you want.
+
+- [X] default value
+-- :default => value
+-- :default => proc {}
+-- do default value end
+-- do default do ... end end
+- [X] optional if has default, required otherwise
+- [X] enforce required
+- [X] When handling defaults, want to be able to execute default block
+  in context of instance, e.g.
+
+  class DateRange < Doodle::Root 
+    has :start_date, :kind => Date do
+      default { Date.today }
+    end
+    has :end_date, :kind => Date do
+      default { start_date }
+    end
+  end
+
+  dr = DateRange.new
+  dr.end_date # => Date.today
+
+=== validation and conversion [7/7]
+
+- [X] kind
+- [X] validations
+- [X] conversions
+- [X] from
+- [X] must
+- [X] validate (Attribute validation)
+- [X] validate! (Object validation)
+- notes
+  - (would rather have 'should' instead of 'must' but that's taken by rspec :/)
+  - use ancestor conversion if direct not available
+=== user defined datatypes
+
+These are not part of Doodle (yet) as there are issues involved with
+defining your own datatype declarations that I have not yet fully
+worked out. (I will probably end up using a separate block to enable
+datatype directives.)
+
+However, to see what can be done, see
+[[file:~/scratch/doodle/trunk/examples/datatype-defs.rb]],
+[[file:examples/datatypes.rb][file:~/scratch/doodle/trunk/examples/datatypes.rb]] and
+[[file:examples/application-model.rb][file:~/scratch/doodle/trunk/examples/application-model.rb]] 
+
+== Hide behind extension instance_variable?
+
+e.g. rather than pollute the instance variable namespace with my
+variables, it might be better to hang them all off another structure,
+e.g. @__doodle__ and access everything through that
+
+could even be a 'hidden' variable accessible only through method, e.g.
+
+class Foo
+  def initialize
+    doodle = DoodleData.new
+    define_method :doodle do
+      doodle
+    end
+  end
+end
+
+or even use object id and global hash, e.g.
+
+  def doodle
+    Doodle.definitions[object_id]
+  end
+
+  then o.doodle.attributes
+
+but that could get v slow
+
+also issue with objects disappearing before method references
+(can that happen?)
+
+== NEW Typedef has :init => value as well as default
+
+this is different to default - this sets the value in initialization
+and so creates an instance variable whereas default never creates an
+instance variable
+
+= What to show
+== normal instance attributes
+has :name
+== class attributes
+class_init do
+  has :name
+end
+== singleton instance attributes
+o.singleton_class.has :name

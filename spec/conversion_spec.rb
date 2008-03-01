@@ -1,0 +1,59 @@
+$:.unshift(File.join(File.dirname(__FILE__), '../.'))
+
+require 'lib/spec_helper'
+require 'date'
+
+describe Doodle, 'defaults which have not been set' do
+  after :each do
+    undefine_const(:Foo)
+  end
+  before(:each) do
+    raise_if_defined(:Foo)
+    class Foo < Doodle::Base
+      has :start do
+        default { Date.today }
+        from String do |s|
+          Doodle::Debug.d { [:converting_from, String, s] }
+          Date.parse(s)
+        end
+        from Integer do |jd|
+          Doodle::Debug.d { [:converting_from, Integer, jd] }
+          Date.new(*Date.jd_to_civil(jd))
+        end
+      end
+      from String do |s|
+        Doodle::Debug.d { [:from, self, self.class] }
+        new(:start => s)
+      end
+    end
+  end
+
+  it 'should have default date == today' do
+    foo = Foo.new
+    foo.start.should == Date.today
+  end
+
+  it 'should convert String to Date' do
+    foo = Foo.new(:start => '2007-12-31')
+    foo.start.should == Date.new(2007, 12, 31)
+  end
+
+  it 'should convert Integer representing Julian date to Date' do
+    foo = Foo.new(:start => 2454428)
+    foo.start.should == Date.new(2007, 11, 23)
+  end
+
+  it 'should allow from' do
+    foo = Foo.from("2007-12-31")
+    foo.start.should == Date.new(2007, 12, 31)
+  end
+  
+  it 'should allow factory function' do
+#     class Foo
+#       include Doodle::Factory
+#     end
+    foo = Foo("2007-12-31")
+    foo.start.should == Date.new(2007, 12, 31)
+  end
+end
+
