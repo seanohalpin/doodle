@@ -1,7 +1,7 @@
 # doodle
 # Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
 
-require 'lib/orderedhash'       # todo[replace this with own (required function only) version]
+require 'molic-orderedhash'  # todo[replace this with own (required function only) version]
 
 # *doodle* is my attempt at a metaprogramming framework that does not
 # have to inject methods into core Ruby objects such as Object, Class
@@ -10,6 +10,8 @@ require 'lib/orderedhash'       # todo[replace this with own (required function 
 # While doodle itself is useful for defining classes, my main goal is to
 # come up with a useful DSL notation for class definitions which can be
 # reused in many contexts.
+
+# Docs at http://doodle.rubyforge.org
 
 module Doodle
   module Debug
@@ -493,10 +495,7 @@ module Doodle
     end
     
     # define a getter_setter
-    # todo[do the magic here]
-    def define_getter_setter(name, *args, &block)
-      #attr_accessor name
-      
+    def define_getter_setter(name, *args, &block)      
       # d { [:define_getter_setter, [self, self.class, self_class], name, args, block] }
 
       # need to use string eval because passing block
@@ -504,6 +503,14 @@ module Doodle
       module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end"
     end
     private :define_getter_setter
+
+    # define a collector
+    # - collection should provide a :<< method
+    def define_collector(collection, klass, name, &block)
+      # need to use string eval because passing block
+      module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end"
+    end
+    private :define_collector
 
     # +has+ is an extended +attr_accessor+
     #
@@ -536,12 +543,24 @@ module Doodle
       # d { [:has_args, self, key_values, positional_args, args] }
       params = { :name => name }
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
+
+      # don't pass collector params through to Attribute
+      if collector = params.delete(:collect)
+        if collector.kind_of?(Hash)
+          collector_name, klass = collector.to_a[0]
+        else
+          klass = collector.to_s
+          collector_name = klass.downcase
+        end
+        define_collector name, klass, collector_name
+      end
       
       # d { [:has_args, :params, params] }
       # fixme[this is a little fragile - depends on order of local_attributes in Attribute - should convert to hash args]
       #      self_class.local_attributes[name] = attribute = Attribute.new(params, &block)        
       local_attributes[name] = attribute = Attribute.new(params, &block)        
       define_getter_setter name, *args, &block
+      
       #super(*args, &block) if defined?(super)
       attribute
     end
