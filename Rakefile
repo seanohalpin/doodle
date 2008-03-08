@@ -99,7 +99,7 @@ end
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.author = "Sean O'Halpin"
   s.email = "sean.ohalpin@gmail.com"
   s.homepage = "http://doodle.rubyforge.org/"
