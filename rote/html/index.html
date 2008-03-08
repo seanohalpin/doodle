@@ -1,0 +1,865 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org" />
+  <meta http-equiv="Content-Type" content=
+  "text/html; charset=utf-8" />
+
+  <title>doodle - introduction</title>
+  <link rel="stylesheet" href="stylesheets/normal.css" media=
+  "screen" type="text/css" />
+  <!-- <meta http-equiv="refresh" content="1" /> -->
+</head>
+
+<body>
+  <div class="main">
+    <div class="toc">
+      <div id="subnav">
+        <a href='#installation'>installation</a> - <a href=
+        '#initialization'>initialization</a> - <a href=
+        '#defaults'>defaults</a> - <a href=
+        '#initial_values'>initial values</a> - <a href=
+        '#validations'>validations</a> - <a href=
+        '#conversions'>conversions</a> - <a href=
+        '#collectors'>collectors</a> - <a href=
+        '#class_and_singleton_level_definitions'>class and
+        singleton level definitions</a>
+      </div>
+    </div>
+
+    <h1 class="logo">#d00d1e</h1>
+
+    <p>Doodle is a Ruby library and gem for simplifying the
+    definition of Ruby classes by making attributes and their
+    properties more declarative.</p>
+
+    <p>Doodle is eco-friendly – it does not globally modify Object,
+    Class or Module, nor does it pollute instances with its own
+    instance variables (i.e. it plays nice with yaml).</p><a name=
+    'features' id="features"></a>
+
+    <h3>features</h3>
+
+    <ul>
+      <li>
+        <a href="#initialization">initialization</a>
+
+        <ul>
+          <li>using <a href=
+          "#using_positional_arguments">positional
+          arguments</a></li>
+
+          <li>with <a href="#named_arguments">named
+          arguments</a></li>
+
+          <li>by <a href="#block_initialization">block</a></li>
+        </ul>
+      </li>
+
+      <li><a href="#defaults">defaults</a></li>
+
+      <li><a href="#initial_values">initial values</a></li>
+
+      <li><a href="#validations">validation</a> at attribute and
+      class levels</li>
+
+      <li><a href="#conversions">conversions</a> for attributes and
+      classes</li>
+
+      <li><a href="#collectors">collectors</a> to help in defining
+      simple DSLs</li>
+
+      <li>works for <a href=
+      "#class_and_singleton_level_definitions">classes, instances
+      and singletons</a></li>
+    </ul>
+
+    <p>Putting all this together, you can initialize objects like
+    this:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"punct">"</span><span class="string">Festival</span><span class=
+"punct">"</span> <span class="keyword">do</span>
+    <span class="ident">date</span> <span class=
+"punct">'</span><span class="string">2008-04-01</span><span class=
+"punct">'</span>
+    <span class="ident">place</span> <span class=
+"punct">"</span><span class=
+"string">The muddy field</span><span class="punct">"</span>
+    <span class="ident">place</span> <span class=
+"punct">"</span><span class="string">Beer tent</span><span class=
+"punct">"</span> <span class="keyword">do</span>
+      <span class="ident">event</span> <span class=
+"punct">"</span><span class="string">Drinking</span><span class=
+"punct">"</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">pp</span> <span class="ident">event</span>
+  
+  <span class="comment">#&lt;Event:0x595394</span>
+   <span class="attribute">@date</span><span class=
+"punct">=</span><span class=
+"comment">#&lt;Date: 4909115/2,0,2299161&gt;,</span>
+   <span class="attribute">@locations</span><span class=
+"punct">=</span>
+    <span class="punct">[</span><span class=
+"comment">#&lt;Location:0x5913d4 @events=[], @name="The muddy field"&gt;,</span>
+     <span class="comment">#&lt;Location:0x58ef58</span>
+      <span class="attribute">@events</span><span class=
+"punct">=[</span><span class=
+"comment">#&lt;Event:0x58d630 @locations=[], @name="Drinking"&gt;],</span>
+      <span class="attribute">@name</span><span class=
+"punct">="</span><span class="string">Beer tent</span><span class=
+"punct">"&gt;],</span>
+   <span class="attribute">@name</span><span class=
+"punct">="</span><span class="string">Festival</span><span class=
+"punct">"&gt;</span></code>
+</pre>
+
+    <p>from a class definition like this:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"ident">require</span> <span class="punct">'</span><span class=
+"string">date</span><span class="punct">'</span>
+  <span class="ident">require</span> <span class=
+"punct">'</span><span class="string">pp</span><span class=
+"punct">'</span>
+  <span class="ident">require</span> <span class=
+"punct">'</span><span class="string">doodle</span><span class=
+"punct">'</span>
+
+  <span class="keyword">class </span><span class=
+"class">Location</span> <span class=
+"punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:name</span><span class="punct">,</span> <span class=
+"symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
+"constant">String</span>
+    <span class="ident">has</span> <span class=
+"symbol">:events</span><span class="punct">,</span> <span class=
+"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
+"punct">[],</span> <span class=
+"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="symbol">:Event</span>
+  <span class="keyword">end</span>
+
+  <span class="keyword">class </span><span class=
+"class">Event</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:name</span><span class="punct">,</span> <span class=
+"symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
+"constant">String</span>
+    <span class="ident">has</span> <span class=
+"symbol">:date</span> <span class="keyword">do</span>
+      <span class="ident">kind</span> <span class=
+"constant">Date</span>
+      <span class="ident">default</span> <span class=
+"punct">{</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span> <span class=
+"punct">}</span>
+      <span class="ident">must</span> <span class=
+"punct">'</span><span class=
+"string">be &gt;= today</span><span class=
+"punct">'</span> <span class="keyword">do</span> <span class=
+"punct">|</span><span class="ident">value</span><span class=
+"punct">|</span>
+        <span class="ident">value</span> <span class=
+"punct">&gt;=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+      <span class="keyword">end</span>
+      <span class="ident">from</span> <span class=
+"constant">String</span> <span class=
+"keyword">do</span> <span class="punct">|</span><span class=
+"ident">s</span><span class="punct">|</span>
+        <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">parse</span><span class=
+"punct">(</span><span class="ident">s</span><span class=
+"punct">)</span>
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
+"punct">[],</span> <span class=
+"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:place</span> <span class="punct">=&gt;</span> <span class="punct">"</span><span class="string">Location</span><span class="punct">"}</span>
+  <span class="keyword">end</span></code>
+</pre><a name='installation' id="installation"></a>
+
+    <h2>installation</h2>
+
+    <p>On Linux:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="global">$ </span><span class=
+"ident">sudo</span> <span class="ident">gem</span> <span class=
+"ident">install</span> <span class="ident">doodle</span></code>
+</pre>
+
+    <p>On Windows:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="constant">C</span><span class=
+"punct">:\&gt;</span> <span class="ident">gem</span> <span class=
+"ident">install</span> <span class="ident">doodle</span></code>
+</pre><a name='initialization' id="initialization"></a>
+
+    <h2>initialization</h2>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:date</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+    <p>With this declaration, you can now initialize an instance of
+    Event in the following ways.</p><a name=
+    'using_positional_arguments' id=
+    "using_positional_arguments"></a>
+
+    <h3>using positional arguments</h3>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"constant">Date</span><span class="punct">.</span><span class=
+"ident">today</span></code>
+</pre><a name='named_arguments' id="named_arguments"></a>
+
+    <h3>named arguments</h3>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"symbol">:date</span> <span class="punct">=&gt;</span> <span class=
+"constant">Date</span><span class="punct">.</span><span class=
+"ident">today</span></code>
+</pre><a name='block_initialization' id="block_initialization"></a>
+
+    <h3>block initialization</h3>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"keyword">do</span>
+    <span class="ident">date</span> <span class=
+"constant">Date</span><span class="punct">.</span><span class=
+"ident">today</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+    <p>Of course, if you insist on typing <code>new</code>, you
+    can:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">.</span><span class="ident">new</span><span class=
+"punct">(</span><span class="symbol">:date</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span><span class=
+"punct">)</span></code>
+</pre><a name='defaults' id="defaults"></a>
+
+    <h2>defaults</h2>
+
+    <p>Doodle assumes that if you specify an attribute without a
+    default, it is required. If you try to initialize an instance
+    without specifying all required attributes, it will
+    complain.</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">.</span><span class="ident">new</span></code>
+</pre>
+
+    <p>will result in:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"constant">ArgumentError</span><span class=
+"punct">:</span> <span class=
+"comment">#&lt;Event:0x72b118&gt; missing required attribute 'date'</span></code>
+</pre>
+
+    <p>To specify a default, use the <code>default</code>
+    option:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:date</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+    <p>Now we can create an Event without specifying a date:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="punct">=&gt;</span> <span class=
+"comment">#&lt;Event:0x71343c&gt;  </span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">date</span>
+  <span class="punct">=&gt;</span> <span class=
+"comment">#&lt;Date: 4909061/2,0,2299161&gt;</span></code>
+</pre>
+
+    <p>You can of course override the default on initialization or
+    later:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">(</span><span class="symbol">:date</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">new</span><span class=
+"punct">(</span><span class="number">2008</span><span class=
+"punct">,</span> <span class="number">03</span><span class=
+"punct">,</span> <span class="number">01</span><span class=
+"punct">))</span>
+  <span class="punct">=&gt;</span> <span class=
+"comment">#&lt;Event:0x7036e0 @date=#&lt;Date: 4909053/2,0,2299161&gt;&gt;</span>
+   <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">date</span> <span class=
+"punct">=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">new</span><span class=
+"punct">(</span><span class="number">2008</span><span class=
+"punct">,</span> <span class="number">03</span><span class=
+"punct">,</span> <span class="number">05</span><span class=
+"punct">)</span>
+  <span class="punct">=&gt;</span> <span class=
+"comment">#&lt;Date: 4909061/2,0,2299161&gt;</span></code>
+</pre>
+
+    <p>Note that if you do not specify a value for an attribute
+    with a default, no instance variable is created.</p>
+
+    <blockquote>
+      Side note: to use the class method constructor syntax with
+      other classes, include <code>Doodle::Factory</code>:
+      <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Date</span>
+    <span class="ident">include</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Factory</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+      <p>You can now write:</p>
+      <pre class='ruby'>
+<code class='ruby'>  <span class="ident">date</span> <span class=
+"punct">=</span> <span class="constant">Date</span><span class=
+"punct">(</span><span class="number">2008</span><span class=
+"punct">,</span> <span class="number">03</span><span class=
+"punct">,</span> <span class="number">01</span><span class=
+"punct">)</span></code>
+</pre>
+    </blockquote>
+
+    <p>With the default specified as above, the <code>date</code>
+    attribute will take on the value current when the class is
+    defined. If you want the default value to be recalculated every
+    time, use a Proc object as the default value.</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:time</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="ident">proc</span> <span class=
+"punct">{</span> <span class="constant">Time</span><span class=
+"punct">.</span><span class="ident">now</span> <span class=
+"punct">}</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">time</span>
+  <span class="punct">=&gt;</span> <span class=
+"constant">Wed</span> <span class=
+"constant">Mar</span> <span class="number">05</span> <span class=
+"number">14</span><span class="punct">:</span><span class=
+"number">44</span><span class="punct">:</span><span class=
+"number">01</span> <span class="punct">+</span><span class=
+"number">0000</span> <span class="number">2008</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">time</span>
+  <span class="punct">=&gt;</span> <span class=
+"constant">Wed</span> <span class=
+"constant">Mar</span> <span class="number">05</span> <span class=
+"number">14</span><span class="punct">:</span><span class=
+"number">44</span><span class="punct">:</span><span class=
+"number">03</span> <span class="punct">+</span><span class=
+"number">0000</span> <span class="number">2008</span></code>
+</pre>
+
+    <p>This becomes more useful when you have dependent attributes,
+    as in this example:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:start_date</span><span class=
+"punct">,</span> <span class="symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+    <span class="ident">has</span> <span class=
+"symbol">:end_date</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="ident">proc</span> <span class=
+"punct">{</span> <span class="ident">start_date</span> <span class=
+"punct">+</span> <span class="number">1</span> <span class=
+"punct">}</span>
+  <span class="keyword">end</span>
+  
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>
+  <span class="punct">=&gt;</span> <span class=
+"punct">"</span><span class="string">2008-03-05</span><span class=
+"punct">"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>
+  <span class="punct">=&gt;</span> <span class=
+"punct">"</span><span class="string">2008-03-06</span><span class=
+"punct">"</span></code>
+</pre><a name='initial_values' id="initial_values"></a>
+
+    <h2>initial values</h2>
+
+    <p>Sometimes, you don’t want <em>default</em> values set when
+    the <em>class</em> is <em>defined</em> or recalculated every
+    time, you want <em>initial</em> values which are set when the
+    <em>object</em> is <em>instantiated</em>. Also, default values
+    are fine for simple scalar objects, but can cause problems with
+    aggregates such as Arrays because you end up sharing them among
+    all instances.</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="punct">[]</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">e1</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="ident">e2</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="ident">e1</span><span class=
+"punct">.</span><span class="ident">locations</span><span class=
+"punct">.</span><span class="ident">object_id</span> <span class=
+"punct">==</span> <span class="ident">e2</span><span class=
+"punct">.</span><span class="ident">locations</span><span class=
+"punct">.</span><span class="ident">object_id</span>
+  <span class="punct">=&gt;</span> <span class=
+"constant">true</span></code>
+</pre>
+
+    <p>In these cases, use <code>init</code> instead of
+    <code>default</code>:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
+"punct">[]</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">e1</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="ident">e2</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">()</span>
+  <span class="ident">e1</span><span class=
+"punct">.</span><span class="ident">locations</span><span class=
+"punct">.</span><span class="ident">object_id</span> <span class=
+"punct">==</span> <span class="ident">e2</span><span class=
+"punct">.</span><span class="ident">locations</span><span class=
+"punct">.</span><span class="ident">object_id</span>
+  <span class="punct">=&gt;</span> <span class=
+"constant">false</span></code>
+</pre>
+
+    <p>Internally, Doodle copies the <code>init</code> value by
+    cloning it. Unlike <code>default</code>, <code>init</code>
+    <em>does</em> create an instance variable.</p>
+
+    <p>However, we can set still the <code>date</code> attribute to
+    any value we like.</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"symbol">:start_date</span> <span class=
+"punct">=&gt;</span> <span class="punct">"</span><span class=
+"string">Hello</span><span class="punct">"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span>
+  <span class="punct">=&gt;</span> <span class=
+"punct">"</span><span class="string">Hello</span><span class=
+"punct">"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">end_date</span>
+  <span class="punct">=&gt;</span> <span class=
+"constant">TypeError</span><span class=
+"punct">:</span> <span class="ident">can</span><span class=
+"punct">'</span><span class=
+"string">t convert Fixnum into String</span></code>
+</pre>
+
+    <p>Hmmm… that doesn’t seem right. We can restrict the kinds of
+    values the <code>date</code> attribute will accept with
+    validations.</p><a name='validations' id="validations"></a>
+
+    <h2>validations</h2><a name='by_kind' id="by_kind"></a>
+
+    <h3>by kind</h3>
+    <pre class='ruby'>
+<code class='ruby'><span class="keyword">class </span><span class=
+"class">Event</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+  <span class="ident">has</span> <span class=
+"symbol">:start_date</span><span class=
+"punct">,</span> <span class="symbol">:kind</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span>
+<span class="keyword">end</span></code>
+</pre>
+
+    <p>(We use <code>kind</code> because Doodle uses
+    <code>kind_of?</code> to test the value.)</p>
+
+    <p>If you now try to initialize Event#date with something that
+    isn’t a Date:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">.</span><span class="ident">new</span><span class=
+"punct">(</span><span class="symbol">:date</span> <span class=
+"punct">=&gt;</span> <span class="punct">"</span><span class=
+"string">Hello</span><span class="punct">")</span></code>
+</pre>
+
+    <p>you’ll get a Doodle::ValidationError exception:</p>
+    <pre class='ruby'>
+<code class='ruby'> <span class="ident">date</span> <span class=
+"ident">must</span> <span class="ident">be</span> <span class=
+"constant">Date</span> <span class="punct">-</span> <span class=
+"ident">got</span> <span class="constant">String</span><span class=
+"punct">("</span><span class="string">Hello</span><span class=
+"punct">")</span> <span class="punct">(</span><span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">ValidationError</span><span class=
+"punct">)</span></code>
+</pre><a name='specific_validations_with_must' id=
+"specific_validations_with_must"></a>
+
+    <h3>specific validations with <code>must</code></h3>
+
+    <p>To specify a validation on an attribute, use
+    <code>must</code> inside the attribute’s definition block:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:start_date</span><span class=
+"punct">,</span> <span class="symbol">:kind</span> <span class=
+"punct">=&gt;</span> <span class=
+"constant">Date</span> <span class="keyword">do</span>
+      <span class="ident">must</span> <span class=
+"punct">"</span><span class=
+"string">be &gt;= today</span><span class=
+"punct">"</span> <span class="keyword">do</span> <span class=
+"punct">|</span><span class="ident">value</span><span class=
+"punct">|</span>
+        <span class="ident">value</span> <span class=
+"punct">&gt;=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"symbol">:start_date</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span> <span class=
+"punct">=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">parse</span><span class=
+"punct">('</span><span class="string">2001-01-01</span><span class=
+"punct">')</span>
+  <span class="punct">=&gt;</span>  <span class=
+"ident">start_date</span> <span class=
+"ident">must</span> <span class="ident">be</span> <span class=
+"punct">&gt;=</span> <span class="ident">today</span> <span class=
+"punct">-</span> <span class="ident">got</span> <span class=
+"constant">Date</span><span class="punct">(</span><span class=
+"comment">#&lt;Date: 4903821/2,0,2299161&gt;) (Doodle::ValidationError)</span></code>
+</pre>
+
+    <p>The <code>must</code> block should return true if the value
+    is valid, false otherwise. A failed validation will raise a
+    Doodle::ValidationError exception.</p>
+
+    <p>Attribute validations happen before the instance variable is
+    changed.</p>
+
+    <p>You can also specify validations for the object as a
+    whole:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:start_date</span><span class=
+"punct">,</span> <span class="symbol">:kind</span> <span class=
+"punct">=&gt;</span> <span class=
+"constant">Date</span> <span class="keyword">do</span>
+      <span class="ident">must</span> <span class=
+"punct">"</span><span class=
+"string">be &gt;= today</span><span class=
+"punct">"</span> <span class="keyword">do</span> <span class=
+"punct">|</span><span class="ident">value</span><span class=
+"punct">|</span>
+        <span class="ident">value</span> <span class=
+"punct">&gt;=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="ident">has</span> <span class=
+"symbol">:end_date</span><span class="punct">,</span> <span class=
+"symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
+"constant">Date</span> <span class="keyword">do</span>
+      <span class="ident">default</span> <span class=
+"punct">{</span> <span class="ident">start_date</span> <span class=
+"punct">}</span>
+    <span class="keyword">end</span>
+  
+    <span class="ident">must</span> <span class=
+"punct">"</span><span class=
+"string">have end_date &gt;= start_date</span><span class=
+"punct">"</span> <span class="keyword">do</span>
+      <span class="ident">end_date</span> <span class=
+"punct">&gt;=</span> <span class="ident">start_date</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"symbol">:start_date</span> <span class=
+"punct">=&gt;</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">today</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">end_date</span> <span class=
+"punct">=</span> <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">parse</span><span class=
+"punct">('</span><span class="string">2001-01-01</span><span class=
+"punct">')</span>
+  <span class="punct">=&gt;</span>  <span class=
+"comment">#&lt;Event:0x657ed0 @start_date=#&lt;Date: 4909061/2,0,2299161&gt;, @end_date=#&lt;Date: 4903821/2,0,2299161&gt;&gt; must have end_date &gt;= start_date (Doodle::ValidationError)</span></code>
+</pre>
+
+    <p>Note that you don’t need to project the value into the block
+    but you can if you like – its value is <code>self</code>.</p>
+
+    <p>Object level validations occur after all instance variables
+    have been set.</p><a name='conversions' id="conversions"></a>
+
+    <h2>conversions</h2>
+
+    <p>Even when you want to restrict an attribute to a particular
+    kind, it is often convenient to allow initialization from
+    values that can be converted to the target type. To do this in
+    Doodle, use the <code>from</code> method inside an attribute’s
+    definition block:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:start_date</span><span class=
+"punct">,</span> <span class="symbol">:kind</span> <span class=
+"punct">=&gt;</span> <span class=
+"constant">Date</span> <span class="keyword">do</span>
+      <span class="ident">from</span> <span class=
+"constant">String</span> <span class=
+"keyword">do</span> <span class="punct">|</span><span class=
+"ident">value</span><span class="punct">|</span>
+        <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">parse</span><span class=
+"punct">(</span><span class="ident">value</span><span class=
+"punct">)</span>
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="ident">has</span> <span class=
+"symbol">:end_date</span><span class="punct">,</span> <span class=
+"symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
+"constant">Date</span>  <span class="keyword">do</span>
+      <span class="ident">from</span> <span class=
+"constant">String</span> <span class=
+"keyword">do</span> <span class="punct">|</span><span class=
+"ident">value</span><span class="punct">|</span>
+        <span class="constant">Date</span><span class=
+"punct">.</span><span class="ident">parse</span><span class=
+"punct">(</span><span class="ident">value</span><span class=
+"punct">)</span>
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"punct">'</span><span class="string">2008-03-05</span><span class=
+"punct">',</span> <span class="punct">'</span><span class=
+"string">2008-03-06</span><span class="punct">'</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>   <span class=
+"comment"># =&gt; "2008-03-05"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">end_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>     <span class=
+"comment"># =&gt; "2008-03-06"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span> <span class=
+"punct">=</span> <span class="punct">'</span><span class=
+"string">2001-01-01</span><span class="punct">'</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class=
+"ident">start_date</span>        <span class=
+"comment"># =&gt; #&lt;Date: 4903821/2,0,2299161&gt;</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>   <span class=
+"comment"># =&gt; "2001-01-01"</span></code>
+</pre>
+
+    <p><code>from</code> also works on the class level:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="punct">...</span>
+    <span class="ident">from</span> <span class=
+"constant">String</span> <span class=
+"keyword">do</span> <span class="punct">|</span><span class=
+"ident">value</span><span class="punct">|</span>
+      <span class="ident">args</span> <span class=
+"punct">=</span> <span class="ident">value</span><span class=
+"punct">.</span><span class="ident">split</span><span class=
+"punct">('</span><span class="string"> to </span><span class=
+"punct">')</span>
+      <span class="ident">new</span><span class=
+"punct">(*</span><span class="ident">args</span><span class=
+"punct">)</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span><span class=
+"punct">.</span><span class="ident">from</span> <span class=
+"punct">'</span><span class=
+"string">2008-03-05 to 2008-03-06</span><span class=
+"punct">'</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">start_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>   <span class=
+"comment"># =&gt; "2008-03-05"</span>
+  <span class="ident">event</span><span class=
+"punct">.</span><span class="ident">end_date</span><span class=
+"punct">.</span><span class="ident">to_s</span>     <span class=
+"comment"># =&gt; "2008-03-06"</span></code>
+</pre>
+
+    <p>Note: the class level interface to <code>from</code> may
+    change in a future version.</p><a name='collectors' id=
+    "collectors"></a>
+
+    <h2>collectors</h2>
+
+    <p>Collectors provide a means to define a convenience method
+    you can use to add items to a collection. For example:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Location</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:name</span>
+  <span class="keyword">end</span>
+  <span class="keyword">class </span><span class=
+"class">Event</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
+"punct">[],</span> <span class=
+"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="constant">Location</span>
+  <span class="keyword">end</span>
+  
+  <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"keyword">do</span>
+    <span class="ident">location</span> <span class=
+"punct">"</span><span class="string">Stage 1</span><span class=
+"punct">"</span>
+    <span class="ident">location</span> <span class=
+"punct">"</span><span class="string">Stage 2</span><span class=
+"punct">"</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+    <p>In this example, we have an attribute called
+    <code>locations</code> which is intended to be an array of
+    <code>Location</code> objects. Using the <code>:collect =&gt;
+    Location</code> option of <code>has</code> defines a method
+    called <code>location</code> (derived from the class name) that
+    will create a new <code>Location</code> object using the
+    parameters passed to the <code>location</code> methods and add
+    it to the <code>locations</code> attribute.</p>
+
+    <p>To use a specific name for the collecting method, use the
+    pass a hash containing <code>{:method_name =&gt;
+    ClassName}</code> to the <code>collect</code> option like
+    this:</p>
+    <pre class='ruby'>
+<code class='ruby'>    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
+"punct">[],</span> <span class=
+"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:place</span> <span class="punct">=&gt;</span> <span class="constant">Location</span><span class="punct">}</span>
+    <span class="punct">...</span>
+    <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"keyword">do</span>
+      <span class="ident">place</span> <span class=
+"punct">"</span><span class="string">Stage 1</span><span class=
+"punct">"</span>
+      <span class="ident">place</span> <span class=
+"punct">"</span><span class="string">Stage 2</span><span class=
+"punct">"</span>
+    <span class="keyword">end</span></code>
+</pre>
+
+    <p>The classname can be a class constant, a symbol or a
+    string.</p><a name='class_and_singleton_level_definitions' id=
+    "class_and_singleton_level_definitions"></a>
+
+    <h2>class and singleton level definitions</h2>
+
+    <p>[todo]</p>
+
+    <p align='right'><span style=
+    'font-size: 8pt; color: #7c7c90'>Generated with</span><br />
+    <a href='http://rote.rubyforge.org/' target='_blank'><img src=
+    'images/rote-tiny.png' alt='Rote' /></a></p>
+  </div>
+</body>
+</html>

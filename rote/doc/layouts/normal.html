@@ -1,0 +1,46 @@
+<% 
+  # This is the 'normal' layout. It can be selected with:
+  #
+  # layout 'normal'
+  #
+  # in page code. If the page itself doesn't have an '.html'
+  # extension, you will need to use:
+  #
+  #    layout 'normal.html'
+  #
+  #  instead.
+  #
+  #  Here we just add basic HTML wrap-up, use the custom var
+  #  (@page_title) to get the title, and insert content where
+  #  we want it with @content_for_layout.
+%>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF8">
+    <%# Use our custom vars for the title %>
+    <title><%= @site_title + ' - ' + @page_title %></title>
+	  <link rel="stylesheet" href="<%= link_rel '/stylesheets/normal.css' %>" media="screen" type="text/css" />
+	<!-- <meta http-equiv="refresh" content="1" /> -->
+  </head>
+
+  <body>
+	<div class="main">
+		<div class="toc">
+		<% unless @toc.nil? or @toc.links.empty? %>
+		<div id="subnav"><%= @toc.links.select { |l| l.tag =~ /h2/ }.join(' - ') %></div>
+		<% end %>		
+		</div>
+
+    	<%# Insert page content #%>
+    	<%= @content_for_layout %>
+
+    	<p align='right'>
+    		<span style='font-size: 8pt; color: #7c7c90'>Generated with</span><br/>
+
+      		<%# use the link_rel helper to make absolute links relative to current page #%>
+      		<a href='http://rote.rubyforge.org/' target='_blank'><img src='<%= link_rel '/images/rote-tiny.png' %>' alt='Rote'/></a>
+    	</p>
+    </div>
+  </body>
+</html>
+
