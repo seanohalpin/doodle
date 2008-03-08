@@ -1,7 +1,7 @@
 # doodle
 # Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
 
-require 'molic-orderedhash'  # todo[replace this with own (required function only) version]
+require 'molic_orderedhash'  # todo[replace this with own (required function only) version]
 
 # *doodle* is my attempt at a metaprogramming framework that does not
 # have to inject methods into core Ruby objects such as Object, Class

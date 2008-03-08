@@ -15,7 +15,7 @@ Note that this is very much the first version of a
 work-in-progress. Despite a fair number of specifications, you can
 expect there to be bugs and unexpected behaviours.
 
-Read more at: Doodle::Validation
+Read more at http://doodle.rubyforge.org
 
 == Examples
 === Simple example

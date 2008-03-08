@@ -1,7 +1,15 @@
 # Rakefile for doodle project
 # Sean O'Halpin, 2007-11-24
 require 'rake'
+require 'rake/gempackagetask'
 require 'spec/rake/spectask'
+require 'rubygems'
+
+task :default => [:all]
+
+all_tasks = [:spec, :rcov, :rdoc, :profile, :dcov]
+desc "Run all tasks: #{all_tasks.map{|x| x.to_s}.join(', ')}"
+task :all => all_tasks
 
 desc "Run all examples with RCov"
 Spec::Rake::SpecTask.new('rcov') do |t|
@@ -55,9 +63,6 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options << '--line-numbers' << '--inline-source'
 end
 
-desc 'Build all'
-task :all => [:spec, :rcov, :rdoc, :profile, :dcov]
-
 desc 'checkin after running tests'
 task :commit => [:spec] do
   if ENV['comment'].nil?
@@ -70,21 +75,6 @@ EOT
   end
 end
 
-desc 'scratch task for testing'
-task :scratch => [:spec] do
-  if ENV['comment'].nil?
-    puts <<-EOT
-You must specify a comment, e.g.
-  $ rake commit comment="My comment"
-EOT
-  else
-    p ENV['comment']
-    puts %[svn commit -m"#{ENV['comment']}"]
-  end
-end
-
-task :default => [:all]
-
 desc "Profile application"
 task :profile do
   system "ruby-prof examples/profile-options.rb > scratch/profile-options.txt"
@@ -93,7 +83,7 @@ task :profile do
 end
 
 desc "Sanity check examples"
-task :check do
+task :check_examples do
   system "for p in examples/*.rb ; do ruby $p>/dev/null; done"
 end
 
@@ -106,3 +96,34 @@ desc "Assess complexity (with flog)"
 task :flog do
   system "flog doodle.rb lib/*.rb"
 end
+
+spec = Gem::Specification.new do |s| 
+  s.name = "doodle"
+  s.version = "0.0.1"
+  s.author = "Sean O'Halpin"
+  s.email = "sean.ohalpin@gmail.com"
+  s.homepage = "http://doodle.rubyforge.org/"
+  s.platform = Gem::Platform::RUBY
+  s.summary = "Declarative attribute definitions and validations"
+  s.files = FileList["{bin,lib,examples}/**/*"].to_a
+  s.require_path = "lib"
+  s.test_files = FileList["{spec}/**/*spec.rb"].to_a
+  s.has_rdoc = true
+  s.extra_rdoc_files = ["README", "COPYING"]
+  s.rubyforge_project = "doodle"
+end
+ 
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.need_tar = true
+end
+
+desc "Generate rote docs"
+task :rote do
+  system "cd ./rote && rake"
+end
+
+desc "Copy docs to rubyforge"
+task :publish_docs => [:rdoc] do
+  system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
+end
+
