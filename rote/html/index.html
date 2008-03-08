@@ -100,95 +100,99 @@
   <span class="keyword">end</span>
 
   <span class="ident">pp</span> <span class="ident">event</span>
-  
-  <span class="comment">#&lt;Event:0x595394</span>
-   <span class="attribute">@date</span><span class=
-"punct">=</span><span class=
-"comment">#&lt;Date: 4909115/2,0,2299161&gt;,</span>
-   <span class="attribute">@locations</span><span class=
-"punct">=</span>
-    <span class="punct">[</span><span class=
-"comment">#&lt;Location:0x5913d4 @events=[], @name="The muddy field"&gt;,</span>
-     <span class="comment">#&lt;Location:0x58ef58</span>
-      <span class="attribute">@events</span><span class=
-"punct">=[</span><span class=
-"comment">#&lt;Event:0x58d630 @locations=[], @name="Drinking"&gt;],</span>
-      <span class="attribute">@name</span><span class=
-"punct">="</span><span class="string">Beer tent</span><span class=
-"punct">"&gt;],</span>
-   <span class="attribute">@name</span><span class=
-"punct">="</span><span class="string">Festival</span><span class=
-"punct">"&gt;</span></code>
+  <span class="comment"># &gt;&gt; #&lt;Event:0x111dd4c</span>
+  <span class=
+"comment"># &gt;&gt;  @date=#&lt;Date: 4909115/2,0,2299161&gt;,</span>
+  <span class="comment"># &gt;&gt;  @locations=</span>
+  <span class=
+"comment"># &gt;&gt;   [#&lt;Location:0x1117be0 @events=[], @name="The muddy field"&gt;,</span>
+  <span class=
+"comment"># &gt;&gt;    #&lt;Location:0x1114148</span>
+  <span class=
+"comment"># &gt;&gt;     @events=[#&lt;Event:0x11115b0 @locations=[], @name="Drinking"&gt;],</span>
+  <span class=
+"comment"># &gt;&gt;     @name="Beer tent"&gt;],</span>
+  <span class=
+"comment"># &gt;&gt;  @name="Festival"&gt;</span></code>
 </pre>
 
     <p>from a class definition like this:</p>
     <pre class='ruby'>
-<code class='ruby'>  <span class=
-"ident">require</span> <span class="punct">'</span><span class=
-"string">date</span><span class="punct">'</span>
-  <span class="ident">require</span> <span class=
+<code class='ruby'><span class="ident">require</span> <span class=
+"punct">'</span><span class="string">rubygems</span><span class=
+"punct">'</span>
+<span class="ident">require</span> <span class=
+"punct">'</span><span class="string">date</span><span class=
+"punct">'</span>
+<span class="ident">require</span> <span class=
 "punct">'</span><span class="string">pp</span><span class=
 "punct">'</span>
-  <span class="ident">require</span> <span class=
+<span class="ident">require</span> <span class=
 "punct">'</span><span class="string">doodle</span><span class=
 "punct">'</span>
 
-  <span class="keyword">class </span><span class=
+<span class="keyword">class </span><span class=
 "class">Location</span> <span class=
 "punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
-    <span class="ident">has</span> <span class=
+  <span class="ident">has</span> <span class=
 "symbol">:name</span><span class="punct">,</span> <span class=
 "symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
 "constant">String</span>
-    <span class="ident">has</span> <span class=
+  <span class="ident">has</span> <span class=
 "symbol">:events</span><span class="punct">,</span> <span class=
 "symbol">:init</span> <span class="punct">=&gt;</span> <span class=
 "punct">[],</span> <span class=
 "symbol">:collect</span> <span class="punct">=&gt;</span> <span class="symbol">:Event</span>
-  <span class="keyword">end</span>
+<span class="keyword">end</span>
 
-  <span class="keyword">class </span><span class=
-"class">Event</span> <span class="punct">&lt;</span> <span class=
+<span class="keyword">class </span><span class="class">Event</span>
+  <span class=
+"comment"># or if you want to inherit from another class</span>
+  <span class="ident">include</span> <span class=
 "constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
-    <span class="ident">has</span> <span class=
+"constant">Helper</span>
+  <span class="ident">include</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Factory</span>
+
+  <span class="ident">has</span> <span class=
 "symbol">:name</span><span class="punct">,</span> <span class=
 "symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
 "constant">String</span>
-    <span class="ident">has</span> <span class=
+  <span class="ident">has</span> <span class=
 "symbol">:date</span> <span class="keyword">do</span>
-      <span class="ident">kind</span> <span class=
+    <span class="ident">kind</span> <span class=
 "constant">Date</span>
-      <span class="ident">default</span> <span class=
+    <span class="ident">default</span> <span class=
 "punct">{</span> <span class="constant">Date</span><span class=
 "punct">.</span><span class="ident">today</span> <span class=
 "punct">}</span>
-      <span class="ident">must</span> <span class=
+    <span class="ident">must</span> <span class=
 "punct">'</span><span class=
 "string">be &gt;= today</span><span class=
 "punct">'</span> <span class="keyword">do</span> <span class=
 "punct">|</span><span class="ident">value</span><span class=
 "punct">|</span>
-        <span class="ident">value</span> <span class=
+      <span class="ident">value</span> <span class=
 "punct">&gt;=</span> <span class="constant">Date</span><span class=
 "punct">.</span><span class="ident">today</span>
-      <span class="keyword">end</span>
-      <span class="ident">from</span> <span class=
+    <span class="keyword">end</span>
+    <span class="ident">from</span> <span class=
 "constant">String</span> <span class=
 "keyword">do</span> <span class="punct">|</span><span class=
 "ident">s</span><span class="punct">|</span>
-        <span class="constant">Date</span><span class=
+      <span class="constant">Date</span><span class=
 "punct">.</span><span class="ident">parse</span><span class=
 "punct">(</span><span class="ident">s</span><span class=
 "punct">)</span>
-      <span class="keyword">end</span>
     <span class="keyword">end</span>
-    <span class="ident">has</span> <span class=
+  <span class="keyword">end</span>
+  <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
 "symbol">:init</span> <span class="punct">=&gt;</span> <span class=
 "punct">[],</span> <span class=
 "symbol">:collect</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:place</span> <span class="punct">=&gt;</span> <span class="punct">"</span><span class="string">Location</span><span class="punct">"}</span>
-  <span class="keyword">end</span></code>
+<span class="keyword">end</span></code>
 </pre><a name='installation' id="installation"></a>
 
     <h2>installation</h2>
@@ -854,7 +858,58 @@
 
     <h2>class and singleton level definitions</h2>
 
-    <p>[todo]</p>
+    <p>You can also use <code>has</code> for class attributes:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Foo</span> <span class=
+"punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+    <span class="keyword">class </span><span class=
+"punct">&lt;&lt;</span> <span class="constant">self</span>
+      <span class="ident">has</span> <span class=
+"symbol">:doc</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="punct">"</span><span class=
+"string">This is the Foo class</span><span class="punct">"</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span></code>
+</pre>
+
+    <p>or singleton instances:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Foo</span> <span class=
+"punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+    <span class="keyword">class </span><span class=
+"punct">&lt;&lt;</span> <span class="constant">self</span>
+      <span class="ident">has</span> <span class=
+"symbol">:doc</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="punct">"</span><span class=
+"string">This is the Foo class</span><span class="punct">"</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+  
+  <span class="ident">foo</span> <span class=
+"punct">=</span> <span class="constant">Foo</span><span class=
+"punct">.</span><span class="ident">new</span>
+  <span class="keyword">class </span><span class=
+"punct">&lt;&lt;</span> <span class="ident">foo</span>
+    <span class="ident">has</span> <span class=
+"symbol">:special</span><span class="punct">,</span> <span class=
+"symbol">:default</span> <span class=
+"punct">=&gt;</span> <span class="punct">'</span><span class=
+"string">This object is special</span><span class="punct">'</span>
+  <span class="keyword">end</span>
+  <span class="ident">p</span> <span class=
+"ident">foo</span><span class="punct">.</span><span class=
+"ident">special</span>
+  <span class=
+"comment"># =&gt; 'This object is special'</span></code>
+</pre>
 
     <p align='right'><span style=
     'font-size: 8pt; color: #7c7c90'>Generated with</span><br />

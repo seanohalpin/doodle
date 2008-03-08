@@ -1,6 +1,6 @@
-$:.unshift(File.join(File.dirname(__FILE__), '../.'))
-
-require 'lib/doodle'
+$:.unshift(File.join(File.dirname(__FILE__), '../lib'))
+require 'molic_orderedhash'
+require 'doodle'
 require 'date'
 
 def undefine_const(*consts)

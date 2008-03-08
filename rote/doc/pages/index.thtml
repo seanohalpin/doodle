@@ -31,43 +31,47 @@ Putting all this together, you can initialize objects like this:
   end
 
   pp event
-  
-  #<Event:0x595394
-   @date=#<Date: 4909115/2,0,2299161>,
-   @locations=
-    [#<Location:0x5913d4 @events=[], @name="The muddy field">,
-     #<Location:0x58ef58
-      @events=[#<Event:0x58d630 @locations=[], @name="Drinking">],
-      @name="Beer tent">],
-   @name="Festival">
+  # >> #<Event:0x111dd4c
+  # >>  @date=#<Date: 4909115/2,0,2299161>,
+  # >>  @locations=
+  # >>   [#<Location:0x1117be0 @events=[], @name="The muddy field">,
+  # >>    #<Location:0x1114148
+  # >>     @events=[#<Event:0x11115b0 @locations=[], @name="Drinking">],
+  # >>     @name="Beer tent">],
+  # >>  @name="Festival">
 #:code#
 
 from a class definition like this:
 
 #:code#ruby#
-  require 'date'
-  require 'pp'
-  require 'doodle'
+require 'rubygems'
+require 'date'
+require 'pp'
+require 'doodle'
 
-  class Location < Doodle::Base
-    has :name, :kind => String
-    has :events, :init => [], :collect => :Event
-  end
+class Location < Doodle::Base
+  has :name, :kind => String
+  has :events, :init => [], :collect => :Event
+end
 
-  class Event < Doodle::Base
-    has :name, :kind => String
-    has :date do
-      kind Date
-      default { Date.today }
-      must 'be >= today' do |value|
-        value >= Date.today
-      end
-      from String do |s|
-        Date.parse(s)
-      end
+class Event
+  # or if you want to inherit from another class
+  include Doodle::Helper
+  include Doodle::Factory
+
+  has :name, :kind => String
+  has :date do
+    kind Date
+    default { Date.today }
+    must 'be >= today' do |value|
+      value >= Date.today
     end
-    has :locations, :init => [], :collect => {:place => "Location"}
-  end  
+    from String do |s|
+      Date.parse(s)
+    end
+  end
+  has :locations, :init => [], :collect => {:place => "Location"}
+end
 #:code#
 
 h2. installation
@@ -411,4 +415,32 @@ The classname can be a class constant, a symbol or a string.
 
 h2. class and singleton level definitions
 
-[todo]
+You can also use @has@ for class attributes:
+
+#:code#ruby#
+  class Foo < Doodle::Base
+    class << self
+      has :doc, :default => "This is the Foo class"
+    end
+  end
+#:code#
+
+or singleton instances:
+
+#:code#ruby#
+  class Foo < Doodle::Base
+    class << self
+      has :doc, :default => "This is the Foo class"
+    end
+  end
+  
+  foo = Foo.new
+  class << foo
+    has :special, :default => 'This object is special'
+  end
+  p foo.special
+  # => 'This object is special'
+#:code#
+
+
+
