@@ -1,5 +1,7 @@
 2008-03-12  seano  <sean.ohalpin@gmail.com>
 
+	* added init_spec
+
 	* tweaked Rakefile (don't run profile by default, fix dcov task)
 
 	* allow :collect => :name form for collecting raw
