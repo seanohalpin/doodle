@@ -22,63 +22,62 @@ describe Doodle::Attribute, 'basics' do
       end
     end
     
-    @goo = Foo.new
-    @baz = Bar.new :info => 'Hi'
+    @foo = Foo.new
+    @bar = Bar.new :info => 'Hi'
+  end
+
+  it 'should have attribute :name with default defined' do
+    @foo.attributes[:name].default.should == 'Hello'
   end
 
   it 'should have default name' do
-    #pending 'making it work'
-    #p [:name, :default, @goo.attributes[:name].default]
-    @goo.attributes[:name].default.should == 'Hello'
+    @foo.name.should == 'Hello'
   end
 
-  it 'should have default name' do
-    #pending 'making it work'
-    @goo.name.should == 'Hello'
+  it 'should not have an instance variable for a default' do
+    @foo.instance_variables.include?('@name').should == false
   end
 
   it 'should have name required == false (because has default)' do
-    #pending 'to do required/optional'
-    @goo.attributes[:name].required?.should == false
+    @foo.attributes[:name].required?.should == false
   end
 
   it 'should have info required == true' do
-    #pending 'to do required/optional'
-    @baz.attributes[:info].required?.should == true
+    @bar.attributes[:info].required?.should == true
   end
 
   it 'should have name.optional? == true (because has default)' do
-    #pending 'to do required/optional'
-    @goo.attributes[:name].optional?.should == true
+    @foo.attributes[:name].optional?.should == true
+  end
+
+  it 'should inherit attribute from parent' do
+    @bar.attributes[:name].should == @foo.attributes[:name]
   end
 
   it 'should have info.optional? == false' do
-    #pending 'to do required/optional'
-    @baz.attributes[:info].optional?.should == false
+    @bar.attributes[:info].optional?.should == false
   end
 
-  it "should have parents in order" do
+  it "should have parents in correct order" do
     Bar.parents.should == [Foo, Object]
   end
     
-  it "should have Bar's meta parents in reverse order of definition" do
-    @baz.meta.parents.should == [Bar.singleton_class.singleton_class, Bar.singleton_class, Foo.singleton_class]
+  it "should have Bar's singleton parents in reverse order of definition" do
+    @bar.singleton_class.parents.should == [Bar.singleton_class.singleton_class, Bar.singleton_class, Foo.singleton_class]
   end
 
-  it 'should have inherited meta local_attributes in order of definition' do
-    @baz.meta.class_eval { collect_inherited(:local_attributes).map { |x| x[0]} }.should == [:metadata, :doc]
+  it 'should have inherited singleton local_attributes in order of definition' do
+    @bar.singleton_class.class_eval { collect_inherited(:local_attributes).map { |x| x[0]} }.should == [:metadata, :doc]
   end
 
-  it 'should have inherited meta attributes in order of definition' do
-    @baz.meta.attributes.keys.should == [:metadata, :doc]
+  it 'should have inherited singleton attributes in order of definition' do
+    @bar.singleton_class.attributes.keys.should == [:metadata, :doc]
   end
 end
 
 describe Doodle::Attribute, 'attribute order' do
   before :each do
-    undefine_const(:A)
-    undefine_const(:B)
-    undefine_const(:C)
+    raise_if_defined :A, :B, :C
 
     class A < Doodle::Base
       has :a
@@ -91,9 +90,14 @@ describe Doodle::Attribute, 'attribute order' do
     class C < B
       has :c
     end
-
   end
 
+  after :each do
+    undefine_const(:A)
+    undefine_const(:B)
+    undefine_const(:C)
+  end
+  
   it 'should keep order of inherited attributes' do
     C.parents.should == [B, A, Doodle::Base, Object]
   end
