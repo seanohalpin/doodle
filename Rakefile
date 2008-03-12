@@ -98,9 +98,11 @@ task :flog do
   system "flog doodle.rb lib/*.rb"
 end
 
+VERSION = "0.0.4"
+
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
-  s.version = "0.0.3"
+  s.version = VERSION
   s.author = "Sean O'Halpin"
   s.email = "sean.ohalpin@gmail.com"
   s.homepage = "http://doodle.rubyforge.org/"
@@ -127,4 +129,11 @@ desc "Copy docs to rubyforge"
 task :publish_docs => [:rdoc] do
   system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
 end
+
+desc "Upload new gem"
+task :upload_gem => [:gem] do
+  sh "rubyforge add_release doodle doodle #{VERSION} pkg/doodle-#{VERSION}.gem"
+end
+
+
 
