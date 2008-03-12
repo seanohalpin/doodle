@@ -100,17 +100,17 @@ end
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
-  s.version = "0.0.2"
+  s.version = "0.0.3"
   s.author = "Sean O'Halpin"
   s.email = "sean.ohalpin@gmail.com"
   s.homepage = "http://doodle.rubyforge.org/"
   s.platform = Gem::Platform::RUBY
-  s.summary = "Declarative attribute definitions and validations"
+  s.summary = "Declarative attribute definitions, validations and conversions"
   s.files = FileList["{bin,lib,examples}/**/*"].to_a
   s.require_path = "lib"
   s.test_files = FileList["{spec}/**/*spec.rb"].to_a
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "COPYING"]
+  s.extra_rdoc_files = ["README", "COPYING", "ChangeLog"]
   s.rubyforge_project = "doodle"
 end
  
