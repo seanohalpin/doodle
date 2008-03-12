@@ -1,0 +1,37 @@
+= doodle to do list
+== TODO fix singleton init
+== TODO fix class init
+== TODO add typedef methods (e.g. date :name, string :name, etc.)
+== TODO check memory usage
+- all those closures
+- and DOODLES hash (are objects being finalised?)
+== TODO profile performance against plain old attributes
+== TODO provide full example of before vs after
+i.e. write out in full what you'd have to do to get same functionality
+perhaps also using traits and fattr
+== TODO example of using doodle to generate classes
+(e.g. write out optimised Ruby code rather than use framework)
+i.e. I could use the information gathered to generate a source file
+could also be in other language (e.g. Java, SQL DDL, etc.)
+== TODO check compatibility with ActiveRecord
+may need to rename :attributes to :doodles or something similar to
+avoid name clash
+or to access through __doodle__ method
+also, validate! method, etc.
+== TODO add errors collection
+- make compatible with AR
+- make raise exception on invalid values optional
+== TODO compare with moose
+== TODO fix messy code
+- [ ] parents
+- [ ] collect_inherited
+- [ ] embrace - maybe replace?
+== TODO simplify usage
+class Foo < Doodle
+end
+class Bar
+  include Doodling # or something similar
+end
+
+i.e. have a top-level class rather than module
+
