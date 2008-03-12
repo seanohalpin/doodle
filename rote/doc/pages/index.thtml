@@ -411,7 +411,8 @@ containing @{:method_name => ClassName}@ to the @collect@ option like this:
     end
 #:code#
 
-The classname can be a class constant, a symbol or a string.
+The classname can be a class constant, a symbol or a string. @collect@
+works for any class that provides a @<<@ method.
 
 h2. class and singleton level definitions
 

@@ -29,6 +29,10 @@ module Doodle
     def self.flatten_first_level(enum)
       enum.inject([]) {|arr, i| if i.kind_of? Array then arr.push(*i) else arr.push(i) end }
     end
+    # from facets/string/case.rb, line 80
+    def self.snake_case(camel_cased_word)
+      camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+    end
   end
 
   # internal error raised when a default was expected but not found
@@ -506,9 +510,13 @@ module Doodle
 
     # define a collector
     # - collection should provide a :<< method
-    def define_collector(collection, klass, name, &block)
+    def define_collector(collection, name, klass = nil, &block)
       # need to use string eval because passing block
-      module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end"
+      if klass.nil?
+        module_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end"
+      else
+        module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end"
+      end
     end
     private :define_collector
 
@@ -549,19 +557,20 @@ module Doodle
         if collector.kind_of?(Hash)
           collector_name, klass = collector.to_a[0]
         else
+          # if Capitalized word given, treat as classname
+          # and create collector for specific class
           klass = collector.to_s
-          collector_name = klass.downcase
+          collector_name = Utils.snake_case(klass)
+          if klass !~ /^[A-Z]/
+            klass = nil
+          end
         end
-        define_collector name, klass, collector_name
+        define_collector name, collector_name, klass
       end
       
       # d { [:has_args, :params, params] }
-      # fixme[this is a little fragile - depends on order of local_attributes in Attribute - should convert to hash args]
-      #      self_class.local_attributes[name] = attribute = Attribute.new(params, &block)        
       local_attributes[name] = attribute = Attribute.new(params, &block)        
       define_getter_setter name, *args, &block
-      
-      #super(*args, &block) if defined?(super)
       attribute
     end
 

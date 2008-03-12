@@ -7,7 +7,8 @@ require 'rubygems'
 
 task :default => [:all]
 
-all_tasks = [:spec, :rcov, :rdoc, :profile, :dcov]
+all_tasks = [:spec, :rcov, :rdoc, :dcov]
+#all_tasks = [:spec, :rcov, :rdoc, :profile, :dcov]
 desc "Run all tasks: #{all_tasks.map{|x| x.to_s}.join(', ')}"
 task :all => all_tasks
 
@@ -89,7 +90,7 @@ end
 
 desc "Documentation coverage"
 task :dcov do
-  system "dcov doodle.rb lib/*.rb"
+  system "dcov lib/doodle.rb"
 end
 
 desc "Assess complexity (with flog)"

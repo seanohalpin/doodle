@@ -1,0 +1,10 @@
+2008-03-12  seano  <sean.ohalpin@gmail.com>
+
+	* tweaked Rakefile (don't run profile by default, fix dcov task)
+
+	* allow :collect => :name form for collecting raw
+	  objects (i.e. don't do a klass.new(*args) on values)
+
+	* use snake_case (from facets) when generating name from class for
+	  collect
+
