@@ -638,29 +638,32 @@ module Doodle
     private :ivar_defined?
 
     # validate this object by applying all validations in sequence
-    def validate!
-      #d# d { [:validate!, self] }
+    # - if all == true, validate all attributes, e.g. when loaded from YAML
+    def validate!(all = false)
+      #Doodle::Debug.d { [:validate!, self] }
+      #Doodle::Debug.d { [:validate!, self, __doodle__.validation_on] }
       if __doodle__.validation_on
         attributes.each do |name, att|
-          # d { [:validate!, self, self.class, att.name, att.default_defined? ] }
-          #p collect_inherited(:attributes)
           # treat default as special case
           if att.name == :default || att.default_defined?
+            # nop
           elsif !ivar_defined?(att.name)
             raise ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
+          end
+          # if all == true, validate all attributes - e.g. when loaded from YAML
+          if all
+            att.validate(send(att.name))
           end
         end
 
         validations.each do |v|
-          #d# d { [:validate!, self, v ] }
+          Doodle::Debug.d { [:validate!, self, v ] }
           if !instance_eval(&v.block)
-            #        if !instance_eval{ v.block.call(self) }
             raise ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
           end
         end
       end
     end
-    private :validate!
 
     # turn off validation, execute block, then set validation to same
     # state as it was before +defer_validation+ was called - can be nested
