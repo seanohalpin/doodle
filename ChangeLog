@@ -1,3 +1,10 @@
+2008-03-15  Sean O'Halpin  <ohalps01@MC-S001853.local>
+
+	* added option (all=true|false) to validate! if true, will
+	validate all attributes as well as invoking object level validation
+
+	* made validate! public
+
 2008-03-12  seano  <sean.ohalpin@gmail.com>
 
 	* added init_spec

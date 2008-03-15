@@ -98,11 +98,11 @@ task :flog do
   system "flog doodle.rb lib/*.rb"
 end
 
-VERSION = "0.0.4"
+DOODLE_VERSION = "0.0.4"
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
-  s.version = VERSION
+  s.version = DOODLE_VERSION
   s.author = "Sean O'Halpin"
   s.email = "sean.ohalpin@gmail.com"
   s.homepage = "http://doodle.rubyforge.org/"
@@ -132,7 +132,7 @@ end
 
 desc "Upload new gem"
 task :upload_gem => [:gem] do
-  sh "rubyforge add_release doodle doodle #{VERSION} pkg/doodle-#{VERSION}.gem"
+  sh "rubyforge add_release doodle doodle #{DOODLE_VERSION} pkg/doodle-#{DOODLE_VERSION}.gem"
 end
 
 
