@@ -1,6 +1,4 @@
-$:.unshift(File.join(File.dirname(__FILE__), '../.'))
-
-require 'lib/doodle'
+require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe 'flatten_first_level' do
 
@@ -25,6 +23,9 @@ describe 'flatten_first_level' do
       [1, [2], 3],
       [1, [2, 3]],
       ]
+  end
+  after :each do
+    remove_ivars :data, :results
   end
 
   it 'should flatten first level' do

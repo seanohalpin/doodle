@@ -1,6 +1,4 @@
-$:.unshift(File.join(File.dirname(__FILE__), '../.'))
-
-require 'lib/spec_helper'
+require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'date'
 
 describe Doodle, 'defaults which have not been set' do

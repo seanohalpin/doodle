@@ -1,25 +1,17 @@
-$:.unshift(File.join(File.dirname(__FILE__), '../.'))
-
-require 'lib/spec_helper'
-require 'date'
+require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe Doodle, 'defaults which have not been set' do
-  after :each do
-    undefine_const(:Foo)
-  end
-  before :each do
-    raise_if_defined :Foo
-
-    class Foo < Doodle::Base
-      has :baz
-      has :start do
-        default { Date.today }
+  temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle::Base
+        has :baz
+        has :start, :default => 1
       end
     end
-  end
 
-  it 'should have raise error if required value not set' do
-    proc { Foo.new }.should raise_error(ArgumentError)
+    it 'should have raise error if required value not set' do
+      proc { Foo.new }.should raise_error(ArgumentError)
+    end
   end
 end
 

@@ -1,32 +1,48 @@
 = doodle to do list
-== TODO fix singleton init
-== TODO fix class init
+== TODO fix singleton & class init
+- I'm not happy using the class_init directive
+- may be better to treat singleton attributes differently, e.g. to
+  interpret the init at definition time rather than on object
+  initialization
+- the question then is how do you know you're in a singleton? it seems
+  to be one of those things that by checking to see if you are one,
+  you become it
 == TODO add typedef methods (e.g. date :name, string :name, etc.)
+- [ ] how should this be presented?
+  - class level directives (at attr_accessor level)
+  - within block?
 == TODO check memory usage
-- all those closures
+- all those closures - are they leaking?
 - and DOODLES hash (are objects being finalised?)
 == TODO profile performance against plain old attributes
-== TODO provide full example of before vs after
+- [ ] attr_accessor
+- [ ] attributes
+- [ ] traits
+- [ ] fattr
+== TODO Documentation
+=== TODO provide full example of before vs after
 i.e. write out in full what you'd have to do to get same functionality
 perhaps also using traits and fattr
-== TODO example of using doodle to generate classes
+=== TODO example of using doodle to generate classes
 (e.g. write out optimised Ruby code rather than use framework)
 i.e. I could use the information gathered to generate a source file
 could also be in other language (e.g. Java, SQL DDL, etc.)
-== TODO check compatibility with ActiveRecord
+== TODO Integration
+=== TODO add errors collection
+- make compatible with AR
+- make raise exception on invalid values optional
+=== TODO compare with moose
+=== TODO check compatibility with ActiveRecord
 may need to rename :attributes to :doodles or something similar to
 avoid name clash
 or to access through __doodle__ method
 also, validate! method, etc.
-== TODO add errors collection
-- make compatible with AR
-- make raise exception on invalid values optional
-== TODO compare with moose
-== TODO fix messy code
+== Fixes
+=== TODO fix messy code
 - [ ] parents
 - [ ] collect_inherited
 - [ ] embrace - maybe replace?
-== TODO simplify usage
+=== TODO simplify usage
 class Foo < Doodle
 end
 class Bar
@@ -35,3 +51,4 @@ end
 
 i.e. have a top-level class rather than module
 
+== TODO reorganize library layout to follow newgem
