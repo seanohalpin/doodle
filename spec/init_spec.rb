@@ -43,11 +43,11 @@ describe Doodle, 'init' do
     end
     it 'should have an initialized class attribute :metadata' do
       pending 'deciding how this should work'
-      Foo.metadata.should == 'D2'
+      #Foo.metadata.should == 'D2'
     end
     it 'should have an initialized singleton attribute :special' do
       pending 'deciding how this should work'
-      @foo.special.should == 'D3'
+      #@foo.special.should == 'D3'
     end
   end
 end

@@ -3,63 +3,63 @@
 
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe :DateRange, ' validation' do
-  temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
-  
-    before :each do
-      module AttributeDate
-        def date(*a, &b)
-          #    if a.size > 0
-          name = a.shift
-          #    else
-          #      name = :date
-          #    end
-          td = has(name, :kind => Date, *a) do
-            # it is a bit clumsy to define these conversions &
-            # conditions for every attribute/typedef could define a
-            # subclass of Typedef which does this by default (so
-            # instances can override or defer to class level
-            # conversions and conditions)
-            from String do |s|
-              Date.parse(s)
-            end
-            from Array do |y,m,d|
-              #p [:from, Array, y, m, d]
-              Date.new(y, m, d)
-            end
-            from Integer do |jd|
-              #Doodle::Debug.d { [:converting_from, Integer, jd] }
-              Date.new(*Date.jd_to_civil(jd))
-            end
-          end
-          #Doodle::Debug.d { [:date, td] }
-          td.instance_eval(&b) if block_given? # user's block should override default
+shared_code = proc do
+  module AttributeDate
+    def date(*a, &b)
+      #    if a.size > 0
+      name = a.shift
+      #    else
+      #      name = :date
+      #    end
+      td = has(name, :kind => Date, *a) do
+        # it is a bit clumsy to define these conversions &
+        # conditions for every attribute/typedef could define a
+        # subclass of Attribute which does this by default (so
+        # instances can override or defer to class level
+        # conversions and conditions)
+        from String do |s|
+          Date.parse(s)
+        end
+        from Array do |y,m,d|
+          #p [:from, Array, y, m, d]
+          Date.new(y, m, d)
+        end
+        from Integer do |jd|
+          #Doodle::Debug.d { [:converting_from, Integer, jd] }
+          Date.new(*Date.jd_to_civil(jd))
         end
       end
-
-      class Base < Doodle::Base
-        extend AttributeDate
-      end
-
-      class DateRange < Base
-        date :start_date do
-          #Doodle::Debug.d { [:start_date, self, self.class] }
-          default { Date.today }
-        end
-        date :end_date do
-          default { start_date }
-        end
-        must "have end_date >= start_date" do
-          end_date >= start_date
-        end
-      end
-
+      #Doodle::Debug.d { [:date, td] }
+      td.instance_eval(&b) if block_given? # user's block should override default
     end
-  
+  end
+  class Base < Doodle::Base
+    extend AttributeDate
+  end
+
+  class DateRange < Base
+    date :start_date do
+      #Doodle::Debug.d { [:start_date, self, self.class] }
+      default { Date.today }
+    end
+    date :end_date do
+      default { start_date }
+    end
+    must "have end_date >= start_date" do
+      end_date >= start_date
+    end
+  end
+end
+
+describe :DateRange, ' validation' do
+  temporary_constants :AttributeDate, :Base, :DateRange do
+
+    before :each, &shared_code
+    
     it 'should not raise an exception if end_date >= start_date' do
       proc { DateRange.new('2007-01-01', '2007-01-02') }.should_not raise_error
     end
-  
+
     it 'should raise an exception if end_date < start_date' do
       proc { DateRange.new('2007-11-01', '2007-01-02') }.should raise_error
     end
@@ -67,59 +67,13 @@ describe :DateRange, ' validation' do
 end
 
 [:DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange].each do |klass|
-  
+
   describe klass, ' validation' do
     temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
 
+      before :each, &shared_code
       before :each do
 
-        module AttributeDate
-          def date(*a, &b)
-            #    if a.size > 0
-            name = a.shift
-            #    else
-            #      name = :date
-            #    end
-            td = has(name, :kind => Date, *a) do
-              # it is a bit clumsy to define these conversions &
-              # conditions for every attribute/typedef could define a
-              # subclass of Typedef which does this by default (so
-              # instances can override or defer to class level
-              # conversions and conditions)
-              from String do |s|
-                Date.parse(s)
-              end
-              from Array do |y,m,d|
-                #p [:from, Array, y, m, d]
-                Date.new(y, m, d)
-              end
-              from Integer do |jd|
-                #Doodle::Debug.d { [:converting_from, Integer, jd] }
-                Date.new(*Date.jd_to_civil(jd))
-              end
-            end
-            #Doodle::Debug.d { [:date, td] }
-            td.instance_eval(&b) if block_given? # user's block should override default
-          end
-        end
-
-        class Base < Doodle::Base
-          extend AttributeDate
-        end
-
-        class DateRange < Base
-          date :start_date do
-            #Doodle::Debug.d { [:start_date, self, self.class] }
-            default { Date.today }
-          end
-          date :end_date do
-            default { start_date }
-          end
-          must "have end_date >= start_date" do
-            end_date >= start_date
-          end
-        end
-      
         class DerivedDateRange < DateRange
         end
 
@@ -143,13 +97,37 @@ end
         proc { @klass.new('2007-01-03', '2007-01-02') }.should raise_error(Doodle::ValidationError)
       end
 
-      bad_dates = ['Hello', Object.new, Object, Hash.new, { :key => 42 }, [], 1.2, 'tomorrow', 'today', 'yesterday', :today]
+      # distinguish between objects which have invalid classes and objects which have classes
+      # which can be converted (i.e. in from clause) but which have unconvertible values
+
+      invalid_dates = [Object.new, Object, Hash.new, { :key => 42 }, 1.2, :today]
       keys = [:start_date, :end_date]
-    
+  
       keys.each do |key|
-        bad_dates.each do |o|
-          it "should not allow #{o.inspect} for #{key}" do
+        invalid_dates.each do |o|
+          it "should not validate #{o.inspect} for #{key}" do
             proc { @klass.new(key => o) }.should raise_error(Doodle::ValidationError)
+          end
+        end
+      end
+
+      unconvertible_dates = [
+        'Hello', 
+        [], 
+        'tomorrow', 
+        'today', 
+        'yesterday',
+        "-9999999999999991-12-31",
+        "9999999999999990-12-31", 
+        9999999999999999999, 
+        -9999999999999999999,
+        ]
+      keys = [:start_date, :end_date]
+
+      keys.each do |key|
+        unconvertible_dates.each do |o|
+          it "should not convert #{o.inspect} to #{key}" do
+            proc { @klass.new(key => o) }.should raise_error(Doodle::ConversionError)
           end
         end
       end
@@ -161,21 +139,21 @@ end
                         [{ :end_date => '2007-01-01' }],
                         [{ :start_date => '2007-01-01', :end_date => '2006-01-01' }]
                        ]
-    
+  
       bad_date_pairs.each do |o|
         it "should not allow #{o.inspect[1..-2]}" do
           proc { @klass.new(*o) }.should raise_error(Doodle::ValidationError)
         end
       end
-    
-      # note, these are splatted do need [] around args
+  
+      # note, these are splatted so need [] around args
       good_dates = [
                     [[2007,1,1],[2007,1,2]],
                     [{ :start_date => '2007-01-01' }],
                     [{ :start_date => '2007-01-01', :end_date => '2007-01-01' }],
                     [{ :start_date => -1, :end_date => 0 }]
                    ]
-    
+  
       good_dates.each do |o|
         it "should allow #{o.inspect[1..-2]}" do
           proc { @klass.new(*o) }.should_not raise_error
@@ -186,54 +164,8 @@ end
 
   describe klass, ' defaults' do
     temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
-      before do
-        module AttributeDate
-          def date(*a, &b)
-            #    if a.size > 0
-            name = a.shift
-            #    else
-            #      name = :date
-            #    end
-            td = has(name, :kind => Date, *a) do
-              # it is a bit clumsy to define these conversions &
-              # conditions for every attribute/typedef could define a
-              # subclass of Typedef which does this by default (so
-              # instances can override or defer to class level
-              # conversions and conditions)
-              from String do |s|
-                Date.parse(s)
-              end
-              from Array do |y,m,d|
-                #p [:from, Array, y, m, d]
-                Date.new(y, m, d)
-              end
-              from Integer do |jd|
-                #Doodle::Debug.d { [:converting_from, Integer, jd] }
-                Date.new(*Date.jd_to_civil(jd))
-              end
-            end
-            #Doodle::Debug.d { [:date, td] }
-            td.instance_eval(&b) if block_given? # user's block should override default
-          end
-        end
-
-        class Base < Doodle::Base
-          extend AttributeDate
-        end
-
-        class DateRange < Base
-          date :start_date do
-            #Doodle::Debug.d { [:start_date, self, self.class] }
-            default { Date.today }
-          end
-          date :end_date do
-            default { start_date }
-          end
-          must "have end_date >= start_date" do
-            end_date >= start_date
-          end
-        end
-      
+      before :each, &shared_code
+      before :each do
         class DerivedDateRange < DateRange
         end
 
@@ -243,7 +175,7 @@ end
         @klass = self.class.const_get(klass)
         @dr = @klass.new
       end
-    
+  
       it 'should have default start_date == Date.today' do
         @dr.start_date == Date.today
       end
@@ -256,54 +188,8 @@ end
 
   describe klass, ' setting attributes after initialization' do
     temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
-      before do
-        module AttributeDate
-          def date(*a, &b)
-            #    if a.size > 0
-            name = a.shift
-            #    else
-            #      name = :date
-            #    end
-            td = has(name, :kind => Date, *a) do
-              # it is a bit clumsy to define these conversions &
-              # conditions for every attribute/typedef could define a
-              # subclass of Typedef which does this by default (so
-              # instances can override or defer to class level
-              # conversions and conditions)
-              from String do |s|
-                Date.parse(s)
-              end
-              from Array do |y,m,d|
-                #p [:from, Array, y, m, d]
-                Date.new(y, m, d)
-              end
-              from Integer do |jd|
-                #Doodle::Debug.d { [:converting_from, Integer, jd] }
-                Date.new(*Date.jd_to_civil(jd))
-              end
-            end
-            #Doodle::Debug.d { [:date, td] }
-            td.instance_eval(&b) if block_given? # user's block should override default
-          end
-        end
-
-        class Base < Doodle::Base
-          extend AttributeDate
-        end
-
-        class DateRange < Base
-          date :start_date do
-            #Doodle::Debug.d { [:start_date, self, self.class] }
-            default { Date.today }
-          end
-          date :end_date do
-            default { start_date }
-          end
-          must "have end_date >= start_date" do
-            end_date >= start_date
-          end
-        end
-      
+      before :each, &shared_code
+      before :each do
         class DerivedDateRange < DateRange
         end
 
@@ -327,7 +213,6 @@ end
         @dr.end_date.should == @dr.start_date
       end
 
-      # but you can do this
       it "should not raise an error when changing start_date and changing end_date using defer_validation" do
         proc {
           @dr.defer_validation do |x|
@@ -337,7 +222,6 @@ end
         }.should_not raise_error
       end
 
-      # or this
       it "should allow changing start_date and changing end_date using defer_validation" do
         @dr.defer_validation do
           start_date start_date + 1
@@ -345,7 +229,7 @@ end
         end
         @dr.start_date.should >= @dr.end_date
       end
-    
+  
       it "should not allow changing start_date to be > end_date" do
         proc {
           @dr.end_date = @dr.start_date
@@ -361,7 +245,7 @@ end
           }
         }.should raise_error(Doodle::ValidationError)
       end
-    
+  
       it "should not allow changing end_date to be < start_date" do
         proc {
           @dr.instance_eval {
@@ -369,7 +253,7 @@ end
           }
         }.should raise_error(Doodle::ValidationError)
       end
-    
+  
     end
   end
 end

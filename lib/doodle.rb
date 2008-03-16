@@ -1,18 +1,10 @@
 # doodle
 # Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
 
-# TODO: sort out duplication of errors when calling validate! after setting incorrect value has already generated entry
-# TODO: should be simpler way of getting to errors collection
-# TODO: need some way of accessing containing object from attribute
-# TODO: check garbage collection of attributes
-# TODO: formalize content of errors collection - e.g. include attribute name
-#       - do I want to save the call stack? probably
+require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
 
-require 'molic_orderedhash'  # todo[replace this with own (required function only) version]
-
-# *doodle* is my attempt at a metaprogramming framework that does not
-# have to inject methods into core Ruby objects such as Object, Class
-# and Module.
+# *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
+# have pollute core Ruby objects such as Object, Class and Module.
 
 # While doodle itself is useful for defining classes, my main goal is to
 # come up with a useful DSL notation for class definitions which can be
@@ -23,16 +15,16 @@ require 'molic_orderedhash'  # todo[replace this with own (required function onl
 module Doodle
   module Debug
     class << self
-      # output result of block if DEBUG_DOODLE set
+      # output result of block if ENV['DEBUG_DOODLE'] set
       def d(&block)
         p(block.call) if ENV['DEBUG_DOODLE']
       end
     end
   end
 
-  module Utils
-    # Unnest arrays by one level of nesting - for example, [1, [[2], 3]] => [1, [2], 3].
-    # This is a function to avoid changing base classes.
+  # Set of utility functions to avoid changing base classes
+  module Utils    
+    # Unnest arrays by one level of nesting, e.g. [1, [[2], 3]] => [1, [2], 3].
     def self.flatten_first_level(enum)
       enum.inject([]) {|arr, i| if i.kind_of? Array then arr.push(*i) else arr.push(i) end }
     end
@@ -305,8 +297,8 @@ module Doodle
     private :__doodle__
     
     # handle errors either by collecting in :errors or raising an exception
-    def handle_error(*args)
-      __doodle__.errors << args
+    def handle_error(name, *args)
+      __doodle__.errors << [name, *args]
       if DoodleInfo.raise_exception_on_error
         raise *args
       end
@@ -381,7 +373,7 @@ module Doodle
       if tf
         a = collect_inherited(:local_conversions).inject(OrderedHash.new){ |hash, item|
           #p [:hash, hash, :item, item]
-          hash.merge(Hash[*item])
+          hash.merge(OrderedHash[*item])
         }.merge(self.local_conversions)
         # d { [:conversions, self.to_s, a] }
         a
@@ -394,7 +386,7 @@ module Doodle
     def lookup_attribute(name)
       # (look at singleton attributes first)
       # fixme[this smells like a hack to me - why not handled in attributes?]
-      att = meta.attributes[name] || attributes[name]
+      meta.attributes[name] || attributes[name]
     end
     private :lookup_attribute
 
@@ -428,23 +420,19 @@ module Doodle
         v
       else
         # handle default
+        # Note: use :init => value to cover cases where defaults don't work
+        # (e.g. arrays that disappear when you go out of scope)
         att = lookup_attribute(name)
-        #d { [:getter, name, att,  block] }
+        #d { [:getter, name, att, block] }
         if att.default_defined?
           if att.default.kind_of?(Proc)
-            default = instance_eval(&att.default)
+            instance_eval(&att.default)
           else
-            default = att.default
+            att.default
           end
-          #d { [:_getter, :default, name, default] } Note: once the
-          # default is accessed, the instance variable is set. I think
-          # I would prefer not to do this and to have :init => value
-          # instead to cover cases where defaults don't work
-          # (e.g. arrays that disappear when you go out of scope)
-          #instance_variable_set("@#{name}", default)
-          default
         else
-          handle_error NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
+          # This is an internal error (i.e. shouldn't happen)
+          handle_error name, NoDefaultError, "Internal error - '#{name}' has no default defined", [caller[-1]]
         end
       end
     end
@@ -520,7 +508,7 @@ module Doodle
           end
         end
       rescue => e
-        handle_error ValidationError, e.to_s, [caller[-1]]
+        handle_error name, ConversionError, e.to_s, [caller[-1]]
       end
       value
     end
@@ -532,7 +520,7 @@ module Doodle
       validations.each do |v|
         Doodle::Debug.d { [:validate, self, v, args ] }
         if !v.block[value]
-          handle_error ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
+          handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
       #d { [:validate, :value, value ] }
@@ -588,7 +576,7 @@ module Doodle
       name = args.shift.to_sym
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
-      handle_error ArgumentError, "Too many arguments" if positional_args.size > 0
+      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
       # d { [:has_args, self, key_values, positional_args, args] }
       params = { :name => name }
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
@@ -622,13 +610,13 @@ module Doodle
           #p [:arg_order, 1, self, self.class, args]
           args.uniq!
           args.each do |x|
-            handle_error ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
-            handle_error NameError, "#{x} not an attribute name" if !attributes.keys.include?(x)
+            handle_error :arg_order, ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
+            handle_error :arg_order, NameError, "#{x} not an attribute name" if !attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
           #p [InvalidOrderError, e.to_s]
-          handle_error InvalidOrderError, e.to_s, [caller[-1]]
+          handle_error :arg_order, InvalidOrderError, e.to_s, [caller[-1]]
         end
       else
         #p [:arg_order, 3, self, self.class, :default]
@@ -689,7 +677,7 @@ module Doodle
           if att.name == :default || att.default_defined?
             # nop
           elsif !ivar_defined?(att.name)
-            handle_error ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
+            handle_error name, ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
           # if all == true, validate all attributes - e.g. when loaded from YAML
           if all
@@ -700,7 +688,7 @@ module Doodle
         validations.each do |v|
           #Doodle::Debug.d { [:validate!, self, v ] }
           if !instance_eval(&v.block)
-            handle_error ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
+            handle_error :validate!, ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
           end
         end
       end

@@ -1,4 +1,11 @@
 = doodle to do list
+== TODO sort out duplication of errors when calling validate! after setting incorrect value has already generated entry
+== TODO should be simpler way of getting to errors collection
+== TODO need some way of accessing containing object from attribute
+== TODO check garbage collection of attributes
+== TODO formalize content of errors collection
+- e.g. include attribute name
+- do I want to save the call stack? probably
 == TODO fix singleton & class init
 - I'm not happy using the class_init directive
 - may be better to treat singleton attributes differently, e.g. to
@@ -14,31 +21,32 @@
 == TODO check memory usage
 - all those closures - are they leaking?
 - and DOODLES hash (are objects being finalised?)
-== TODO profile performance against plain old attributes
+== TODO profile performance against plain old attributes [0/4]
 - [ ] attr_accessor
 - [ ] attributes
 - [ ] traits
 - [ ] fattr
-== TODO Documentation
-=== TODO provide full example of before vs after
-i.e. write out in full what you'd have to do to get same functionality
-perhaps also using traits and fattr
-=== TODO example of using doodle to generate classes
-(e.g. write out optimised Ruby code rather than use framework)
+== TODO Documentation [0/2]
+- [ ] provide full example of before vs after 
+      - i.e. write out in full what you'd have to do to get same
+        functionality perhaps also using traits and fattr
+- [ ] example of using doodle to generate classes 
+- (e.g. write out optimised Ruby code rather than use framework)
 i.e. I could use the information gathered to generate a source file
-could also be in other language (e.g. Java, SQL DDL, etc.)
+- could also be in other language (e.g. Java, SQL DDL, etc.)
+  (see SQL tables definition example)
 == TODO Integration
-=== TODO add errors collection
-- make compatible with AR
-- make raise exception on invalid values optional
+=== TODO add errors collection [1/1]
+- compatibility with AR? do I need/want that?
+- [X] make raise exception on invalid values optional
 === TODO compare with moose
 === TODO check compatibility with ActiveRecord
-may need to rename :attributes to :doodles or something similar to
-avoid name clash
-or to access through __doodle__ method
-also, validate! method, etc.
+- may need to rename :attributes to :doodles or something similar to
+  avoid name clash
+- or to access through __doodle__ method
+- also, validate! method, etc.
 == Fixes
-=== TODO fix messy code
+=== TODO fix messy code [0/3]
 - [ ] parents
 - [ ] collect_inherited
 - [ ] embrace - maybe replace?

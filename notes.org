@@ -1,4 +1,16 @@
 #+TAGS: test(t) benchmark(b) doc(d) cov(c) feature(f)
+= Organize these notes and docs
+== Categorize
+=== public interface
+==== features
+===== existing features
+====== bugs
+===== planned features
+===== experimental features
+====== datatypes
+=== implementation
+=== rationale
+=== other?
 = Notes on doodle
 
 See also [[file:~/doodle-bugs.mm]]
@@ -15,7 +27,9 @@ I've put in a class_init method which does a basic initializaton after
 calling the block - but don't want to repeat initialize_from_hash -
 (but borks on arg_order if I call that)
 
-=== DONE :init => value/proc {} ?
+Need to address this in a more systematic way
+
+=== DONE Initial values :init => value/proc {} ?
 
    Do I need an initialize with default method? i.e. set an initial
 value - a different concept to the default value? i.e. set only once
@@ -68,7 +82,7 @@ stash away somewhere so can be retrieved later
 
 ==== ignore
 quietly discard - this is probably the least appealing option - don't
-want to lose info without raising alert
+want to lose info without raising alert (e.g. could be misspelling)
 
 === TODO Inherited attributes                                             :test:
 
@@ -104,13 +118,16 @@ See [[file:lib/doodle.rb::bump%20off%20validate%20for%20Attributes%20maybe%20bet
   as default derived value) - this might be quite tricky to fix
 - if I don't set default on access, then array defaults can be updated
   without setting instance_variable (which means the update is lost)
+- 2008-03-16: this has been addressed with :init => value option -
+  defaults no longer create an instance variable
 
-=== TODO validate array members
+=== TODO Validate array members
 
 - do I want to enforce kind of array members? 'typesafe' containers?
   - e.g. ensure that all members of array are Things
+  - 2008-03-16: this is partly addressed with :collect interface
 
-=== DONE singleton attribute defaults
+=== DONE Singleton attribute defaults
 
 - because singleton objects do not have an initialize which is called,
   defaults don't work (I think this is the reason) - fix this
@@ -124,7 +141,7 @@ initialization so I can do Thing.new(other)
 - would need to be careful about infinite regression
 - need to test conversions on input
 
-=== TODO factory functions
+=== TODO Factory functions
 
 Some wrinkles with factory functions - not always defined properly?
 Anonymous classes, etc. Need to test in modules, etc.
@@ -140,23 +157,33 @@ is the same as:
 
   Cat.new(:name => 'Ren')
 
-As the notion of a factory function is somewhat contentious [xref
-ruby-talk], you need to explicitly ask for them by including Factory
-in your base class:
+The notion of a factory function is somewhat contentious [xref
+ruby-talk], so while you get them automatically when deriving from
+Doodle::Base, you need to explicitly ask for them by including Factory
+in your base class if you use Doodle by including Doodle::Helper:
 
-  class Base < Doodle::Root
-    include Factory
+  class Base < Doodle::Base
   end
 
   class Dog < Base
+    has :name
   end
 
   stimpy = Dog(:name => 'Stimpy')
 
+but
+
+  class Cat
+    include Doodle::Helper
+    include Doodle::Factory
+    has :name
+  end
+
+  ren = Cat('Ren')
 etc.
 
 
-=== TODO collector
+=== DONE Collector
 
   has :locations, :init => [], :collect => Location
 
@@ -193,35 +220,35 @@ work? Would get around the default vs init treatment of procs maybe?
 === attribute accessors [2/2]
 
 - [X] getter_setter
-- [X] default set on access
--- or not?
+- [X] default does not create an instance_variable
+- [X] init does create an instance_variable
 
 === defaults [4/4]
 
 Unless a default is specified, an attribute is assumed to be required.
-You can specify a default of nil if that is what you want.
+You can specify :default => nil :init => nil if that is what you want.
 
 - [X] default value
 -- :default => value
 -- :default => proc {}
 -- do default value end
 -- do default do ... end end
-- [X] optional if has default, required otherwise
+- [X] optional if has :default or :init, required otherwise
 - [X] enforce required
 - [X] When handling defaults, want to be able to execute default block
-  in context of instance, e.g.
+      in context of instance, e.g.
 
-  class DateRange < Doodle::Root 
-    has :start_date, :kind => Date do
-      default { Date.today }
-    end
-    has :end_date, :kind => Date do
-      default { start_date }
-    end
-  end
+        class DateRange < Doodle::Root 
+          has :start_date, :kind => Date do
+            default { Date.today }
+          end
+          has :end_date, :kind => Date do
+            default { start_date }
+          end
+        end
 
-  dr = DateRange.new
-  dr.end_date # => Date.today
+        dr = DateRange.new
+        dr.end_date # => Date.today
 
 === validation and conversion [7/7]
 
@@ -247,37 +274,16 @@ However, to see what can be done, see
 [[file:examples/datatypes.rb][file:~/scratch/doodle/trunk/examples/datatypes.rb]] and
 [[file:examples/application-model.rb][file:~/scratch/doodle/trunk/examples/application-model.rb]] 
 
-== Hide behind extension instance_variable?
+== DONE Hide behind extension __doodle__
 
-e.g. rather than pollute the instance variable namespace with my
-variables, it might be better to hang them all off another structure,
-e.g. @__doodle__ and access everything through that
+Rather than pollute the instance variable namespace with my variables,
+I've chosen to hang all Doodle related info off another structure,
+i.e. the method :__doodle__ and access everything through that
 
-could even be a 'hidden' variable accessible only through method, e.g.
+This gives access to a DoodleInfo object which is stored centrally
+inside the DoodleInfo::DOODLES hash (keyed by object_id).
 
-class Foo
-  def initialize
-    doodle = DoodleData.new
-    define_method :doodle do
-      doodle
-    end
-  end
-end
-
-or even use object id and global hash, e.g.
-
-  def doodle
-    Doodle.definitions[object_id]
-  end
-
-  then o.doodle.attributes
-
-but that could get v slow
-
-also issue with objects disappearing before method references
-(can that happen?)
-
-== NEW Typedef has :init => value as well as default
+== DONE Attribute has :init => value as well as default
 
 this is different to default - this sets the value in initialization
 and so creates an instance variable whereas default never creates an
@@ -294,3 +300,16 @@ class_init do
 end
 == singleton instance attributes
 o.singleton_class.has :name
+
+= Address community questions
+== Serialization
+== Compatibility with other libraries
+=== ActiveRecord
+=== Sequel
+=== JRuby
+=== Ruby 1.9
+=== Rubinius
+== How to do something comparable to has_many/belongs_to
+== Performance
+== Use cases
+=== TODO Example real-world use cases

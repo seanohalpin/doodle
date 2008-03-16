@@ -98,7 +98,7 @@ task :flog do
   system "flog doodle.rb lib/*.rb"
 end
 
-DOODLE_VERSION = "0.0.4"
+DOODLE_VERSION = "0.0.5"
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
@@ -108,7 +108,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://doodle.rubyforge.org/"
   s.platform = Gem::Platform::RUBY
   s.summary = "Declarative attribute definitions, validations and conversions"
-  s.files = FileList["{bin,lib,examples}/**/*"].to_a
+  s.files = FileList["{bin,lib}/**/*"].to_a + FileList["{examples}/**/e*.rb"].to_a
   s.require_path = "lib"
   s.test_files = FileList["{spec}/**/*spec.rb"].to_a
   s.has_rdoc = true
@@ -132,6 +132,7 @@ end
 
 desc "Upload new gem"
 task :upload_gem => [:gem] do
+  sh "rubyforge --login"
   sh "rubyforge add_release doodle doodle #{DOODLE_VERSION} pkg/doodle-#{DOODLE_VERSION}.gem"
 end
 
