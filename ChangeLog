@@ -12,6 +12,7 @@
   without raising an exception (which is the default behaviour)
   - errors - returns array of error information
   - clear_errors - clears errors array
+  - this is still a bit rough - work in progress
 
 - fixed problem with init borking when given non-cloneable object (e.g. Fixnum)
 
