@@ -1,6 +1,13 @@
 # doodle
 # Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
 
+# TODO: sort out duplication of errors when calling validate! after setting incorrect value has already generated entry
+# TODO: should be simpler way of getting to errors collection
+# TODO: need some way of accessing containing object from attribute
+# TODO: check garbage collection of attributes
+# TODO: formalize content of errors collection - e.g. include attribute name
+#       - do I want to save the call stack? probably
+
 require 'molic_orderedhash'  # todo[replace this with own (required function only) version]
 
 # *doodle* is my attempt at a metaprogramming framework that does not
@@ -190,10 +197,6 @@ module Doodle
           break
         end
       end
-      # d { [:collect_inherited, :result, message, result] }
-      if self.class.respond_to?(message)
-        result.unshift(*self.class.send(message))
-      end
       result
     end
     private :collect_inherited
@@ -255,11 +258,20 @@ module Doodle
 
   class DoodleInfo
     DOODLES = {}
+    @@raise_exception_on_error = true
     attr_accessor :local_attributes
     attr_accessor :local_validations
     attr_accessor :local_conversions
     attr_accessor :validation_on
     attr_accessor :arg_order
+    attr_accessor :errors
+    
+    def self.raise_exception_on_error
+      @@raise_exception_on_error
+    end
+    def self.raise_exception_on_error=(tf)
+      @@raise_exception_on_error = tf
+    end
     
     def initialize(object)
       @local_attributes = OrderedHash.new
@@ -267,8 +279,12 @@ module Doodle
       @validation_on = true
       @local_conversions = {}
       @arg_order = []
+      @errors = []
+
       oid = object.object_id
       ObjectSpace.define_finalizer(object) do
+        # this seems to be called only on exit
+        Doodle::Debug.d { "finalizing #{oid}" }
         DOODLES.delete(oid)
       end
     end
@@ -281,13 +297,36 @@ module Doodle
     include Inherited
 
     # this is the only way to get at internal values
-    # FIXME: this is going to leak memory
+    # FIXME: this is going to leak memory (I think)
     
     def __doodle__
       DoodleInfo::DOODLES[object_id] ||= DoodleInfo.new(self)
     end
     private :__doodle__
     
+    # handle errors either by collecting in :errors or raising an exception
+    def handle_error(*args)
+      __doodle__.errors << args
+      if DoodleInfo.raise_exception_on_error
+        raise *args
+      end
+    end
+
+    # get list of errors
+    def errors
+      errs = attributes.inject([]) do |e, (n, a)|
+        e.push(*a.send(:__doodle__).errors)
+        e
+      end
+      errs.push(__doodle__.errors).reject{|x| x.size == 0}
+    end
+    def clear_errors
+      attributes.each do |n, a|
+        a.send(:__doodle__).errors.clear
+      end
+      __doodle__.errors.clear
+    end
+
     # return attributes defined in instance
     def local_attributes
       __doodle__.local_attributes
@@ -321,7 +360,9 @@ module Doodle
     # - if tf == false, returns only those validations defined in the current object/class
     def validations(tf = true)
       if tf
-        local_validations.push(*collect_inherited(:local_validations))
+        #p [:inherited_validations, collect_inherited(:local_validations)]
+        #p [:local_validations, local_validations]
+        local_validations + collect_inherited(:local_validations)
       else
         local_validations
       end
@@ -403,7 +444,7 @@ module Doodle
           #instance_variable_set("@#{name}", default)
           default
         else
-          raise NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
+          handle_error NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
         end
       end
     end
@@ -424,7 +465,7 @@ module Doodle
         #d { [:_setter, :instance_variable_set, ivar, args ] }
         v = instance_variable_set(ivar, *args)
       end
-      validate!
+      validate!(false)
       v
     end
     private :_setter
@@ -479,7 +520,7 @@ module Doodle
           end
         end
       rescue => e
-        raise ValidationError, e.to_s, [caller[-1]]
+        handle_error ValidationError, e.to_s, [caller[-1]]
       end
       value
     end
@@ -491,7 +532,7 @@ module Doodle
       validations.each do |v|
         Doodle::Debug.d { [:validate, self, v, args ] }
         if !v.block[value]
-          raise ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
+          handle_error ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
       #d { [:validate, :value, value ] }
@@ -547,7 +588,7 @@ module Doodle
       name = args.shift.to_sym
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
-      raise ArgumentError, "Too many arguments" if positional_args.size > 0
+      handle_error ArgumentError, "Too many arguments" if positional_args.size > 0
       # d { [:has_args, self, key_values, positional_args, args] }
       params = { :name => name }
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
@@ -581,13 +622,13 @@ module Doodle
           #p [:arg_order, 1, self, self.class, args]
           args.uniq!
           args.each do |x|
-            raise Exception, "#{x} not a Symbol" if !(x.class <= Symbol)
-            raise Exception, "#{x} not an attribute name" if !attributes.keys.include?(x)
+            handle_error ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
+            handle_error NameError, "#{x} not an attribute name" if !attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
           #p [InvalidOrderError, e.to_s]
-          raise InvalidOrderError, e.to_s, [caller[-1]]
+          handle_error InvalidOrderError, e.to_s, [caller[-1]]
         end
       else
         #p [:arg_order, 3, self, self.class, :default]
@@ -610,7 +651,7 @@ module Doodle
         # d { [:initialize, :arg_keywords, arg_keywords] }
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
-        init_values = attributes.select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| hash[n] = a.init.clone; hash }
+        init_values = attributes.select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| hash[n] = a.init.clone rescue a.init; hash }
           
         # add to start of key_values (so can be overridden by params)
         key_values.unshift(init_values)
@@ -638,8 +679,8 @@ module Doodle
     private :ivar_defined?
 
     # validate this object by applying all validations in sequence
-    # - if all == true, validate all attributes, e.g. when loaded from YAML
-    def validate!(all = false)
+    # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
+    def validate!(all = true)
       #Doodle::Debug.d { [:validate!, self] }
       #Doodle::Debug.d { [:validate!, self, __doodle__.validation_on] }
       if __doodle__.validation_on
@@ -648,7 +689,7 @@ module Doodle
           if att.name == :default || att.default_defined?
             # nop
           elsif !ivar_defined?(att.name)
-            raise ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
+            handle_error ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
           # if all == true, validate all attributes - e.g. when loaded from YAML
           if all
@@ -657,9 +698,9 @@ module Doodle
         end
 
         validations.each do |v|
-          Doodle::Debug.d { [:validate!, self, v ] }
+          #Doodle::Debug.d { [:validate!, self, v ] }
           if !instance_eval(&v.block)
-            raise ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
+            handle_error ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
           end
         end
       end
@@ -676,7 +717,7 @@ module Doodle
       ensure
         __doodle__.validation_on = old_validation
       end
-      validate!
+      validate!(false)
       v
     end
 
@@ -775,7 +816,7 @@ module Doodle
     # it will fail because Attribute is not a kind of Date -
     # obviously, I have to think about this some more :S
     #
-    def validate!
+    def validate!(all = true)
     end
 
     # is this attribute optional? true if it has a default defined for it

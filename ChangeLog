@@ -1,19 +1,36 @@
-2008-03-15  Sean O'Halpin  <ohalps01@MC-S001853.local>
+= ChangeLog for doodle
 
-	* added option (all=true|false) to validate! if true, will
-	validate all attributes as well as invoking object level validation
+== 2008-03-16
 
-	* made validate! public
+- fixed dumb bug where validations were getting duplicated resulting from using push on the source array. D'oh! 
 
-2008-03-12  seano  <sean.ohalpin@gmail.com>
+- added Doodle::DoodleInfo.raise_exception_on_error - set to false to have errors collected only
+  without raising an exception (which is the default behaviour)
+  - errors - returns array of error information
+  - clear_errors - clears errors array
 
-	* added init_spec
+- fixed problem with init borking when given non-cloneable object (e.g. Fixnum)
 
-	* tweaked Rakefile (don't run profile by default, fix dcov task)
+- added serialize_spec
 
-	* allow :collect => :name form for collecting raw
-	  objects (i.e. don't do a klass.new(*args) on values)
+- validate! now validates all attributes too by default (no need to use validate!(true) any more)
 
-	* use snake_case (from facets) when generating name from class for
-	  collect
+== 2008-03-15  Sean O'Halpin  <ohalps01@MC-S001853.local>
+
+- added option (all=true|false) to validate! if true, will
+  validate all attributes as well as invoking object level validation
+
+- made validate! public
+
+== 2008-03-12  seano  <sean.ohalpin@gmail.com>
+
+- added init_spec
+
+- tweaked Rakefile (don't run profile by default, fix dcov task)
+
+- allow :collect => :name form for collecting raw
+  objects (i.e. don't do a klass.new(*args) on values)
+
+- use snake_case (from facets) when generating name from class for
+  collect
 
