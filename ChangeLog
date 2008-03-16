@@ -1,6 +1,10 @@
 = ChangeLog for doodle
 
-== 2008-03-16
+== 0.0.5 / 2008-03-16
+
+- added collector_spec
+
+- tidied up validation specs
 
 - fixed dumb bug where validations were getting duplicated resulting from using push on the source array. D'oh! 
 
