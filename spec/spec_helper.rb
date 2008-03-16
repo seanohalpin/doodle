@@ -1,8 +1,11 @@
-$:.unshift(File.join(File.dirname(__FILE__), '../lib'))
-require 'molic_orderedhash'
-require 'doodle'
+DEVLIB = File.join(File.dirname(__FILE__), '..', 'lib')
+$:.unshift DEVLIB
+# make sure we get the development versions
+require "#{DEVLIB}/molic_orderedhash"
+require "#{DEVLIB}/doodle.rb"
 require 'date'
 
+# functions to help clean up namespace after defining classes
 def undefine_const(*consts)
   consts.each do |const|
     if Object.const_defined?(const)
