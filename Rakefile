@@ -98,7 +98,7 @@ task :flog do
   system "flog doodle.rb lib/*.rb"
 end
 
-DOODLE_VERSION = "0.0.5"
+DOODLE_VERSION = "0.0.6"
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
