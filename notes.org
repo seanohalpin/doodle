@@ -79,6 +79,7 @@ raise error if unrecognised arguments in init
 
 ==== accept
 stash away somewhere so can be retrieved later
+- this is what is currently happening - creates instance vars for unrecognised values
 
 ==== ignore
 quietly discard - this is probably the least appealing option - don't

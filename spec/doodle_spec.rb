@@ -1,24 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe Doodle, 'basics' do
-  temporary_constant :Foo do
-    before(:each) do
-      class Foo
-        include Doodle::Helper
-      end
-      @foo = Foo.new
-    end
-    after :each do
-      remove_ivars :foo
-    end
-
-    it 'should have meta as synonym for singleton_class' do
-      Foo.singleton_class.should == Foo.meta
-      @foo.singleton_class.should == @foo.meta
-    end
-  end
-end
-
 describe Doodle, 'instance attributes' do
   temporary_constant :Foo do
     before(:each) do
@@ -87,11 +68,11 @@ describe Doodle, 'class attributes(false)' do
     end
 
     it "should list all class's own attributes" do
-      Foo.meta.attributes(false).keys.should == [:metadata]
+      Foo.singleton_class.attributes(false).keys.should == [:metadata]
     end
   
     it "should list all class's own attributes" do
-      Foo.meta.attributes.keys.should == [:metadata]
+      Foo.singleton_class.attributes.keys.should == [:metadata]
     end
   end
 end
@@ -156,19 +137,19 @@ describe Doodle, 'inherited class attributes(false)' do
     end
   
     it "should list class's own attributes" do
-      Foo.meta.attributes(false).keys.should == [:metadata]
+      Foo.singleton_class.attributes(false).keys.should == [:metadata]
     end
   
     it "should list all class's own attributes" do
-      Foo.meta.attributes.keys.should == [:metadata]
+      Foo.singleton_class.attributes.keys.should == [:metadata]
     end
 
     it "should list class's own attributes(false)" do
-      Bar.meta.attributes(false).keys.should == [:doc]
+      Bar.singleton_class.attributes(false).keys.should == [:doc]
     end
 
     it "should list all inherited meta class attributes" do
-      Bar.meta.attributes.keys.should == [:metadata, :doc]
+      Bar.singleton_class.attributes.keys.should == [:metadata, :doc]
     end
 
     it "should list all inherited class's attributes" do
@@ -203,11 +184,11 @@ describe Doodle, 'singleton class attributes' do
     end
 
     it 'should list instance attributes' do
-      @foo.meta.attributes(false).keys.should == [:special]
+      @foo.singleton_class.attributes(false).keys.should == [:special]
     end
 
     it 'should list instance attributes' do
-      @foo.meta.attributes.keys.should == [:metadata, :special]
+      @foo.singleton_class.attributes.keys.should == [:metadata, :special]
     end
   end
 end
@@ -261,20 +242,20 @@ describe Doodle, 'inherited singleton class attributes' do
     end
 
     it 'should list instance meta attributes' do
-      @foo.meta.attributes(false).keys.should == [:special]
-      @bar.meta.attributes(false).keys.should == [:extra]
+      @foo.singleton_class.attributes(false).keys.should == [:special]
+      @bar.singleton_class.attributes(false).keys.should == [:extra]
     end
 
     it 'should list instance attributes' do
-      @foo.meta.attributes.keys.should == [:metadata, :special]
-      @bar.meta.attributes.keys.should == [:metadata, :doc, :extra]
+      @foo.singleton_class.attributes.keys.should == [:metadata, :special]
+      @bar.singleton_class.attributes.keys.should == [:metadata, :doc, :extra]
     end
   
     it 'should keep meta attributes separate' do
       @foo.special = 'foo special'
       @foo.special.should == 'foo special'
-      @foo.meta.metadata = 'foo meta'
-      @foo.meta.metadata.should == 'foo meta'
+      @foo.singleton_class.metadata = 'foo meta'
+      @foo.singleton_class.metadata.should == 'foo meta'
       # note: you cannot set any other values on @bar until you have set @bar.extra because it's defined as required
       @bar.extra = 'bar extra'
       @bar.extra.should == 'bar extra'
@@ -287,7 +268,7 @@ describe Doodle, 'inherited singleton class attributes' do
 
       # now make sure they haven't bumped each other off
       @foo.special.should == 'foo special'
-      @foo.meta.metadata.should == 'foo meta'
+      @foo.singleton_class.metadata.should == 'foo meta'
       @bar.extra.should == 'bar extra'
       Foo.metadata.should == 'Foo meta'
       Bar.metadata.should == 'Bar meta'
@@ -298,11 +279,11 @@ describe Doodle, 'inherited singleton class attributes' do
       @bar.extra = 'bar extra'
       @bar.extra.should == 'bar extra'
       # pending 'working out how to make this work' do
-      #   @bar.meta.metadata = 'bar meta metadata'
-      #   @bar.meta.metadata.should == 'bar meta metadata'
-      #   @bar.meta.doc = 'bar doc'
-      #   @bar.meta.doc.should == 'bar doc'
-      #   proc { @foo.meta.doc = 1 }.should raise_error(NoMethodError)
+      #   @bar.singleton_class.metadata = 'bar meta metadata'
+      #   @bar.singleton_class.metadata.should == 'bar meta metadata'
+      #   @bar.singleton_class.doc = 'bar doc'
+      #   @bar.singleton_class.doc.should == 'bar doc'
+      #   proc { @foo.singleton_class.doc = 1 }.should raise_error(NoMethodError)
       # end
     end
   end

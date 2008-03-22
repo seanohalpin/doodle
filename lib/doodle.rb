@@ -50,10 +50,7 @@ module Doodle
   # provides more direct access to the singleton class and a way to
   # treat Modules and Classes equally in a meta context
   module SelfClass
-    # return self if a Module, else the singleton class
-    def self_class
-      self.kind_of?(Module) ? self : singleton_class
-    end
+
     # return the 'singleton class' of an object, optionally executing
     # a block argument in the (module/class) context of that object
     def singleton_class(&block)
@@ -61,10 +58,15 @@ module Doodle
       sc.module_eval(&block) if block_given?
       sc
     end
-    # an alias for singleton_class
-    alias :meta :singleton_class
+
+    # return self if a Module, else the singleton class
+    def self_class
+      self.kind_of?(Module) ? self : singleton_class
+    end
+    
+    # frankly a hack to allow init options to work for singleton classes
     def class_init(params = {}, &block)
-      sc = singleton_class &block
+      sc = singleton_class(&block)
       sc.attributes.select{|n, a| a.init_defined? }.each do |n, a|
         send(n, a.init)
       end
@@ -116,8 +118,8 @@ module Doodle
             if cap = self.to_s.match(regex)
               if cap.captures.size > 0
                 k = const_get(cap[1])
-                if k.respond_to?(:superclass) && k.superclass.respond_to?(:meta)
-                  klasses.unshift k.superclass.meta
+                if k.respond_to?(:superclass) && k.superclass.respond_to?(:singleton_class)
+                  klasses.unshift k.superclass.singleton_class
                 end
               end
               #p [:klass_self_klass, klass]
@@ -300,7 +302,7 @@ module Doodle
     def handle_error(name, *args)
       __doodle__.errors << [name, *args]
       if DoodleInfo.raise_exception_on_error
-        raise *args
+        raise(*args)
       end
     end
 
@@ -386,7 +388,7 @@ module Doodle
     def lookup_attribute(name)
       # (look at singleton attributes first)
       # fixme[this smells like a hack to me - why not handled in attributes?]
-      meta.attributes[name] || attributes[name]
+      singleton_class.attributes[name] || attributes[name]
     end
     private :lookup_attribute
 
@@ -463,8 +465,10 @@ module Doodle
     def from(*args, &block)
       # d { [:from, self, self.class, self.name, args, block] }
       if block_given?
-        # setting rule
-        local_conversions[*args] = block
+        # set the rule for each arg given
+        args.each do |arg|
+          local_conversions[arg] = block
+        end
         # d { [:from, conversions] }
       else
         convert(*args)
@@ -630,26 +634,41 @@ module Doodle
     def initialize_from_hash(*args)
       defer_validation do
         # hash initializer
-        # separate into positional args and hashes (keyword => value)
+        # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        # d { [:initialize, :key_values, key_values, :args, args] }
+        Doodle::Debug.d { [:initialize_from_hash, :key_values, key_values, :args, args] }
 
-        # use idiom to create hash from array of assocs
+        # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
         arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
         # d { [:initialize, :arg_keywords, arg_keywords] }
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
-        init_values = attributes.select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| hash[n] = a.init.clone rescue a.init; hash }
-          
-        # add to start of key_values (so can be overridden by params)
+        init_values = attributes.select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| 
+          hash[n] = begin
+            case a.init
+            when NilClass, TrueClass, FalseClass, Fixnum
+              a.init
+            else
+              a.init.clone 
+            end
+          rescue 
+            a.init
+          end
+          ; hash }
+
+        # add to start of key_values array (so can be overridden by params)
         key_values.unshift(init_values)
 
         # merge all hash args into one
-        key_values = key_values.inject(arg_keywords){ |hash, item| hash.merge(item)}
-        # d { [:initialize, :key_values, key_values] }
+        key_values = key_values.inject(arg_keywords) { |hash, item| hash.merge(item)}
+
+        # convert key names to symbols
+        key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
+        Doodle::Debug.d { [:initialize_from_hash, :key_values2, key_values, :args2, args] }
+        
+        # create attributes
         key_values.keys.each do |key|
-          key = key.to_sym
-          # d { [:initialize_from_hash, :setting, key, key_values[key]] }
+          Doodle::Debug.d { [:initialize_from_hash, :setting, key, key_values[key]] }
           if respond_to?(key)
             send(key, key_values[key])
           else
@@ -692,6 +711,8 @@ module Doodle
           end
         end
       end
+      # if OK, then return self
+      self
     end
 
     # turn off validation, execute block, then set validation to same

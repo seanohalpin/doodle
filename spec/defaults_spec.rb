@@ -23,16 +23,16 @@ describe Doodle, 'attributes with defaults' do
       @foo.attributes[:name].default.should == 'D1'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.meta.attributes(false)[:metadata].default.should == 'D2'
+      Foo.singleton_class.attributes(false)[:metadata].default.should == 'D2'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.meta.attributes[:metadata].default.should == 'D2'
+      Foo.singleton_class.attributes[:metadata].default.should == 'D2'
     end
-    it 'should have singleton attribute default via instance.meta.attributes(false)' do
-      @foo.meta.attributes(false)[:special].default.should == 'D3'
+    it 'should have singleton attribute default via instance.singleton_class.attributes(false)' do
+      @foo.singleton_class.attributes(false)[:special].default.should == 'D3'
     end
-    it 'should have singleton attribute default via instance.meta.attributes' do
-      @foo.meta.attributes[:special].default.should == 'D3'
+    it 'should have singleton attribute default via instance.singleton_class.attributes' do
+      @foo.singleton_class.attributes[:special].default.should == 'D3'
     end
     it 'should have singleton attribute name by default' do
       @foo.name.should == 'D1'
@@ -53,8 +53,8 @@ describe Doodle, 'attributes with defaults' do
       Foo.instance_variables.sort.should == []
     end
     it 'should not have @special singleton instance variable' do
-      @foo.meta.instance_variables.include?("@special").should == false
-      @foo.meta.instance_variables.sort.should == []
+      @foo.singleton_class.instance_variables.include?("@special").should == false
+      @foo.singleton_class.instance_variables.sort.should == []
     end
   end
 end

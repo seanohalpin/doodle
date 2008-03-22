@@ -1,6 +1,16 @@
 = ChangeLog for doodle
 
-== 0.0.6 / 2008-03-16
+== 0.0.6 / 2008-03-22
+
+- return self from validate! (so you can use idiom foo = YAML::load(yaml).validate!)
+
+- fix normalization of keys to symbols in initialize_from_hash
+
+- fix error not allowing nils in :init clause (because can't clone nil)
+
+- allow more than one class in from clause (e.g. from String, Symbol do ... end)
+
+- removed :meta as alias for :singleton_class (conflicts with openuri, facets, etc.)
 
 - fixed Rakefile error (wasn't including examples in rdoc)
 
