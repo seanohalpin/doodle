@@ -696,15 +696,15 @@ module Doodle
           if att.name == :default || att.default_defined?
             # nop
           elsif !ivar_defined?(att.name)
-            handle_error name, ArgumentError, "#{self} missing required attribute '#{name}'", [caller[-1]]
+            handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
-          # if all == true, validate all attributes - e.g. when loaded from YAML
+          # if all == true, reset values so conversions and validations are applied to raw instance variables
+          # e.g. when loaded from YAML
           if all
-            #att.validate(send(att.name))
-            send(att.name, send(att.name))
+            send(att.name, instance_variable_get("@#{att.name}"))
           end
         end
-
+        # now apply instance level validations
         validations.each do |v|
           #Doodle::Debug.d { [:validate!, self, v ] }
           if !instance_eval(&v.block)

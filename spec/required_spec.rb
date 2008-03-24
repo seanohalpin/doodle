@@ -9,8 +9,8 @@ describe Doodle, 'defaults which have not been set' do
       end
     end
 
-    it 'should have raise error if required value not set' do
-      proc { Foo.new }.should raise_error(ArgumentError)
+    it 'should raise Doodle::ValidationError if required value not set' do
+      proc { Foo.new }.should raise_error(Doodle::ValidationError)
     end
   end
 end

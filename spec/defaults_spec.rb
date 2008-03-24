@@ -67,8 +67,8 @@ describe Doodle, 'defaults which have not been set' do
       end
     end
 
-    it 'should raise error if required attributes not passed to new' do
-      proc { foo = Foo.new }.should raise_error(ArgumentError)
+    it 'should raise Doodle::ValidationError if required attributes not passed to new' do
+      proc { foo = Foo.new }.should raise_error(Doodle::ValidationError)
     end
 
     it 'should not raise error if required attributes passed to new' do
@@ -124,8 +124,8 @@ describe Doodle, "overriding inherited defaults" do
       text.value.should == 'any'
     end
   
-    it 'should raise ArgumentError if initialized without all required values' do
-      proc { KeyValue.new(:value => 'Enter name:') }.should raise_error(ArgumentError)
+    it 'should raise Doodle::ValidationError if initialized without all required values' do
+      proc { KeyValue.new(:value => 'Enter name:') }.should raise_error(Doodle::ValidationError)
     end
   
     it 'should allow initialization using inherited defaults' do
