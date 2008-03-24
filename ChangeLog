@@ -1,6 +1,6 @@
 = ChangeLog for doodle
 
-== 0.0.6 / 2008-03-22
+== 0.0.7 / 2008-03-22
 
 - return self from validate! (so you can use idiom foo = YAML::load(yaml).validate!)
 
@@ -11,6 +11,8 @@
 - allow more than one class in from clause (e.g. from String, Symbol do ... end)
 
 - removed :meta as alias for :singleton_class (conflicts with openuri, facets, etc.)
+
+== 0.0.6 / 2008-03-16
 
 - fixed Rakefile error (wasn't including examples in rdoc)
 
