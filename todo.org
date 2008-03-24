@@ -1,6 +1,6 @@
 = doodle to do list
 == TODO Bugs
-- [ ] loading from yaml - see bad-yaml.rb - does not convert String to Date
+- [X] loading from yaml should apply conversions
 == TODO sort out duplication of errors when calling validate! after setting incorrect value has already generated entry
 == TODO should be simpler way of getting to errors collection
 == TODO need some way of accessing containing object from attribute

@@ -24,7 +24,6 @@ describe 'Doodle', ' loading good data from yaml' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle::Base
-        has :name
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -33,8 +32,7 @@ describe 'Doodle', ' loading good data from yaml' do
       end      
       @str = %[
       --- !ruby/object:Foo
-      date: 2000-7-01
-      name: Hi
+      date: "2000-7-01"
       ]
       
     end
@@ -59,7 +57,6 @@ describe 'Doodle', ' loading bad data from yaml' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle::Base
-        has :name
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -69,7 +66,6 @@ describe 'Doodle', ' loading bad data from yaml' do
       @str = %[
       --- !ruby/object:Foo
       date: "2000"
-      name: Hi
       ]      
     end
 
@@ -77,7 +73,7 @@ describe 'Doodle', ' loading bad data from yaml' do
       proc { foo = YAML::load(@str)}.should_not raise_error
     end
 
-    it 'should fail on validation' do
+    it 'should fail with ConversionError when it cannot convert' do
       proc { foo = YAML::load(@str).validate! }.should raise_error(Doodle::ConversionError)
     end
   end
