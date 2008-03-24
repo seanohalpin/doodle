@@ -41,8 +41,12 @@ puts str
 loaded_event = YAML::load(str)
 pp loaded_event
 
-another_event = YAML::load(DATA.read)
-another_event.validate!(true)
+str =<<EOS
+--- !ruby/object:Event
+name: Glastonbury
+date: 2000-07-01
+EOS
+event = YAML::load(str).validate! # will raise Doodle::ValidationError
 
 __END__
 --- !ruby/object:Event 

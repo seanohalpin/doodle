@@ -330,6 +330,36 @@ Note that you don't need to project the value into the block but you can if you 
 
 Object level validations occur after all instance variables have been set.
 
+h3. validating data loaded from a yaml source
+
+YAML::load sets an object's instance variables directly, bypassing its attribute accessors. In a Doodle context, this means that
+loading from a yaml source bypasses attribute validations. You can apply validations 'manually' by using the @validate!@ method (the exclamation
+mark denotes that this method can raise an exception). For convenience, @validate!@ returns the validated object on success, so you can get
+a validated object from a yaml source using the following:
+
+#:code#ruby#
+  foo = YAML::load(yaml_source).validate!
+#:code#
+
+The following will raise an exception, complaining that 'name' is missing:
+
+#:code#ruby#
+  require "rubygems"
+  require "doodle"
+  require "yaml"
+  class Foo < Doodle::Base
+    has :name
+    has :date
+  end
+  str = %[
+  --- !ruby/object:Foo
+  date: 2000-07-01
+  ]
+  # load from string
+  foo = YAML::load(str).validate!
+  # => #<Foo:0x10c4cb0> missing required attribute 'name' (ArgumentError)
+#:code#
+
 h2. conversions
 
 Even when you want to restrict an attribute to a particular kind, it is often convenient to allow
@@ -355,6 +385,14 @@ use the @from@ method inside an attribute's definition block:
   event.start_date = '2001-01-01'
   event.start_date        # => #<Date: 4903821/2,0,2299161>
   event.start_date.to_s   # => "2001-01-01"
+#:code#
+
+You can pass multiple classes or modules to @from@ - it's up to you to ensure that it makes sense to do so. For example:
+
+#:code#ruby#
+  from Symbol, String do |name|
+    Event[:name => name.to_s]
+  end
 #:code#
 
 @from@ also works on the class level:

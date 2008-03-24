@@ -700,7 +700,8 @@ module Doodle
           end
           # if all == true, validate all attributes - e.g. when loaded from YAML
           if all
-            att.validate(send(att.name))
+            #att.validate(send(att.name))
+            send(att.name, send(att.name))
           end
         end
 

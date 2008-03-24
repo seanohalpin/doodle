@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta name="generator" content=
-  "HTML Tidy for Linux/x86 (vers 1 September 2005), see www.w3.org" />
+  "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org" />
   <meta http-equiv="Content-Type" content=
   "text/html; charset=utf-8" />
 
@@ -679,7 +679,64 @@
     but you can if you like – its value is <code>self</code>.</p>
 
     <p>Object level validations occur after all instance variables
-    have been set.</p><a name='conversions' id="conversions"></a>
+    have been set.</p><a name=
+    'validating_data_loaded_from_a_yaml_source' id=
+    "validating_data_loaded_from_a_yaml_source"></a>
+
+    <h3>validating data loaded from a yaml source</h3>
+
+    <p><span class="caps">YAML</span>::load sets an object’s
+    instance variables directly, bypassing its attribute accessors.
+    In a Doodle context, this means that loading from a yaml source
+    bypasses attribute validations. You can apply validations
+    ‘manually’ by using the <code>validate!</code> method (the
+    exclamation mark denotes that this method can raise an
+    exception). For convenience, <code>validate!</code> returns the
+    validated object on success, so you can get a validated object
+    from a yaml source using the following:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">foo</span> <span class=
+"punct">=</span> <span class="constant">YAML</span><span class=
+"punct">::</span><span class="ident">load</span><span class=
+"punct">(</span><span class="ident">yaml_source</span><span class=
+"punct">).</span><span class="ident">validate!</span></code>
+</pre>
+
+    <p>The following will raise an exception, complaining that
+    ‘name’ is missing:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class=
+"ident">require</span> <span class="punct">"</span><span class=
+"string">rubygems</span><span class="punct">"</span>
+  <span class="ident">require</span> <span class=
+"punct">"</span><span class="string">doodle</span><span class=
+"punct">"</span>
+  <span class="ident">require</span> <span class=
+"punct">"</span><span class="string">yaml</span><span class=
+"punct">"</span>
+  <span class="keyword">class </span><span class=
+"class">Foo</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span><span class="punct">::</span><span class=
+"constant">Base</span>
+    <span class="ident">has</span> <span class=
+"symbol">:name</span>
+    <span class="ident">has</span> <span class=
+"symbol">:date</span>
+  <span class="keyword">end</span>
+  <span class="ident">str</span> <span class=
+"punct">=</span> <span class="punct">%[</span><span class="string">
+  --- !ruby/object:Foo
+  date: 2000-07-01
+  </span><span class="punct">]</span>
+  <span class="comment"># load from string</span>
+  <span class="ident">foo</span> <span class=
+"punct">=</span> <span class="constant">YAML</span><span class=
+"punct">::</span><span class="ident">load</span><span class=
+"punct">(</span><span class="ident">str</span><span class=
+"punct">).</span><span class="ident">validate!</span>
+  <span class=
+"comment"># =&gt; #&lt;Foo:0x10c4cb0&gt; missing required attribute 'name' (ArgumentError)</span></code>
+</pre><a name='conversions' id="conversions"></a>
 
     <h2>conversions</h2>
 
@@ -746,6 +803,23 @@
 "punct">.</span><span class="ident">start_date</span><span class=
 "punct">.</span><span class="ident">to_s</span>   <span class=
 "comment"># =&gt; "2001-01-01"</span></code>
+</pre>
+
+    <p>You can pass multiple classes or modules to
+    <code>from</code> – it’s up to you to ensure that it makes
+    sense to do so. For example:</p>
+    <pre class='ruby'>
+<code class='ruby'>  <span class="ident">from</span> <span class=
+"constant">Symbol</span><span class="punct">,</span> <span class=
+"constant">String</span> <span class=
+"keyword">do</span> <span class="punct">|</span><span class=
+"ident">name</span><span class="punct">|</span>
+    <span class="constant">Event</span><span class=
+"punct">[</span><span class="symbol">:name</span> <span class=
+"punct">=&gt;</span> <span class="ident">name</span><span class=
+"punct">.</span><span class="ident">to_s</span><span class=
+"punct">]</span>
+  <span class="keyword">end</span></code>
 </pre>
 
     <p><code>from</code> also works on the class level:</p>
