@@ -131,7 +131,7 @@ task :publish_docs => [:rdoc] do
 end
 
 desc "Upload new gem"
-task :upload_gem => [:gem] do
+task :publish_gem => [:gem] do
   sh "rubyforge --login"
   sh "rubyforge add_release doodle doodle #{DOODLE_VERSION} pkg/doodle-#{DOODLE_VERSION}.gem"
 end
