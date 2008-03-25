@@ -777,7 +777,10 @@ module Doodle
         mklass = class << klass; self; end
         #p [:names, klass, mklass]
         #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
-        klass.class_eval src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"
+        # TODO: check how many times this is being called
+        if !klass.respond_to?(name)
+          klass.class_eval(src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end")
+        end
       end
       #p [:factory, mklass, klass, src]
     end
