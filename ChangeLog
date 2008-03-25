@@ -1,5 +1,14 @@
 = ChangeLog for doodle
 
+== 0.0.8 / 2008-03-25
+
+- renamed rake task upload_gem to publish_gem
+- bumped version and updated todo list
+- don't define factory method if one by same name already defined
+- apply validation! to raw instance variables - also, raise Doodle::ValidationError rather than ArgumentError if missing required values
+- tweaked bugs_spec
+- added spec to cover applying conversions to yaml loaded data
+
 == 0.0.7 / 2008-03-22
 
 - return self from validate! (so you can use idiom foo = YAML::load(yaml).validate!)
