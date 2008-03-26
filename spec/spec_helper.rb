@@ -1,5 +1,7 @@
-DEVLIB = File.join(File.dirname(__FILE__), '..', 'lib')
-$:.unshift DEVLIB
+if !Object.const_defined?(:DEVLIB)
+  DEVLIB = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+  $:.unshift DEVLIB
+end
 # make sure we get the development versions
 require "#{DEVLIB}/molic_orderedhash"
 require "#{DEVLIB}/doodle.rb"

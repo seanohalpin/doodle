@@ -14,7 +14,12 @@ describe Doodle, "Serialization" do
     end
     
     it "should be serializable to yaml" do
-      @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
+      # is this a bug in the MRI yaml implementation? why the space after Foo?
+      if RUBY_PLATFORM == 'java'
+        @foo.to_yaml.should == "--- !ruby/object:Foo\nvar: 42\n"
+      else
+        @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
+      end
     end
     
     it "should be loadable from yaml" do
@@ -24,7 +29,7 @@ describe Doodle, "Serialization" do
     end
     
     it "should make it possible to validate already set instance variables" do
-      new_foo = YAML::load("--- !ruby/object:Foo \nvar: Hello World!\n")
+      new_foo = YAML::load("--- !ruby/object:Foo\nvar: Hello World!\n")
       proc { new_foo.validate!(true) }.should raise_error(Doodle::ValidationError)
     end
     
