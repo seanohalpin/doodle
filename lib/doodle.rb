@@ -2,6 +2,7 @@
 # Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
+require 'pp'
 
 # *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
 # have pollute core Ruby objects such as Object, Class and Module.
@@ -259,7 +260,7 @@ module Doodle
     attr_accessor :validation_on
     attr_accessor :arg_order
     attr_accessor :errors
-    
+
     def self.raise_exception_on_error
       @@raise_exception_on_error
     end
@@ -297,28 +298,31 @@ module Doodle
       DoodleInfo::DOODLES[object_id] ||= DoodleInfo.new(self)
     end
     private :__doodle__
+
+    # where should I put this?
+    def errors
+      # @errors ||= []
+      __doodle__.errors
+    end
+  
+    def clear_errors
+      #pp [:clear_errors, self, caller]
+      # remove_instance_variable("@errors")
+      __doodle__.errors.clear
+    end
     
     # handle errors either by collecting in :errors or raising an exception
     def handle_error(name, *args)
-      __doodle__.errors << [name, *args]
+      #__doodle__.errors << [name, *args]
+      #pp [:caller, self, caller]
+      #pp [:handle_error, name, args]
+      # don't include duplicates (FIXME: hacky - shouldn't have duplicates in the first place)
+      if !self.errors.include?([name, *args])
+        self.errors << [name, *args]
+      end
       if DoodleInfo.raise_exception_on_error
         raise(*args)
       end
-    end
-
-    # get list of errors
-    def errors
-      errs = attributes.inject([]) do |e, (n, a)|
-        e.push(*a.send(:__doodle__).errors)
-        e
-      end
-      errs.push(__doodle__.errors).reject{|x| x.size == 0}
-    end
-    def clear_errors
-      attributes.each do |n, a|
-        a.send(:__doodle__).errors.clear
-      end
-      __doodle__.errors.clear
     end
 
     # return attributes defined in instance
@@ -442,7 +446,7 @@ module Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
-      # d { [:_setter, self, self.class,  name, args, block] }
+      #pp [:_setter, self, self.class,  name, args, block]
       ivar = "@#{name}"
       args.unshift(block) if block_given?
       # d { [:_setter, 3, :setting,  name, ivar, args] }
@@ -450,7 +454,7 @@ module Doodle
       # d { [:_setter, 4, :setting,  name, att] }
       if att
         #d { [:_setter, :instance_variable_set, :ivar, ivar, :args, args, :att_validate, att.validate(*args) ] }
-        v = instance_variable_set(ivar, att.validate(*args))
+        v = instance_variable_set(ivar, att.validate(self, *args))
       else
         #d { [:_setter, :instance_variable_set, ivar, args ] }
         v = instance_variable_set(ivar, *args)
@@ -471,7 +475,7 @@ module Doodle
         end
         # d { [:from, conversions] }
       else
-        convert(*args)
+        convert(self, *args)
       end
     end
 
@@ -493,7 +497,7 @@ module Doodle
     end
 
     # convert a value according to conversion rules
-    def convert(value)
+    def convert(owner, value)
       begin
         if (converter = conversions[value.class])
           value = converter[value]
@@ -512,19 +516,19 @@ module Doodle
           end
         end
       rescue => e
-        handle_error name, ConversionError, e.to_s, [caller[-1]]
+        owner.handle_error name, ConversionError, e.to_s, [caller[-1]]
       end
       value
     end
 
     # validate that args meet rules defined with +must+
-    def validate(*args)
-      value = convert(*args)
+    def validate(owner, *args)
+      value = convert(owner, *args)
       #d { [:validate, self, :args, args, :value, value ] }
       validations.each do |v|
         Doodle::Debug.d { [:validate, self, v, args ] }
         if !v.block[value]
-          handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
+          owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
       #d { [:validate, :value, value ] }
@@ -688,6 +692,10 @@ module Doodle
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
+      #pp [:validate!, all, caller]
+      if all
+        clear_errors
+      end
       #Doodle::Debug.d { [:validate!, self] }
       #Doodle::Debug.d { [:validate!, self, __doodle__.validation_on] }
       if __doodle__.validation_on
@@ -771,7 +779,9 @@ module Doodle
         # top level class - should be available to all
         mklass = klass = Object
         #p [:names_empty, klass, mklass]
-        eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
+        if !respond_to?(name)
+          eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
+        end
       else
         klass = names.inject(self) {|c, n| c.const_get(n)}
         mklass = class << klass; self; end
