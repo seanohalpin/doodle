@@ -3,6 +3,7 @@
 - [X] loading from yaml should apply conversions 2008-03-24
 - [X] sort out duplication of errors when calling validate! after
       setting incorrect value has already generated entry 2008-03-26
+- [X] validate! sets instance variables with defaults
 == TODO need some way of accessing containing object from attribute
 - why?
   - to put errors on instance

@@ -57,7 +57,7 @@ describe Doodle, 'class attributes(false)' do
       Foo.metadata.should == 'Foo metadata'
     end
 
-    it 'should access class attribute via self.class' do
+    it 'should access @foo.class attribute via self.class' do
       @foo.class.metadata = '@foo metadata'
       @foo.class.metadata.should == '@foo metadata'
       Foo.metadata.should == '@foo metadata'
@@ -108,7 +108,7 @@ describe Doodle, 'inherited class attributes(false)' do
       Foo.metadata.should == 'Foo metadata'
     end
 
-    it 'should access class attribute via self.class' do
+    it 'should access @foo.class attribute via self.class' do
       @foo.class.metadata = '@foo metadata'
       @foo.class.metadata.should == '@foo metadata'
       Foo.metadata.should == '@foo metadata'
@@ -122,7 +122,7 @@ describe Doodle, 'inherited class attributes(false)' do
       @bar.class.metadata.should == 'Bar metadata'
     end
 
-    it 'should access inherited class attribute via self.class' do
+    it 'should access inherited @foo.class attribute via self.class' do
       @foo.class.metadata = '@foo metadata'
       @foo.class.metadata.should == '@foo metadata'
       Foo.metadata.should == '@foo metadata'

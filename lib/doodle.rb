@@ -13,6 +13,28 @@ require 'pp'
 
 # Docs at http://doodle.rubyforge.org
 
+# patch 1.8.5 to add instance_variable_defined?
+# note: this does not seem to work so well with singletons
+if RUBY_VERSION < '1.8.6'
+  if !Object.method_defined?(:instance_variable_defined?)
+    class Object
+      __doodle__inspect = instance_method(:inspect)
+      define_method :instance_variable_defined? do |name|
+        res = __doodle__inspect.bind(self).call
+        rx = /\B#{name}=/
+        rv = nil
+        if rx =~ res
+          rv = true
+        else
+          rv = false
+        end
+        #p [:instance_variable_defined, rx, name, self, res, rv, caller[0..2]]
+        rv
+      end
+    end
+  end
+end
+
 module Doodle
   module Debug
     class << self
@@ -708,8 +730,9 @@ module Doodle
           end
           # if all == true, reset values so conversions and validations are applied to raw instance variables
           # e.g. when loaded from YAML
-          if all
-            send(att.name, instance_variable_get("@#{att.name}"))
+          att_name = "@#{att.name}"
+          if all && instance_variable_defined?(att_name)
+            send(att.name, instance_variable_get(att_name))
           end
         end
         # now apply instance level validations

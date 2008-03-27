@@ -25,7 +25,7 @@ describe Doodle, 'class attributes' do
       Foo.metadata.should == 'Foo metadata'
     end
 
-    it 'should access class attribute via self.class' do
+    it 'should access @foo class attribute via self.class' do
       @foo.class.metadata = '@foo metadata'
       @foo.class.metadata.should == '@foo metadata'
       Foo.metadata.should == '@foo metadata'
@@ -48,7 +48,7 @@ describe Doodle, 'class attributes' do
       Bar.metadata.should == 'Bar metadata'
     end
 
-    it 'should access class attribute via self.class' do
+    it 'should access @bar class attribute via self.class' do
       @bar.class.metadata = '@bar metadata'
       @bar.class.metadata.should == '@bar metadata'
       Bar.metadata.should == '@bar metadata'
