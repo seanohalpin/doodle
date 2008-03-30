@@ -63,6 +63,9 @@ module Doodle
   # raised when a validation rule returns false
   class ValidationError < Exception
   end
+  # raised when a validation rule returns false
+  class UnknownAttributeError < Exception
+  end
   # raised when a conversion fails
   class ConversionError < Exception
   end
@@ -699,7 +702,7 @@ module Doodle
             send(key, key_values[key])
           else
             # raise error if not defined
-            handle_error key, Doodle::ValidationError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
+            handle_error key, Doodle::UnknownAttributeError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
           end
         end
       end
@@ -864,8 +867,6 @@ module Doodle
     # obviously, I have to think about this some more :S
     #
     def validate!(all = true)
-      #p [self, :validate!, attributes, caller]
-      #super
     end
 
     # is this attribute optional? true if it has a default defined for it

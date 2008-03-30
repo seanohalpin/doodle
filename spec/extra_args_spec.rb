@@ -7,8 +7,14 @@ describe Doodle, ' unspecified attributes' do
       end
     end
   
-    it 'should raise Doodle::ValidationError for unspecified attributes' do
-      proc { foo = Foo(:name => 'foo') }.should raise_error(Doodle::ValidationError)
+    it 'should raise Doodle::UnknownAttributeError for unspecified attributes' do
+      proc { foo = Foo(:name => 'foo') }.should raise_error(Doodle::UnknownAttributeError)
     end
+  end
+end
+
+describe Doodle::Attribute, ' unspecified attributes' do  
+  it 'should raise Doodle::UnknownAttributeError for unspecified attributes' do
+    proc { foo = Doodle::Attribute(:name => 'foo', :extra => 'unwanted') }.should raise_error(Doodle::UnknownAttributeError)
   end
 end
