@@ -194,7 +194,6 @@ module Doodle
           klass = klass.superclass
         end
       end
-      #p [:HERE_HERE_END, klasses]
       klasses
     end
 
@@ -548,7 +547,7 @@ module Doodle
       value = convert(owner, *args)
       #d { [:validate, self, :args, args, :value, value ] }
       validations.each do |v|
-        Doodle::Debug.d { [:validate, self, v, args ] }
+        Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
           owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
@@ -628,8 +627,9 @@ module Doodle
       end
       
       # d { [:has_args, :params, params] }
-      local_attributes[name] = attribute = Attribute.new(params, &block)        
+      # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
+      local_attributes[name] = attribute = Attribute.new(params, &block)        
       attribute
     end
 
@@ -698,7 +698,8 @@ module Doodle
           if respond_to?(key)
             send(key, key_values[key])
           else
-            _setter(key, key_values[key])
+            # raise error if not defined
+            handle_error key, Doodle::ValidationError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
           end
         end
       end
@@ -737,7 +738,7 @@ module Doodle
         end
         # now apply instance level validations
         validations.each do |v|
-          #Doodle::Debug.d { [:validate!, self, v ] }
+          Doodle::Debug.d { [:validate!, self, v ] }
           if !instance_eval(&v.block)
             handle_error :validate!, ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
           end
@@ -863,17 +864,19 @@ module Doodle
     # obviously, I have to think about this some more :S
     #
     def validate!(all = true)
+      #p [self, :validate!, attributes, caller]
+      #super
     end
 
     # is this attribute optional? true if it has a default defined for it
     def optional?
-      !self.required?
+      default_defined? or init_defined?
     end
 
     # an attribute is required if it has no default or initial value defined for it
     def required?
       # d { [:default?, self.class, self.name, instance_variable_defined?("@default"), @default] }
-      !(default_defined? or init_defined?)
+      !optional?
     end
 
     # has default been defined?
@@ -886,11 +889,16 @@ module Doodle
     end
 
     # name of attribute
-    has :name
+    has :name, :kind => Symbol do
+      from String do |s|
+        s.to_sym
+      end
+    end
     # default value (can be a block)
-    has :default
+    has :default, :default => nil
     # initial value
-    has :init
+    has :init, :default => nil
+
   end
 end
 
