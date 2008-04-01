@@ -45,13 +45,5 @@ describe Doodle, 'defaults which have not been set' do
     foo = Foo.from("2007-12-31")
     foo.start.should == Date.new(2007, 12, 31)
   end
-  
-  it 'should allow factory function' do
-#     class Foo
-#       include Doodle::Factory
-#     end
-    foo = Foo("2007-12-31")
-    foo.start.should == Date.new(2007, 12, 31)
-  end
 end
 
