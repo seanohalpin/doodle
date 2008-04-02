@@ -227,7 +227,7 @@ module Doodle
   #
   # this works down to third level <tt>class << self</tt> - in practice, this is
   # perfectly good - it would be great to have a completely general
-  # solution but I'm doubt whether the payoff is worth the time
+  # solution but I'm doubt whether the payoff is worth the effort
 
   module Embrace
     # fake module inheritance chain
@@ -244,8 +244,8 @@ module Doodle
         # ensure that subclasses are also embraced
         define_method :inherited do |klass|
           #p [:embrace, :inherited, klass]
-          klass.send(:embrace, other)
-          klass.send(:include, Factory) # yikes!
+          klass.send(:embrace, other)       # n.b. closure
+          klass.send(:include, Factory)     # is there another way to do this? i.e. not in embrace
           super(klass) if defined?(super)
         end
       }
@@ -797,40 +797,41 @@ module Doodle
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
   module Factory
-    # create a factory function called +name+ for the current class
-    def factory(name = self)
-      name = self.to_s
-      names = name.split(/::/)
-      name = names.pop
-      if names.empty?
-        # top level class - should be available to all
-        mklass = klass = Object
-        #p [:names_empty, klass, mklass]
-        if !respond_to?(name)
-          eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
+    class << self   
+      # create a factory function in appropriate module for the specified class
+      def factory(konst)
+        #p [:factory, name]
+        name = konst.to_s
+        names = name.split(/::/)
+        name = names.pop
+        if names.empty?
+          # top level class - should be available to all
+          klass = Object
+          #p [:names_empty, klass, mklass]
+          if !klass.respond_to?(name)
+            eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
+          end
+        else
+          klass = names.inject(self) {|c, n| c.const_get(n)}
+          mklass = class << klass; self; end
+          #p [:names, klass, mklass]
+          #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
+          # TODO: check how many times this is being called
+          if !klass.respond_to?(name)
+            klass.class_eval(src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end")
+          end
         end
-      else
-        klass = names.inject(self) {|c, n| c.const_get(n)}
-        mklass = class << klass; self; end
-        #p [:names, klass, mklass]
-        #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
-        # TODO: check how many times this is being called
-        if !klass.respond_to?(name)
-          klass.class_eval(src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end")
-        end
+        #p [:factory, mklass, klass, src]
+      end    
+    
+      # inherit the factory function capability
+      def included(other)
+        #p [:factory, :included, self, other ]
+        super
+        #raise Exception, "#{self} can only be included in a Class" if !other.kind_of? Class
+        # make +factory+ method available
+        factory other
       end
-      #p [:factory, mklass, klass, src]
-    end
-    # inherit the factory function capability
-    def self.included(other)
-      #p [:factory, :included, self, other ]
-      super
-      #raise Exception, "#{self} can only be included in a Class" if !other.kind_of? Class
-      # make +factory+ method available
-      other.extend self
-      other.module_eval {
-        factory
-      }
     end
   end
 
