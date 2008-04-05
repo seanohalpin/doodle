@@ -614,25 +614,35 @@ module Doodle
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
 
       # don't pass collector params through to Attribute
+      collector_klass = nil
       if collector = params.delete(:collect)
+        if !params.key?(:init)
+          params[:init] = []
+        end
         if collector.kind_of?(Hash)
-          collector_name, klass = collector.to_a[0]
+          collector_name, collector_klass = collector.to_a[0]
         else
           # if Capitalized word given, treat as classname
           # and create collector for specific class
-          klass = collector.to_s
-          collector_name = Utils.snake_case(klass)
-          if klass !~ /^[A-Z]/
-            klass = nil
+          collector_klass = collector.to_s
+          collector_name = Utils.snake_case(collector_klass)
+          if collector_klass !~ /^[A-Z]/
+            collector_klass = nil
           end
         end
-        define_collector name, collector_name, klass
+        define_collector name, collector_name, collector_klass
       end
       
       # d { [:has_args, :params, params] }
       # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
-      local_attributes[name] = attribute = Attribute.new(params, &block)        
+      local_attributes[name] = attribute = Attribute.new(params, &block)
+      # if a collector has been defined and has a specific class, then you can pass in an array of hashes
+      if collector_klass
+        attribute.instance_eval src = "from Enumerable do |enum|
+          enum.map{|x| #{collector_klass}.new(x)}
+        end"
+      end
       attribute
     end
 

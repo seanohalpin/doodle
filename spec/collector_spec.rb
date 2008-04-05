@@ -71,7 +71,7 @@ describe Doodle, "Typed collector with specified collector name" do
   end
 end
 
-describe Doodle, "Typed collector with specified collector name" do
+describe Doodle, "typed collector with specified collector name" do
   temporary_constant :Location, :Event do
     before :each do
       class Location < Doodle::Base
@@ -91,6 +91,54 @@ describe Doodle, "Typed collector with specified collector name" do
       }.should_not raise_error
       event.locations.map{|loc| loc.name}.should == ["Stage 1", "Stage 2"]
       event.locations.map{|loc| loc.class}.should == [Location, Location]
+    end
+  end
+end
+
+describe Doodle, "typed collector with specified collector name initialized from hash (with default :init param)" do
+  temporary_constant :Location, :Event do
+    before :each do
+      class Location < Doodle::Base
+        has :name, :kind => String
+        has :events, :collect => :Event
+      end
+      class Event < Doodle::Base
+        has :name, :kind => String
+        has :locations, :collect => :Location
+      end
+    end
+    it "should collect items from hash" do
+      event = nil
+      data = {
+        :name => 'RAR',
+        :locations =>
+        [
+         {
+           :name => "Stage 1",
+           :events =>
+           [
+            {
+              :name => 'Foobars',
+              :locations =>
+              [
+               {
+                 :name => 'Backstage'
+               }
+              ]
+            }
+           ]
+         },
+         {
+           :name => "Stage 2"
+         }
+        ]
+      }
+      proc {
+        event = Event(data)
+      }.should_not raise_error
+      event.locations.map{|loc| loc.name}.should == ["Stage 1", "Stage 2"]
+      event.locations.map{|loc| loc.class}.should == [Location, Location]
+      event.locations[0].events[0].kind_of?(Event).should == true
     end
   end
 end

@@ -25,11 +25,15 @@ class Event
       Date.parse(s)
     end
   end
-  has :locations, :init => [], :collect => {:place => "Location"}
+  has :locations, :init => [], :collect => {:place => "Location"} do
+    from Array do |array|
+      array.map{|x| Location(x)}
+    end
+  end
 end  
 
 event = Event "Festival" do
-  date '2008-04-01'
+  date '2018-04-01'
   place "The muddy field"
   place "Beer tent" do
     event "Drinking"
@@ -46,7 +50,46 @@ str =<<EOS
 name: Glastonbury
 date: 2000-07-01
 EOS
-event = YAML::load(str).validate! # will raise Doodle::ValidationError
+
+def capture(&block)
+  begin
+    block.call
+  rescue Exception => e
+    e
+  end
+end
+
+res = capture {
+  event = YAML::load(str).validate! # will raise Doodle::ValidationError
+}
+pp res
+
+hash_data = {
+  :name => "Festival",
+  :date => '2010-04-01',
+  :locations =>
+  [
+   {
+     :events => [],
+     :name => "The muddy field",
+   },
+   {
+     :name => "Beer tent",
+     :events =>
+     [
+      {
+        :name => "Drinking",
+        :locations => [],
+      }
+     ]
+   }
+  ]
+}
+
+pp hash_data
+
+e = Event(hash_data)
+pp e
 
 __END__
 --- !ruby/object:Event 
