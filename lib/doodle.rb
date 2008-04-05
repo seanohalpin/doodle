@@ -639,9 +639,16 @@ module Doodle
       local_attributes[name] = attribute = Attribute.new(params, &block)
       # if a collector has been defined and has a specific class, then you can pass in an array of hashes
       if collector_klass
-        attribute.instance_eval src = "from Enumerable do |enum|
-          enum.map{|x| #{collector_klass}.new(x)}
-        end"
+        attribute.instance_eval {
+          from Enumerable do |enum|
+            if !collector_klass.kind_of?(Class)
+              tmp_klass = self.class.const_get(collector_klass)
+            else
+              tmp_klass = collector_klass
+            end
+            enum.map{|x| tmp_klass.new(x)}
+          end
+        }
       end
       attribute
     end
