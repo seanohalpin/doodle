@@ -29,11 +29,10 @@ describe Doodle::Factory, " as part of Doodle::Base" do
 end
 
 describe Doodle::Factory, " included as module" do
-  temporary_constant :Baz, :Qux, :MyDate do
+  temporary_constant :Baz, :Qux, :MyDate, :AnotherDate do
     before(:each) do
       class Baz
         include Doodle::Helper
-        include Doodle::Factory
         has :var1
       end
       class Qux < Baz
@@ -42,9 +41,11 @@ describe Doodle::Factory, " included as module" do
       class MyDate < Date
         include Doodle::Factory
       end
+      class AnotherDate < MyDate
+      end
     end
 
-    it 'should provde factory function' do
+    it 'should provide factory function' do
       proc {
         foo = Baz("abcd") 
         foo.var1.should == "abcd"
@@ -65,6 +66,14 @@ describe Doodle::Factory, " included as module" do
         qux.to_s.should == "2008-01-01" 
         }.should_not raise_error
     end
+
+    # do I actually want this? should it be opt-in at each level?
+    # it 'should be inheritable by non-doodle classes' do
+    #   proc {
+    #     qux = AnotherDate(2008, 01, 01) 
+    #     qux.to_s.should == "2008-01-01" 
+    #     }.should_not raise_error
+    # end
 
   end
 end

@@ -797,6 +797,7 @@ module Doodle
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
   module Factory
+    RX_IDENTIFIER = /[A-Za-z_][A-Za-z_0-9]+\??/
     class << self   
       # create a factory function in appropriate module for the specified class
       def factory(konst)
@@ -808,7 +809,7 @@ module Doodle
           # top level class - should be available to all
           klass = Object
           #p [:names_empty, klass, mklass]
-          if !klass.respond_to?(name)
+          if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
           end
         else
@@ -817,13 +818,13 @@ module Doodle
           #p [:names, klass, mklass]
           #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
           # TODO: check how many times this is being called
-          if !klass.respond_to?(name)
+          if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             klass.class_eval(src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end")
           end
         end
         #p [:factory, mklass, klass, src]
-      end    
-    
+      end
+
       # inherit the factory function capability
       def included(other)
         #p [:factory, :included, self, other ]
@@ -845,6 +846,7 @@ module Doodle
       other.module_eval {
         extend Embrace
         embrace BaseMethods
+        include Factory
       }
     end
   end
