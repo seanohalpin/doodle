@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta name="generator" content=
-  "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org" />
+  "HTML Tidy for Linux/x86 (vers 1 September 2005), see www.w3.org" />
   <meta http-equiv="Content-Type" content=
   "text/html; charset=utf-8" />
 
@@ -26,7 +26,8 @@
         '#conversions'>conversions</a> - <a href=
         '#collectors'>collectors</a> - <a href=
         '#class_and_singleton_level_definitions'>class and
-        singleton level definitions</a>
+        singleton level definitions</a> - <a href=
+        '#links'>links</a>
       </div>
     </div>
 
@@ -189,9 +190,11 @@
   <span class="keyword">end</span>
   <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
-"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
-"punct">[],</span> <span class=
-"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:place</span> <span class="punct">=&gt;</span> <span class="punct">"</span><span class="string">Location</span><span class="punct">"}</span>
+"symbol">:collect</span> <span class=
+"punct">=&gt;</span> <span class="punct">{</span><span class=
+"symbol">:place</span> <span class=
+"punct">=&gt;</span> <span class="punct">"</span><span class=
+"string">Location</span><span class="punct">"}</span>
 <span class="keyword">end</span></code>
 </pre><a name='installation' id="installation"></a>
 
@@ -269,12 +272,19 @@
 
     <p>Doodle assumes that if you specify an attribute without a
     default, it is required. If you try to initialize an instance
-    without specifying all required attributes, it will
-    complain.</p>
+    without specifying all required attributes, it will complain.
+    For example:</p>
     <pre class='ruby'>
-<code class='ruby'>  <span class="ident">event</span> <span class=
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span>
+    <span class="ident">has</span> <span class=
+"symbol">:date</span>
+  <span class="keyword">end</span>
+
+  <span class="ident">event</span> <span class=
 "punct">=</span> <span class="constant">Event</span><span class=
 "punct">()</span>
+  <span class="comment"># or</span>
   <span class="ident">event</span> <span class=
 "punct">=</span> <span class="constant">Event</span><span class=
 "punct">.</span><span class="ident">new</span></code>
@@ -815,10 +825,10 @@
 "keyword">do</span> <span class="punct">|</span><span class=
 "ident">name</span><span class="punct">|</span>
     <span class="constant">Event</span><span class=
-"punct">[</span><span class="symbol">:name</span> <span class=
+"punct">(</span><span class="symbol">:name</span> <span class=
 "punct">=&gt;</span> <span class="ident">name</span><span class=
 "punct">.</span><span class="ident">to_s</span><span class=
-"punct">]</span>
+"punct">)</span>
   <span class="keyword">end</span></code>
 </pre>
 
@@ -894,25 +904,29 @@
   <span class="keyword">end</span></code>
 </pre>
 
-    <p>In this example, we have an attribute called
-    <code>locations</code> which is intended to be an array of
-    <code>Location</code> objects. Using the <code>:collect =&gt;
-    Location</code> option of <code>has</code> defines a method
-    called <code>location</code> (derived from the class name) that
-    will create a new <code>Location</code> object using the
-    parameters passed to the <code>location</code> methods and add
-    it to the <code>locations</code> attribute.</p>
+    <p>In the example above, we want <code>locations</code> to be
+    an array of <code>Location</code> objects. Using the
+    <code>:collect =&gt; Location</code> option defines a method
+    called <code>location</code> (derived from the class name).
+    Each time the <code>location</code> method is called a new
+    <code>Location</code> object is added to the
+    <code>locations</code> array</p>
 
-    <p>To use a specific name for the collecting method, use the
-    pass a hash containing <code>{:method_name =&gt;
-    ClassName}</code> to the <code>collect</code> option like
-    this:</p>
+    <p>You can leave out the <code>:init</code> option if all you
+    want is to collect into an array - doodle will supply one for
+    you. Otherwise, you need to supply an Enumerable that provides
+    the <code>&lt;&lt;</code> method.</p>
+
+    <p>To use a specific name for the collecting method, pass a
+    hash containing <code>{:method_name =&gt; ClassName}</code> to
+    the <code>collect</code> option like this:</p>
     <pre class='ruby'>
 <code class='ruby'>    <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
-"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
-"punct">[],</span> <span class=
-"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:place</span> <span class="punct">=&gt;</span> <span class="constant">Location</span><span class="punct">}</span>
+"symbol">:collect</span> <span class=
+"punct">=&gt;</span> <span class="punct">{</span><span class=
+"symbol">:place</span> <span class=
+"punct">=&gt;</span> <span class="constant">Location</span><span class="punct">}</span>
     <span class="punct">...</span>
     <span class="ident">event</span> <span class=
 "punct">=</span> <span class="constant">Event</span> <span class=
@@ -926,11 +940,29 @@
     <span class="keyword">end</span></code>
 </pre>
 
-    <p>The classname can be a class constant, a symbol or a string.
-    <code>collect</code> works for any class that provides a
-    <code>&lt;&lt;</code> method.</p><a name=
-    'class_and_singleton_level_definitions' id=
-    "class_and_singleton_level_definitions"></a>
+    <p>The classname can be a class constant, a symbol or a
+    string.</p>
+
+    <p>Finally, if you don’t want to restrict the value to a
+    particular class, you can just specify a method name:</p>
+    <pre class='ruby'>
+<code class='ruby'>    <span class="ident">has</span> <span class=
+"symbol">:locations</span><span class="punct">,</span> <span class=
+"symbol">:collect</span> <span class=
+"punct">=&gt;</span> <span class="symbol">:place</span>
+    <span class="punct">...</span>
+    <span class="ident">event</span> <span class=
+"punct">=</span> <span class="constant">Event</span> <span class=
+"keyword">do</span>
+      <span class="ident">place</span> <span class=
+"punct">"</span><span class="string">Stage 1</span><span class=
+"punct">"</span>
+      <span class="ident">place</span> <span class=
+"constant">SomeOtherObject</span><span class=
+"punct">.</span><span class="ident">new</span>
+    <span class="keyword">end</span></code>
+</pre><a name='class_and_singleton_level_definitions' id=
+"class_and_singleton_level_definitions"></a>
 
     <h2>class and singleton level definitions</h2>
 
@@ -985,7 +1017,21 @@
 "ident">special</span>
   <span class=
 "comment"># =&gt; 'This object is special'</span></code>
-</pre>
+</pre><a name='links' id="links"></a>
+
+    <h2>links</h2>
+
+    <ul>
+      <li><a href="http://rubyforge.org/projects/doodle">Rubyforge
+      project</a></li>
+
+      <li><a href=
+      "http://rubyforge.org/forum/?group_id=5159">Forum</a></li>
+
+      <li><a href=
+      "http://rubyforge.org/tracker/?atid=19938&amp;group_id=5159&amp;func=browse">
+      Bug reports</a></li>
+    </ul>
 
     <p align='right'><span style=
     'font-size: 8pt; color: #7c7c90'>Generated with</span><br />

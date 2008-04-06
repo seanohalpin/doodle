@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe Doodle, 'init' do
   temporary_constant :Foo do
-  
+    
     before(:each) do
       class Foo
         include Doodle::Helper
@@ -16,7 +16,7 @@ describe Doodle, 'init' do
         has :special, :init => 'D3'
       end
     end
-  
+    
     it 'should have instance attribute init via class' do
       Foo.attributes[:name].init.should == 'D1'
     end
@@ -42,12 +42,66 @@ describe Doodle, 'init' do
       @foo.instance_variables.include?('@name').should == true
     end
     it 'should have an initialized class attribute :metadata' do
-      pending 'deciding how this should work'
-      #Foo.metadata.should == 'D2'
+      pending 'deciding how this should work' do
+        Foo.metadata.should == 'D2'
+      end
     end
     it 'should have an initialized singleton attribute :special' do
-      pending 'deciding how this should work'
-      #@foo.special.should == 'D3'
+      pending 'deciding how this should work' do
+        @foo.special.should == 'D3'
+      end
+    end
+  end
+end
+
+describe Doodle, 'init' do  
+  temporary_constant :Foo do
+    it 'should accept nil as :init' do
+      class Foo < Doodle::Base
+        has :value, :init => nil
+      end
+      foo = Foo.new
+      foo.value.should == nil
+    end
+  end
+  temporary_constant :Foo do
+    it 'should accept true as :init' do
+      class Foo < Doodle::Base
+        has :value, :init => true
+      end
+      foo = Foo.new
+      foo.value.should == true
+    end
+  end
+  temporary_constant :Foo do
+    it 'should accept Fixnum as :init' do
+      class Foo < Doodle::Base
+        has :value, :init => 42
+      end
+      foo = Foo.new
+      foo.value.should == 42
+    end
+  end
+  temporary_constant :Foo do
+    it 'should not evaluate value when proc given as :init' do
+      class Foo < Doodle::Base
+        has :value, :init => proc { 42 }
+      end
+      foo = Foo.new
+      foo.value.call.should == 42
+    end
+  end
+  temporary_constant :Foo do
+    it 'should evaluate value when block given as :init' do
+      class Foo < Doodle::Base
+        has :value do
+          init do
+            42
+          end
+        end
+      end
+      foo = Foo.new
+      foo.value.should == 42
     end
   end
 end

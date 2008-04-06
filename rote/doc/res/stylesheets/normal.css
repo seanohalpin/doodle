@@ -12,6 +12,21 @@ body {
 	padding: 0px;
 	margin: 0px 0px 0px 0px;
 	margin: 40px 40px 40px 40px;
+
+  font-family: 'LucidaGrande', 'Lucida Grande', 'Lucida Sans Unicode', 'sans-serif'; 
+  font-size: 12px; 
+  font-size: 9pt;
+  font-size: 0.8em;
+  font-style: normal; 
+  font-variant: normal;
+  font-weight: normal; 
+  letter-spacing: 0; 
+  line-height: 17px; 
+  line-height: 12.75pt;
+  line-height: 1.4em;
+  opacity: 1.00; 
+  text-decoration: none; 
+  text-transform: none;
 }
 
 ul li {

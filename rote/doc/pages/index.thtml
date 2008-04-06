@@ -70,7 +70,7 @@ class Event
       Date.parse(s)
     end
   end
-  has :locations, :init => [], :collect => {:place => "Location"}
+  has :locations, :collect => {:place => "Location"}
 end
 #:code#
 
@@ -126,11 +126,17 @@ Of course, if you insist on typing @new@, you can:
 
 h2. defaults
 
-Doodle assumes that if you specify an attribute without a default, it is required. If you try to initialize
-an instance without specifying all required attributes, it will complain.
+Doodle assumes that if you specify an attribute without a default, it
+is required. If you try to initialize an instance without specifying
+all required attributes, it will complain. For example:
 
 #:code#ruby#
+  class Event
+    has :date
+  end
+
   event = Event()
+  # or
   event = Event.new
 #:code#
 
@@ -391,7 +397,7 @@ You can pass multiple classes or modules to @from@ - it's up to you to ensure th
 
 #:code#ruby#
   from Symbol, String do |name|
-    Event[:name => name.to_s]
+    Event(:name => name.to_s)
   end
 #:code#
 
@@ -431,17 +437,21 @@ to a collection. For example:
   end
 #:code#
 
-In this example, we have an attribute called @locations@ which is intended to be an
-array of @Location@ objects. Using the @:collect => Location@ option of @has@ defines
-a method called @location@ (derived from the class name) that will create a new
-@Location@ object using the parameters passed to the @location@ methods
-and add it to the @locations@ attribute.
+In the example above, we want @locations@ to be an array of @Location@
+objects. Using the @:collect => Location@ option defines a method
+called @location@ (derived from the class name).  Each time the
+@location@ method is called a new @Location@ object is added to the
+@locations@ array
 
-To use a specific name for the collecting method, use the pass a hash
+You can leave out the @:init@ option if all you want is to collect into an array -
+doodle will supply one for you. Otherwise, you need to supply an
+Enumerable that provides the @<<@ method.
+
+To use a specific name for the collecting method, pass a hash
 containing @{:method_name => ClassName}@ to the @collect@ option like this:
 
 #:code#ruby#
-    has :locations, :init => [], :collect => {:place => Location}
+    has :locations, :collect => {:place => Location}
     ...
     event = Event do
       place "Stage 1"
@@ -449,8 +459,19 @@ containing @{:method_name => ClassName}@ to the @collect@ option like this:
     end
 #:code#
 
-The classname can be a class constant, a symbol or a string. @collect@
-works for any class that provides a @<<@ method.
+The classname can be a class constant, a symbol or a string.
+
+Finally, if you don't want to restrict the value to a particular
+class, you can just specify a method name:
+
+#:code#ruby#
+    has :locations, :collect => :place
+    ...
+    event = Event do
+      place "Stage 1"
+      place 42
+    end
+#:code#
 
 h2. class and singleton level definitions
 
@@ -481,5 +502,8 @@ or singleton instances:
   # => 'This object is special'
 #:code#
 
+h2. links
 
-
+* "Rubyforge project":http://rubyforge.org/projects/doodle
+* "Forum":http://rubyforge.org/forum/?group_id=5159
+* "Bug reports":http://rubyforge.org/tracker/?atid=19938&group_id=5159&func=browse

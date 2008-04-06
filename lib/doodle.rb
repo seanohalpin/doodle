@@ -3,6 +3,7 @@
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
 require 'pp'
+#require 'bleak_house' if ENV['BLEAK_HOUSE']
 
 # *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
 # have pollute core Ruby objects such as Object, Class and Module.
@@ -22,20 +23,24 @@ if RUBY_VERSION < '1.8.6'
       define_method :instance_variable_defined? do |name|
         res = __doodle__inspect.bind(self).call
         rx = /\B#{name}=/
-        rv = nil
-        if rx =~ res
-          rv = true
-        else
-          rv = false
-        end
-        #p [:instance_variable_defined, rx, name, self, res, rv, caller[0..2]]
-        rv
+        rx =~ res ? true : false
       end
     end
   end
 end
 
 module Doodle
+  VERSION = '0.0.9'
+  # where are we?
+  class << self
+    def context
+      Thread.current[:doodle_context] ||= []
+    end
+    def parent
+      context[-2]
+    end
+  end
+
   module Debug
     class << self
       # output result of block if ENV['DEBUG_DOODLE'] set
@@ -256,11 +261,23 @@ module Doodle
   # Lazy is a Proc that caches the result of a call
   class Lazy < Proc
     # return the result of +call+ing this Proc - cached after first +call+
-    def value
-      @value ||= call
+    def call(*args, &block)
+      @value ||= super
     end
+    def value
+      call
+    end
+    alias :[] :call
   end
 
+  class SaveBlock
+    attr_accessor :block
+    def initialize(arg_block = nil, &block)
+      arg_block = block if block_given?
+      @block = arg_block
+    end
+  end
+  
   # A Validation represents a validation rule applied to the instance
   # after initialization. Generated using the Doodle::BaseMethods#must directive.
   class Validation
@@ -299,11 +316,12 @@ module Doodle
       @local_conversions = {}
       @arg_order = []
       @errors = []
-
+      Doodle::Debug.d { [:creating_Doodle_Info_for, object, object.object_id] }
       oid = object.object_id
+      ostr = object.inspect
       ObjectSpace.define_finalizer(object) do
         # this seems to be called only on exit
-        Doodle::Debug.d { "finalizing #{oid}" }
+        Doodle::Debug.d { "finalizing #{ ostr }" }
         DOODLES.delete(oid)
       end
     end
@@ -455,14 +473,17 @@ module Doodle
         att = lookup_attribute(name)
         #d { [:getter, name, att, block] }
         if att.default_defined?
-          if att.default.kind_of?(Proc)
+          case att.default
+          when SaveBlock
+            instance_eval(&att.default.block)
+          when Proc
             instance_eval(&att.default)
           else
             att.default
           end
         else
           # This is an internal error (i.e. shouldn't happen)
-          handle_error name, NoDefaultError, "Internal error - '#{name}' has no default defined", [caller[-1]]
+          handle_error name, NoDefaultError, "Error - '#{name}' has no default defined", [caller[-1]]
         end
       end
     end
@@ -472,7 +493,11 @@ module Doodle
     def _setter(name, *args, &block)
       #pp [:_setter, self, self.class,  name, args, block]
       ivar = "@#{name}"
-      args.unshift(block) if block_given?
+      if block_given?
+        args.unshift(SaveBlock.new(block))
+        #p [:instance_eval_block, self, block]
+        #args = [instance_eval(&block)]
+      end
       # d { [:_setter, 3, :setting,  name, ivar, args] }
       att = lookup_attribute(name)
       # d { [:_setter, 4, :setting,  name, att] }
@@ -521,10 +546,11 @@ module Doodle
     end
 
     # convert a value according to conversion rules
-    def convert(owner, value)
+    def convert(owner, *args)
       begin
+        value = args.first
         if (converter = conversions[value.class])
-          value = converter[value]
+          value = converter[*args]
         else
           # try to find nearest ancestor
           ancestors = value.class.ancestors
@@ -535,7 +561,7 @@ module Doodle
             converter_class = ancestors[indexed_matches.min]
             #p [:converter, converter_class]
             if converter = conversions[converter_class]
-              value = converter[value]
+              value = converter[*args]
             end
           end
         end
@@ -547,6 +573,7 @@ module Doodle
 
     # validate that args meet rules defined with +must+
     def validate(owner, *args)
+      Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
       value = convert(owner, *args)
       #d { [:validate, self, :args, args, :value, value ] }
       validations.each do |v|
@@ -564,8 +591,19 @@ module Doodle
       # d { [:define_getter_setter, [self, self.class, self_class], name, args, block] }
 
       # need to use string eval because passing block
-      module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end"
-      module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end"
+      module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
+      module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
+
+#       module_eval {
+#         define_method name do |*args|
+#           getter_setter(name.to_sym, *args)
+#         end
+#       }
+#       module_eval {
+#         define_method "#{name}=" do |*args|
+#           _setter(name.to_sym, *args)
+#         end
+#       }
     end
     private :define_getter_setter
 
@@ -574,9 +612,9 @@ module Doodle
     def define_collector(collection, name, klass = nil, &block)
       # need to use string eval because passing block
       if klass.nil?
-        module_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end"
+        module_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__
       else
-        module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end"
+        module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end", __FILE__, __LINE__
       end
     end
     private :define_collector
@@ -693,11 +731,17 @@ module Doodle
           hash[n] = begin
             case a.init
             when NilClass, TrueClass, FalseClass, Fixnum
+              #p [:init, :no_clone]
               a.init
+            when SaveBlock
+              #p [:init, :save_block]
+              instance_eval(&a.init.block)
             else
+              #p [:init, :clone]
               a.init.clone 
             end
-          rescue 
+          rescue Exception => e
+            #p [:init, :rescue, e]
             a.init
           end
           ; hash }
@@ -787,13 +831,16 @@ module Doodle
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
       __doodle__.validation_on = true
-      
+      #p [:Doodle_context_push, self]
+      Doodle.context.push(self)
       defer_validation do
         # d { [:initialize, self.to_s, args, block] }
         initialize_from_hash(*args)
         # d { [:initialize, self.to_s, args, block, :calling_block] }
         instance_eval(&block) if block_given?
       end
+      Doodle.context.pop
+      #p [:Doodle_context_pop, ]
     end
 
   end
@@ -827,7 +874,7 @@ module Doodle
           klass = Object
           #p [:names_empty, klass, mklass]
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
-            eval src = "def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING
+            eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
           klass = names.inject(self) {|c, n| c.const_get(n)}
@@ -836,7 +883,7 @@ module Doodle
           #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
           # TODO: check how many times this is being called
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
-            klass.class_eval(src = "def self.#{name}(*args, &block); #{name}.new(*args, &block); end")
+            klass.class_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         end
         #p [:factory, mklass, klass, src]
@@ -921,6 +968,7 @@ module Doodle
     has :init, :default => nil
 
   end
+
 end
 
 ############################################################
