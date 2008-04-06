@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby -w
-$: << '..'
-require 'lib/doodle'
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'doodle'
 require 'pp'
 require 'yaml'
 
