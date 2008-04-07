@@ -861,7 +861,7 @@ module Doodle
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
   module Factory
-    RX_IDENTIFIER = /[A-Za-z_][A-Za-z_0-9]+\??/
+    RX_IDENTIFIER = /^[A-Za-z_][A-Za-z_0-9]+\??$/
     class << self   
       # create a factory function in appropriate module for the specified class
       def factory(konst)
