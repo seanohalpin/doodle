@@ -314,3 +314,61 @@ o.singleton_class.has :name
 == Performance
 == Use cases
 === TODO Example real-world use cases
+
+= Thoughts about implementation
+== 2008-04-07 04:19:14
+- The more I have to hack up dirty workarounds, the more I feel
+  frustrated with the limitations of Ruby 1.8
+- I'm tempted to move to 1.9 or Rubinius, though there's no guarantee
+  that what I'm trying to do would work there either
+
+== 2008-04-07 Datatypes
+- Right now I'm trying to find a way to apply a mixin
+  temporarily. This is so I can 'hygenically' create datatype
+  definitions (e.g. use string :name instead of has :name, :kind =>
+  String). The best solution I've come up with so far is to create an
+  anonymous class which includes the extensions I want, then copy over
+  the resulting Attributes. I also need to copy the accessors and
+  collectors too (not done yet). 
+- I want to apply methods like #string inside a block, the result of
+  which applies to the enclosing class definition, without extending
+  the class to have a #string method.
+- One way would be to define the datatypes to generate data structures
+  that represent the datatype definitions without applying them,
+  i.e. just collect the parameters. This is made a little awkward by
+  the fact you cannot pass blocks to blocks in 1.8 (because I wanted
+  datatype definition to look something like this:
+
+    define_datatype :date, :kind => Date do
+      from String do |s|
+        Date.parse(s)
+      end
+      from Array do |y,m,d|
+        Date.new(y, m, d)
+      end
+      from Integer do |jd|
+        Date.new(*Date.jd_to_civil(jd))
+      end
+    end
+
+  i.e. so you're able to use #from and #must like in an ordinary
+  Attribute definition.
+
+- I would then like to apply these definitions within an encapsulated
+  namespace, like this:
+
+  class DateRange < Base
+    doodle do
+      date :start
+      date :end do
+        default { start }
+      end
+    end
+  end
+
+  so that the definition of #date is valid only within the doodle
+  block, but applies to the class. binding_of_caller would do the
+  trick, but that's not available any more.
+
+  2008-04-07 07:51:53 - see examples/datatypes.rb for current approach
+  using a proxy object
