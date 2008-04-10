@@ -319,11 +319,11 @@ module Doodle
       Doodle::Debug.d { [:creating_Doodle_Info_for, object, object.object_id] }
       oid = object.object_id
       ostr = object.inspect
-      ObjectSpace.define_finalizer(object) do
-        # this seems to be called only on exit
-        Doodle::Debug.d { "finalizing #{ ostr }" }
-        DOODLES.delete(oid)
-      end
+#       ObjectSpace.define_finalizer(object) do
+#         # this seems to be called only on exit
+#         Doodle::Debug.d { "finalizing #{ ostr }" }
+#         DOODLES.delete(oid)
+#       end
     end
   end
 
@@ -333,13 +333,48 @@ module Doodle
     include SelfClass
     include Inherited
 
-    # this is the only way to get at internal values
-    # FIXME: this is going to leak memory (I think)
-    
+    # this is the only way to get at internal values. Note: this is
+    # initialized on the fly rather than in #initialize because
+    # classes and singletons don't call #initialize
     def __doodle__
-      DoodleInfo::DOODLES[object_id] ||= DoodleInfo.new(self)
+      @__doodle__ ||= DoodleInfo.new(self)
     end
+
+    # hack to fool yaml
+    # pick a name that no-one else is likely to use
+    alias :seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6 :instance_variables
+    # redefine instance_variables to ignore our private @__doodle__ variable
+    def instance_variables
+      seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6.reject{ |x| x == '@__doodle__'}
+    end
+
+    # the 'proper' way to do it (but much slower)
+#     seoh_doodle_instance_variables = instance_method(:instance_variables)
+#     define_method :instance_variables do
+#       seoh_doodle_instance_variables.bind(self).call.reject{ |x| x == '@__doodle__'}
+#     end
+
+    # this doesn't work with singletons (not sure why not)
+#     def __doodle__
+#       dood = DoodleInfo.new(self)
+#       self_class.class_eval {
+#         define_method :__doodle__ do
+#           dood
+#         end
+#       }
+#       dood
+#     end
+    
     private :__doodle__
+
+    def marshal_dump
+      instance_variables.map{|x| [x, instance_variable_get(x)] }
+    end
+    def marshal_load(data)
+      data.each do |name, value|
+        instance_variable_set(name, value)
+      end
+    end
 
     # where should I put this?
     def errors
