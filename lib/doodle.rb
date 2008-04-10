@@ -62,6 +62,15 @@ module Doodle
     end
   end
 
+  # error handling
+  @@raise_exception_on_error = true
+  def self.raise_exception_on_error
+    @@raise_exception_on_error
+  end
+  def self.raise_exception_on_error=(tf)
+    @@raise_exception_on_error = tf
+  end
+  
   # internal error raised when a default was expected but not found
   class NoDefaultError < Exception
   end
@@ -293,8 +302,6 @@ module Doodle
   end
 
   class DoodleInfo
-    DOODLES = {}
-    @@raise_exception_on_error = true
     attr_accessor :local_attributes
     attr_accessor :local_validations
     attr_accessor :local_conversions
@@ -302,13 +309,6 @@ module Doodle
     attr_accessor :arg_order
     attr_accessor :errors
 
-    def self.raise_exception_on_error
-      @@raise_exception_on_error
-    end
-    def self.raise_exception_on_error=(tf)
-      @@raise_exception_on_error = tf
-    end
-    
     def initialize(object)
       @local_attributes = OrderedHash.new
       @local_validations = []
@@ -316,14 +316,6 @@ module Doodle
       @local_conversions = {}
       @arg_order = []
       @errors = []
-      Doodle::Debug.d { [:creating_Doodle_Info_for, object, object.object_id] }
-      oid = object.object_id
-      ostr = object.inspect
-#       ObjectSpace.define_finalizer(object) do
-#         # this seems to be called only on exit
-#         Doodle::Debug.d { "finalizing #{ ostr }" }
-#         DOODLES.delete(oid)
-#       end
     end
   end
 
@@ -397,7 +389,7 @@ module Doodle
       if !self.errors.include?([name, *args])
         self.errors << [name, *args]
       end
-      if DoodleInfo.raise_exception_on_error
+      if Doodle.raise_exception_on_error
         raise(*args)
       end
     end

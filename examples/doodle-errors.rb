@@ -24,7 +24,7 @@ params = {
 # pp rv
 
 rv = try {
-  Doodle::DoodleInfo.raise_exception_on_error = false
+  Doodle.raise_exception_on_error = false
   foo = Foo(params)
   foo.errors
 }
