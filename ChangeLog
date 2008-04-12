@@ -1,5 +1,32 @@
 = ChangeLog for doodle
 
+== 0.0.9 / 2008-04-12
+
+- new features:
+  - added Doodle.context and Doodle.parent (only valid during
+    initialization)
+  - use SaveBlock to distinguish between Proc and block args to :init
+  - :collect now creates array by default if no :init specified (thanks to
+    James Adam :)
+  - attributes defined with collect now have :init => [] if no :init
+    specified
+  - :collect can now initialize from Enumerables by default
+  - raise UnknownAttributeError if initialize called with unspecified attribute key
+- new examples:
+  - mail example (with gmail smtp support)
+  - Doodle.parent
+  - datatypes
+- new specs for singletons, Doodle.context and Doodle.parent, factory
+- updated docs
+- removed unused code and tidied up
+- bug fixes:
+  - fixed memory leak and provided custom to_yaml and marshal_dump/load
+  - fixed regex for factory methods
+  - fixed bug where validate! was creating instance variables with defaults
+  - fixed errors collection
+  - fixed yaml test for JRuby
+  - don't define factory method if one by same name already defined
+
 == 0.0.8 / 2008-03-25
 
 - renamed rake task upload_gem to publish_gem
