@@ -8,8 +8,6 @@
   - use SaveBlock to distinguish between Proc and block args to :init
   - :collect now creates array by default if no :init specified (thanks to
     James Adam :)
-  - attributes defined with collect now have :init => [] if no :init
-    specified
   - :collect can now initialize from Enumerables by default
   - raise UnknownAttributeError if initialize called with unspecified attribute key
 - new examples:
