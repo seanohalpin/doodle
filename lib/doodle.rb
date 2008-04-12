@@ -99,39 +99,12 @@ module Doodle
       sc
     end
 
-    # return self if a Module, else the singleton class
-    def self_class
-      self.kind_of?(Module) ? self : singleton_class
-    end
-    
-    # frankly a hack to allow init options to work for singleton classes
-    def class_init(params = {}, &block)
-      sc = singleton_class(&block)
-      sc.attributes.select{|n, a| a.init_defined? }.each do |n, a|
-        send(n, a.init)
-      end
-      sc
-    end
   end
 
   # provide an alternative inheritance chain that works for singleton
   # classes as well as modules, classes and instances
   module Inherited
 
-    # def supers
-    #   supers = []
-    #   s = superclass rescue nil
-    #   while !s.nil?
-    #     supers << s
-    #     last_s = s.superclass rescue nil
-    #     if last_s == s
-    #       last_s = nil
-    #     end
-    #     s = last_s
-    #   end
-    #   supers
-    # end
-    
     # parents returns the set of parent classes of an object.
     # note[this is horribly complicated and kludgy - is there a better way?
     # could do with refactoring]
@@ -142,13 +115,7 @@ module Doodle
       klasses = []
       if defined?(superclass)
         klass = superclass
-        #p [:klass_superclass, klass]
-        if self == superclass
-          # d { [:parents, 'self == superclass'] }
-          klass = nil
-        else
-          #p [:klass_singleton_class, klass]
-          #p [:parents, 'klass = superclass', self, klass, self.ancestors]
+        if self != superclass
           #
           # fixme[any other way to do this? seems really clunky to have to hack strings]
           #
@@ -158,38 +125,21 @@ module Doodle
             if cap = self.to_s.match(regex)
               if cap.captures.size > 0
                 k = const_get(cap[1])
+                # push onto front of array
                 if k.respond_to?(:superclass) && k.superclass.respond_to?(:singleton_class)
                   klasses.unshift k.superclass.singleton_class
                 end
               end
-              #p [:klass_self_klass, klass]
-              #p [:klasses, klasses]
-              loop do
-                if klass.nil?
-                  break
-                end
+              until klass.nil?
                 klasses.unshift klass
-                #p [:loop_klasses, klasses]
                 if klass == klass.superclass
-                  #p [:HERE_HERE_BEFORE, klasses]
-                  #break
                   return klasses # oof
                 end
                 klass = klass.superclass
               end
-              #p [:HERE_HERE, klasses]
             else
-              #p [:klass_self_klass, klass]
-              #p [:klasses, klasses]
-              loop do
-                if klass.nil?
-                  break
-                end
+              until klass.nil?
                 klasses << klass
-                #p [:loop_klasses, klasses]
-                if klass == klass.superclass
-                  break
-                end
                 klass = klass.superclass
               end
             end
@@ -197,17 +147,8 @@ module Doodle
         end
       else
         klass = self.class
-        #p [:klass_self_klass, klass]
-        #p [:klasses, klasses]
-        loop do
-          if klass.nil?
-            break
-          end
+        until klass.nil?
           klasses << klass
-          #p [:loop_klasses, klasses]
-          if klass == klass.superclass
-            break
-          end
           klass = klass.superclass
         end
       end
@@ -220,7 +161,6 @@ module Doodle
       klasses = parents
       #p [:parents, parents]
       # d { [:collect_inherited, :parents, message, klasses] }
-      #klasses = self_class.ancestors # this produces quite different behaviour
       klasses.each do |klass|
         #p [:testing, klass]
         if klass.respond_to?(message)
@@ -575,7 +515,7 @@ module Doodle
     
     # define a getter_setter
     def define_getter_setter(name, *args, &block)      
-      # d { [:define_getter_setter, [self, self.class, self_class], name, args, block] }
+      # d { [:define_getter_setter, [self, self.class], name, args, block] }
 
       # need to use string eval because passing block
       module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
@@ -628,7 +568,7 @@ module Doodle
     #  end
     #    
     def has(*args, &block)
-      Doodle::Debug.d { [:has, self, self.class, self_class, args] }
+      Doodle::Debug.d { [:has, self, self.class, args] }
       name = args.shift.to_sym
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
