@@ -267,18 +267,6 @@ module Doodle
     end
   end
 
-  # Lazy is a Proc that caches the result of a call
-  class Lazy < Proc
-    # return the result of +call+ing this Proc - cached after first +call+
-    def call(*args, &block)
-      @value ||= super
-    end
-    def value
-      call
-    end
-    alias :[] :call
-  end
-
   class SaveBlock
     attr_accessor :block
     def initialize(arg_block = nil, &block)
@@ -331,33 +319,15 @@ module Doodle
     def __doodle__
       @__doodle__ ||= DoodleInfo.new(self)
     end
+    private :__doodle__
 
-    # hack to fool yaml
+    # hack to fool yaml (and anything else that queries instance_variables)
     # pick a name that no-one else is likely to use
     alias :seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6 :instance_variables
     # redefine instance_variables to ignore our private @__doodle__ variable
     def instance_variables
       seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6.reject{ |x| x == '@__doodle__'}
     end
-
-    # the 'proper' way to do it (but much slower)
-#     seoh_doodle_instance_variables = instance_method(:instance_variables)
-#     define_method :instance_variables do
-#       seoh_doodle_instance_variables.bind(self).call.reject{ |x| x == '@__doodle__'}
-#     end
-
-    # this doesn't work with singletons (not sure why not)
-#     def __doodle__
-#       dood = DoodleInfo.new(self)
-#       self_class.class_eval {
-#         define_method :__doodle__ do
-#           dood
-#         end
-#       }
-#       dood
-#     end
-    
-    private :__doodle__
 
     def marshal_dump
       instance_variables.map{|x| [x, instance_variable_get(x)] }
@@ -370,19 +340,16 @@ module Doodle
 
     # where should I put this?
     def errors
-      # @errors ||= []
       __doodle__.errors
     end
   
     def clear_errors
       #pp [:clear_errors, self, caller]
-      # remove_instance_variable("@errors")
       __doodle__.errors.clear
     end
     
     # handle errors either by collecting in :errors or raising an exception
     def handle_error(name, *args)
-      #__doodle__.errors << [name, *args]
       #pp [:caller, self, caller]
       #pp [:handle_error, name, args]
       # don't include duplicates (FIXME: hacky - shouldn't have duplicates in the first place)
@@ -486,13 +453,7 @@ module Doodle
       ivar = "@#{name}"
       if instance_variable_defined?(ivar)
         ## d { [:_getter, 2, name, block] }
-        v = instance_variable_get(ivar)
-        #d { [:_getter, :defined, name, v] }
-        #         if v.kind_of?(Lazy)
-        #          p [name, self, self.class, v]
-        #          v = instance_eval &v.block
-        #         end
-        v
+        instance_variable_get(ivar)
       else
         # handle default
         # Note: use :init => value to cover cases where defaults don't work
@@ -523,7 +484,6 @@ module Doodle
       if block_given?
         args.unshift(SaveBlock.new(block))
         #p [:instance_eval_block, self, block]
-        #args = [instance_eval(&block)]
       end
       # d { [:_setter, 3, :setting,  name, ivar, args] }
       att = lookup_attribute(name)
@@ -621,14 +581,13 @@ module Doodle
       module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
       module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
 
+      # this is how it should be done (in 1.9)      
 #       module_eval {
-#         define_method name do |*args|
-#           getter_setter(name.to_sym, *args)
+#         define_method name do |*args, &block|
+#           getter_setter(name.to_sym, *args, &block)
 #         end
-#       }
-#       module_eval {
-#         define_method "#{name}=" do |*args|
-#           _setter(name.to_sym, *args)
+#         define_method "#{name}=" do |*args, &block|
+#           _setter(name.to_sym, *args, &block)
 #         end
 #       }
     end
@@ -907,7 +866,6 @@ module Doodle
           klass = names.inject(self) {|c, n| c.const_get(n)}
           mklass = class << klass; self; end
           #p [:names, klass, mklass]
-          #eval src = "def #{ names.join('::') }::#{name}(*args, &block); #{ names.join('::') }::#{name}.new(*args, &block); end"
           # TODO: check how many times this is being called
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             klass.class_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
@@ -920,7 +878,6 @@ module Doodle
       def included(other)
         #p [:factory, :included, self, other ]
         super
-        #raise Exception, "#{self} can only be included in a Class" if !other.kind_of? Class
         # make +factory+ method available
         factory other
       end
