@@ -1,4 +1,5 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+$:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'doodle'
 require 'net/smtp'
 require 'rfc822'
@@ -68,6 +69,7 @@ def mail(&block)
 end
 
 def prompt
+  return 'someone@example.com'
   STDOUT.print "Send to? "
   STDOUT.flush
   STDIN.gets.strip

@@ -1,4 +1,5 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+$:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'doodle'
 require 'net/smtp'
 require 'time'
@@ -66,15 +67,18 @@ class GMail < Mail
   has :mail_server, :default => 'smtp.gmail.com'
   has :port, :default => 587
   has :username, :default => 'sean.ohalpin@gmail.com'
-  has :password do
-    init do
-      prompt_for_password
-    end
-  end
+  has :password, :default => 'sesame'
+#   has :password do
+#     init do
+#       prompt_for_password
+#     end
+#   end
   has :host, :default => 'localhost.localdomain'
   has :message_format, :default => 'plain'
   
   def send
+    puts msg
+    return
     ::Net::SMTP.start(mail_server, 
                       port,
                       host, 
