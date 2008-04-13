@@ -30,8 +30,8 @@ if RUBY_VERSION < '1.8.6'
 end
 
 module Doodle
-  VERSION = '0.0.10'
-  # where are we?
+  VERSION = '0.0.11'
+  # where are we? populated during initialization
   class << self
     def context
       Thread.current[:doodle_context] ||= []
@@ -422,20 +422,13 @@ module Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
-      #pp [:_setter, self, self.class, name, args, block, caller]
       ivar = "@#{name}"
       if block_given?
         args.unshift(DeferredBlock.new(block))
-        #p [:instance_eval_block, self, block]
       end
-      # d { [:_setter, 3, :setting,  name, ivar, args] }
-      att = lookup_attribute(name)
-      # d { [:_setter, 4, :setting,  name, att] }
-      if att
-        #d { [:_setter, :instance_variable_set, :ivar, ivar, :args, args, :att_validate, att.validate(*args) ] }
+      if att = lookup_attribute(name)
         v = instance_variable_set(ivar, att.validate(self, *args))
       else
-        #d { [:_setter, :instance_variable_set, ivar, args ] }
         v = instance_variable_set(ivar, *args)
       end
       validate!(false)
@@ -446,13 +439,11 @@ module Doodle
     # if block passed, define a conversion from class
     # if no args, apply conversion to arguments
     def from(*args, &block)
-      # d { [:from, self, self.class, self.name, args, block] }
       if block_given?
         # set the rule for each arg given
         args.each do |arg|
           local_conversions[arg] = block
         end
-        # d { [:from, conversions] }
       else
         convert(self, *args)
       end
@@ -465,7 +456,6 @@ module Doodle
 
     # add a validation that attribute must be of class <= kind
     def kind(*args, &block)
-      # d { [:kind, args, block] }
       if args.size > 0
         # todo[figure out how to handle kind being specified twice?]
         @kind = args.first
@@ -505,21 +495,17 @@ module Doodle
     def validate(owner, *args)
       Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
       value = convert(owner, *args)
-      #d { [:validate, self, :args, args, :value, value ] }
       validations.each do |v|
         Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
           owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
-      #d { [:validate, :value, value ] }
       value
     end
     
     # define a getter_setter
     def define_getter_setter(name, *args, &block)      
-      # d { [:define_getter_setter, [self, self.class], name, args, block] }
-
       # need to use string eval because passing block
       module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
       module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
@@ -571,7 +557,6 @@ module Doodle
     #  end
     #    
     def has(*args, &block)
-      #what_am_i?([:has, args])
       Doodle::Debug.d { [:has, self, self.class, args] }
       name = args.shift.to_sym
       # d { [:has2, name, args] }
@@ -663,47 +648,6 @@ module Doodle
         ; hash }
     end
     private :get_init_values
-    
-    # helper function to initialize from hash - this is safe to use
-    # after initialization (validate! is called if this method is
-    # called after initialization)
-    def initialize_from_hash(*args)
-      defer_validation do
-        # hash initializer
-        # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
-        key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        Doodle::Debug.d { [:initialize_from_hash, :key_values, key_values, :args, args] }
-
-        # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
-        arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
-        # d { [:initialize, :arg_keywords, arg_keywords] }
-
-        # set up initial values with ~clones~ of specified values (so not shared between instances)
-        init_values = get_init_values
-
-        # add to start of key_values array (so can be overridden by params)
-        key_values.unshift(init_values)
-
-        # merge all hash args into one
-        key_values = key_values.inject(arg_keywords) { |hash, item| hash.merge(item)}
-
-        # convert key names to symbols
-        key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
-        Doodle::Debug.d { [:initialize_from_hash, :key_values2, key_values, :args2, args] }
-        
-        # create attributes
-        key_values.keys.each do |key|
-          Doodle::Debug.d { [:initialize_from_hash, :setting, key, key_values[key]] }
-          if respond_to?(key)
-            send(key, key_values[key])
-          else
-            # raise error if not defined
-            handle_error key, Doodle::UnknownAttributeError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
-          end
-        end
-      end
-    end
-    #private :initialize_from_hash
 
     # return true if instance variable +name+ defined
     def ivar_defined?(name)
@@ -768,6 +712,47 @@ module Doodle
       v
     end
 
+    # helper function to initialize from hash - this is safe to use
+    # after initialization (validate! is called if this method is
+    # called after initialization)
+    def initialize_from_hash(*args)
+      defer_validation do
+        # hash initializer
+        # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
+        key_values, args = args.partition{ |x| x.kind_of?(Hash)}
+        Doodle::Debug.d { [:initialize_from_hash, :key_values, key_values, :args, args] }
+
+        # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
+        arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
+        # d { [:initialize, :arg_keywords, arg_keywords] }
+
+        # set up initial values with ~clones~ of specified values (so not shared between instances)
+        init_values = get_init_values
+
+        # add to start of key_values array (so can be overridden by params)
+        key_values.unshift(init_values)
+
+        # merge all hash args into one
+        key_values = key_values.inject(arg_keywords) { |hash, item| hash.merge(item)}
+
+        # convert key names to symbols
+        key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
+        Doodle::Debug.d { [:initialize_from_hash, :key_values2, key_values, :args2, args] }
+        
+        # create attributes
+        key_values.keys.each do |key|
+          Doodle::Debug.d { [:initialize_from_hash, :setting, key, key_values[key]] }
+          if respond_to?(key)
+            send(key, key_values[key])
+          else
+            # raise error if not defined
+            handle_error key, Doodle::UnknownAttributeError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
+          end
+        end
+      end
+    end
+    #private :initialize_from_hash
+
     # object can be initialized from a mixture of positional arguments,
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
@@ -813,20 +798,16 @@ module Doodle
         if names.empty?
           # top level class - should be available to all
           klass = Object
-          #p [:names_empty, klass, mklass]
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
           klass = names.inject(self) {|c, n| c.const_get(n)}
-          mklass = class << klass; self; end
-          #p [:names, klass, mklass]
           # TODO: check how many times this is being called
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             klass.class_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         end
-        #p [:factory, mklass, klass, src]
       end
 
       # inherit the factory function capability
@@ -859,11 +840,11 @@ module Doodle
     include Helper
   end
 
-  # todo[need to extend this]
+  # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
   class Attribute < Doodle::Base
     # must define these methods before using them in #has below
 
-    # bump off +validate!+ for Attributes - maybe better way of doing
+    # hack: bump off +validate!+ for Attributes - maybe better way of doing
     # this however, without this, tries to validate Attribute to :kind
     # specified, e.g. if you have
     #
@@ -871,6 +852,8 @@ module Doodle
     #
     # it will fail because Attribute is not a kind of Date -
     # obviously, I have to think about this some more :S
+    #
+    # at least, I could hand roll a custom validate! method for Attribute
     #
     def validate!(all = true)
     end
@@ -901,9 +884,11 @@ module Doodle
         s.to_sym
       end
     end
+
     # default value (can be a block)
     has :default, :default => nil
-    # initial value
+
+    # initial value
     has :init, :default => nil
 
   end
