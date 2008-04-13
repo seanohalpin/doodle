@@ -409,7 +409,10 @@ module Doodle
         # (e.g. arrays that disappear when you go out of scope)
         att = lookup_attribute(name)
         #d { [:getter, name, att, block] }
-        if att.default_defined?
+        # special case for class/singleton :init
+        if att.init_defined?
+          _setter(name, att.init)
+        elsif att.default_defined?
           case att.default
           when SaveBlock
             instance_eval(&att.default.block)
