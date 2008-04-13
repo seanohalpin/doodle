@@ -1,7 +1,7 @@
 = ChangeLog for doodle
 
 == 0.0.10 / 2008-04-13
-- fixed bug in class attribute initialization
+- fixed bug with setting class and singleton attributes
 	
 == 0.0.9 / 2008-04-12
 
