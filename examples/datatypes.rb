@@ -136,6 +136,8 @@ module DataTypes
     end
   end
 end
+
+# tell doodle to incorporate the datatypes
 Doodle.datatypes DataTypes
 
 if __FILE__ == $0
@@ -172,7 +174,7 @@ if __FILE__ == $0
   require 'pp'
 
   pp try { DateRange "2007-01-18", :version => [0,0,9] }
-  pp try { Person 'Sean', '45', 'sean.ohalpin@gmail.com' }
+  pp try { Person 'Sean', '45', 'someone@example.com' }
   pp try { Person 'Sean', '45' }
   pp try { Person 'Sean', 'old' }
   pp try { Person 'Sean', 45, 'this is not an email address' }
@@ -181,4 +183,8 @@ if __FILE__ == $0
   pp try { Person 'A', 45 }
   pp try { Person '123', 45 }
   pp try { Person '', 45 }
+#   pp try {
+#     person = Person 'Sean', 45
+#     person.name.silly
+#   }
 end

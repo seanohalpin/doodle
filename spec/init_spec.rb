@@ -41,14 +41,14 @@ describe Doodle, 'init' do
       @foo.instance_variables.include?('@moniker').should == true
     end
     it 'should have an initialized class attribute :metadata' do
-      pending 'deciding how this should work' do
+      #pending 'deciding how this should work' do
         Foo.metadata.should == 'D2'
-      end
+      #end
     end
     it 'should have an initialized singleton attribute :special' do
-      pending 'deciding how this should work' do
+      #pending 'deciding how this should work' do
         @foo.special.should == 'D3'
-      end
+      #end
     end
   end
 end
