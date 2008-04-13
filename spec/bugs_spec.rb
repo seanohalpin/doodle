@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
+require 'yaml'
 
 describe 'Doodle', 'parents' do
   temporary_constant :Foo do
@@ -75,6 +76,23 @@ describe 'Doodle', ' loading bad data from yaml' do
 
     it 'should fail with ConversionError when it cannot convert' do
       proc { foo = YAML::load(@str).validate! }.should raise_error(Doodle::ConversionError)
+    end
+  end
+end
+
+describe Doodle, 'class attributes:' do
+    temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle::Base
+        has :ivar
+        class << self
+          has :cvar
+        end
+      end
+    end
+
+    it 'should be possible to set a class var without setting an instance var' do
+      proc { Foo.cvar = 42 }.should_not raise_error
     end
   end
 end

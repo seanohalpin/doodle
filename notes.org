@@ -372,3 +372,12 @@ o.singleton_class.has :name
 
   2008-04-07 07:51:53 - see examples/datatypes.rb for current approach
   using a proxy object
+
+
+== 2008-04-12 23:46:19
+- trying to discover context, e.g. class << self or singleton class,
+  etc.
+== 2008-04-13 01:34:28
+- seems like the whole way I'm doing class and singleton attributes is
+  wrong - keep hitting problems - maybe time for a complete rethink
+

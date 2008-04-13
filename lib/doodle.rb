@@ -30,7 +30,7 @@ if RUBY_VERSION < '1.8.6'
 end
 
 module Doodle
-  VERSION = '0.0.9'
+  VERSION = '0.0.10'
   # where are we?
   class << self
     def context
@@ -99,6 +99,15 @@ module Doodle
       sc
     end
 
+    def is_class_self_defn?
+      defined?(ancestors) && ancestors.include?(Class)
+    end
+    def is_singleton_defn?
+      defined?(superclass) && superclass.ancestors.include?(Class) && !is_class_self_defn?
+    end
+    def is_instance_defn?
+      !is_class_self_defn? && !is_singleton_defn?
+    end
   end
 
   # provide an alternative inheritance chain that works for singleton
@@ -419,7 +428,7 @@ module Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
-      #pp [:_setter, self, self.class,  name, args, block]
+      #pp [:_setter, self, self.class, name, args, block, caller]
       ivar = "@#{name}"
       if block_given?
         args.unshift(SaveBlock.new(block))
@@ -568,6 +577,7 @@ module Doodle
     #  end
     #    
     def has(*args, &block)
+      #what_am_i?([:has, args])
       Doodle::Debug.d { [:has, self, self.class, args] }
       name = args.shift.to_sym
       # d { [:has2, name, args] }
@@ -614,6 +624,19 @@ module Doodle
           end
         }
       end
+      if is_class_self_defn? or is_singleton_defn?
+        #pp [:args, args]
+         init_values = get_init_values(false)
+#         if init_values.size > 0
+           #p [:init_values, name, self, is_class_self_defn? ? :CLASS : is_singleton_defn? ? :SINGLETON : '?', init_values, methods(false)]
+#           #define_getter_setter(name)
+#           #instance_variable_set("@#{name}", init_values[name])
+#         end
+#         #         singleton_class do
+#            #_setter(name, init_values[name])
+#         #         end
+      end
+      
       attribute
     end
 
@@ -638,6 +661,28 @@ module Doodle
       end
     end
 
+    def get_init_values(tf = true)
+      attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| 
+        hash[n] = begin
+                    case a.init
+                    when NilClass, TrueClass, FalseClass, Fixnum
+                      #p [:init, :no_clone]
+                      a.init
+                    when SaveBlock
+                      #p [:init, :save_block]
+                      instance_eval(&a.init.block)
+                    else
+                      #p [:init, :clone]
+                      a.init.clone 
+                    end
+                  rescue Exception => e
+                    #p [:init, :rescue, e]
+                    a.init
+                  end
+        ; hash }
+    end
+    private :get_init_values
+    
     # helper function to initialize from hash - this is safe to use
     # after initialization (validate! is called if this method is
     # called after initialization)
@@ -653,24 +698,7 @@ module Doodle
         # d { [:initialize, :arg_keywords, arg_keywords] }
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
-        init_values = attributes.select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)| 
-          hash[n] = begin
-            case a.init
-            when NilClass, TrueClass, FalseClass, Fixnum
-              #p [:init, :no_clone]
-              a.init
-            when SaveBlock
-              #p [:init, :save_block]
-              instance_eval(&a.init.block)
-            else
-              #p [:init, :clone]
-              a.init.clone 
-            end
-          rescue Exception => e
-            #p [:init, :rescue, e]
-            a.init
-          end
-          ; hash }
+        init_values = get_init_values
 
         # add to start of key_values array (so can be overridden by params)
         key_values.unshift(init_values)
@@ -712,11 +740,17 @@ module Doodle
       #Doodle::Debug.d { [:validate!, self] }
       #Doodle::Debug.d { [:validate!, self, __doodle__.validation_on] }
       if __doodle__.validation_on
-        attributes.each do |name, att|
+        if self.class == Class
+          attribs = singleton_class.attributes
+        else
+          attribs = attributes
+        end
+        #pp [:validate!, self, self.class, attributes]
+        attribs.each do |name, att|
           # treat default as special case
-          if att.name == :default || att.default_defined?
+          if [:default, :init].include?(att.name) || att.default_defined? || is_class_self_defn? || is_singleton_defn?
             # nop
-          elsif !ivar_defined?(att.name)
+          elsif !ivar_defined?(att.name) && self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
           # if all == true, reset values so conversions and validations are applied to raw instance variables
