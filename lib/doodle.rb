@@ -90,23 +90,12 @@ module Doodle
   # provides more direct access to the singleton class and a way to
   # treat Modules and Classes equally in a meta context
   module SelfClass
-
     # return the 'singleton class' of an object, optionally executing
     # a block argument in the (module/class) context of that object
     def singleton_class(&block)
       sc = (class << self; self; end)
       sc.module_eval(&block) if block_given?
       sc
-    end
-
-    def is_class_self_defn?
-      defined?(ancestors) && ancestors.include?(Class)
-    end
-    def is_singleton_defn?
-      defined?(superclass) && superclass.ancestors.include?(Class) && !is_class_self_defn?
-    end
-    def is_instance_defn?
-      !is_class_self_defn? && !is_singleton_defn?
     end
   end
 
@@ -216,7 +205,7 @@ module Doodle
     end
   end
 
-  class SaveBlock
+  class DeferredBlock
     attr_accessor :block
     def initialize(arg_block = nil, &block)
       arg_block = block if block_given?
@@ -271,16 +260,19 @@ module Doodle
     private :__doodle__
 
     # hack to fool yaml (and anything else that queries instance_variables)
-    # pick a name that no-one else is likely to use
+    # - pick a name that no-one else is likely to use
     alias :seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6 :instance_variables
     # redefine instance_variables to ignore our private @__doodle__ variable
     def instance_variables
       seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6.reject{ |x| x == '@__doodle__'}
     end
 
+    # helper for Marshal.dump
     def marshal_dump
+      # note: perhaps should also dump singleton attribute definitions?
       instance_variables.map{|x| [x, instance_variable_get(x)] }
     end
+    # helper for Marshal.load
     def marshal_load(data)
       data.each do |name, value|
         instance_variable_set(name, value)
@@ -310,6 +302,17 @@ module Doodle
       end
     end
 
+    def _handle_inherited_hash(tf, method)
+      if tf
+        collect_inherited(method).inject(OrderedHash.new){ |hash, item|
+          hash.merge(OrderedHash[*item])
+        }.merge(send(method))
+      else
+        send(method)
+      end
+    end
+    private :_handle_inherited_hash
+    
     # return attributes defined in instance
     def local_attributes
       __doodle__.local_attributes
@@ -320,16 +323,20 @@ module Doodle
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
-      if tf
-        a = collect_inherited(:local_attributes).inject(OrderedHash.new){ |hash, item|
-          #p [:hash, hash, :item, item]
-          hash.merge(OrderedHash[*item])
-        }.merge(local_attributes)
-        # d { [:attributes, self.to_s, a] }
-        a
-      else
-        local_attributes
-      end
+      _handle_inherited_hash(tf, :local_attributes)
+    end
+
+    # the set of conversions defined in the current class (i.e. without inheritance)
+    def local_conversions
+      __doodle__.local_conversions
+    end
+    protected :local_conversions
+
+    # returns hash of conversions
+    # - if tf == true, returns all inherited conversions
+    # - if tf == false, returns only those conversions defined in the current object/class
+    def conversions(tf = true)
+      _handle_inherited_hash(tf, :local_conversions)
     end
 
     # the set of validations defined in the current class (i.e. without inheritance)
@@ -343,33 +350,17 @@ module Doodle
     # - if tf == false, returns only those validations defined in the current object/class
     def validations(tf = true)
       if tf
+        # note: validations are handled differently to attributes and
+        # conversions because ~all~ validations apply (so are stored
+        # as an array), whereas attributes and conversions are keyed
+        # by name and kind respectively, so only the most recent
+        # applies
+        
         #p [:inherited_validations, collect_inherited(:local_validations)]
         #p [:local_validations, local_validations]
         local_validations + collect_inherited(:local_validations)
       else
         local_validations
-      end
-    end
-
-    # the set of conversions defined in the current class (i.e. without inheritance)
-    def local_conversions
-      __doodle__.local_conversions
-    end
-    protected :local_conversions
-
-    # returns array of conversions
-    # - if tf == true, returns all inherited conversions
-    # - if tf == false, returns only those conversions defined in the current object/class
-    def conversions(tf = true)
-      if tf
-        a = collect_inherited(:local_conversions).inject(OrderedHash.new){ |hash, item|
-          #p [:hash, hash, :item, item]
-          hash.merge(OrderedHash[*item])
-        }.merge(self.local_conversions)
-        # d { [:conversions, self.to_s, a] }
-        a
-      else
-        local_conversions
       end
     end
 
@@ -414,7 +405,7 @@ module Doodle
           _setter(name, att.init)
         elsif att.default_defined?
           case att.default
-          when SaveBlock
+          when DeferredBlock
             instance_eval(&att.default.block)
           when Proc
             instance_eval(&att.default)
@@ -434,7 +425,7 @@ module Doodle
       #pp [:_setter, self, self.class, name, args, block, caller]
       ivar = "@#{name}"
       if block_given?
-        args.unshift(SaveBlock.new(block))
+        args.unshift(DeferredBlock.new(block))
         #p [:instance_eval_block, self, block]
       end
       # d { [:_setter, 3, :setting,  name, ivar, args] }
@@ -627,19 +618,6 @@ module Doodle
           end
         }
       end
-      if is_class_self_defn? or is_singleton_defn?
-        #pp [:args, args]
-         init_values = get_init_values(false)
-#         if init_values.size > 0
-           #p [:init_values, name, self, is_class_self_defn? ? :CLASS : is_singleton_defn? ? :SINGLETON : '?', init_values, methods(false)]
-#           #define_getter_setter(name)
-#           #instance_variable_set("@#{name}", init_values[name])
-#         end
-#         #         singleton_class do
-#            #_setter(name, init_values[name])
-#         #         end
-      end
-      
       attribute
     end
 
@@ -671,7 +649,7 @@ module Doodle
                     when NilClass, TrueClass, FalseClass, Fixnum
                       #p [:init, :no_clone]
                       a.init
-                    when SaveBlock
+                    when DeferredBlock
                       #p [:init, :save_block]
                       instance_eval(&a.init.block)
                     else
@@ -751,17 +729,17 @@ module Doodle
         #pp [:validate!, self, self.class, attributes]
         attribs.each do |name, att|
           # treat default as special case
-          if [:default, :init].include?(att.name) || att.default_defined? || is_class_self_defn? || is_singleton_defn?
-            # nop
-          elsif !ivar_defined?(att.name) && self.class != Class
+          break if att.default_defined?
+          ivar_name = "@#{att.name}"
+          if instance_variable_defined?(ivar_name)
+            if all
+              send(att.name, instance_variable_get(ivar_name))
+            end
+          elsif self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
           # if all == true, reset values so conversions and validations are applied to raw instance variables
           # e.g. when loaded from YAML
-          att_name = "@#{att.name}"
-          if all && instance_variable_defined?(att_name)
-            send(att.name, instance_variable_get(att_name))
-          end
         end
         # now apply instance level validations
         validations.each do |v|
