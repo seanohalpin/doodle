@@ -97,3 +97,22 @@ describe :DateRange, 'validation & conversions' do
     end
   end
 end
+
+# describe Doodle, 'validations' do
+#   temporary_constants :Foo do
+#     before :each do
+#       class Foo < Doodle::Base
+#         has :identifier, :kind => [String, Symbol]
+#       end
+#     end
+
+#     it 'may have more than one kind#1' do
+#       proc { foo = Foo(:foo) }.should_not raise_error
+#     end
+
+#     it 'may have more than one kind#2' do
+#       proc { foo = Foo('foo') }.should_not raise_error
+#     end
+
+#   end
+# end
