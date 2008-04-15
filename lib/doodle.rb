@@ -427,6 +427,7 @@ module Doodle
         args.unshift(DeferredBlock.new(block))
       end
       if att = lookup_attribute(name)
+        Doodle::Debug.d { [:_setter, name, args] }
         v = instance_variable_set(ivar, att.validate(self, *args))
       else
         v = instance_variable_set(ivar, *args)
@@ -529,7 +530,13 @@ module Doodle
       if klass.nil?
         module_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__
       else
-        module_eval "def #{name}(*args, &block); #{collection} << #{klass}.new(*args, &block); end", __FILE__, __LINE__
+        module_eval "def #{name}(*args, &block);
+                          if args.all?{|x| x.kind_of?(#{klass})}
+                            #{collection}.<<(*args)
+                          else
+                            #{collection} << #{klass}.new(*args, &block);
+                          end
+                     end", __FILE__, __LINE__
       end
     end
     private :define_collector
@@ -599,7 +606,13 @@ module Doodle
             else
               tmp_klass = collector_klass
             end
-            enum.map{|x| tmp_klass.new(x)}
+            enum.map{|x|
+              if x.kind_of?(tmp_klass)
+                x
+              else
+                tmp_klass.new(x)
+              end
+            }
           end
         }
       end
@@ -658,7 +671,7 @@ module Doodle
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
-      #pp [:validate!, all, caller]
+      Doodle::Debug.d { [:validate!, all, caller] }
       if all
         clear_errors
       end
@@ -677,6 +690,7 @@ module Doodle
           ivar_name = "@#{att.name}"
           if instance_variable_defined?(ivar_name)
             if all
+              Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
               send(att.name, instance_variable_get(ivar_name))
             end
           elsif self.class != Class
@@ -720,7 +734,7 @@ module Doodle
         # hash initializer
         # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        Doodle::Debug.d { [:initialize_from_hash, :key_values, key_values, :args, args] }
+        Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values, key_values, :args, args] }
 
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
         arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
@@ -737,11 +751,11 @@ module Doodle
 
         # convert key names to symbols
         key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
-        Doodle::Debug.d { [:initialize_from_hash, :key_values2, key_values, :args2, args] }
+        Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values2, key_values, :args2, args] }
         
         # create attributes
         key_values.keys.each do |key|
-          Doodle::Debug.d { [:initialize_from_hash, :setting, key, key_values[key]] }
+          Doodle::Debug.d { [self.class, :initialize_from_hash, :setting, key, key_values[key]] }
           if respond_to?(key)
             send(key, key_values[key])
           else
