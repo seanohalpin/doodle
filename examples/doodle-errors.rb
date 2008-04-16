@@ -14,6 +14,7 @@ end
 class Foo < Doodle::Base
   has :name, :kind => String
 end
+
 params = {
   :name => 1
 }
