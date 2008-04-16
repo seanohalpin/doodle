@@ -138,3 +138,22 @@ name: Sean
     end
   end
 end
+
+describe 'Doodle', 'hiding @__doodle__' do
+  temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle::Base
+        has :var1, :kind => Integer
+      end
+    end
+    
+    it 'should not reveal @__doodle__ in inspect string' do
+      foo = Foo 2
+      foo.inspect.should_not =~ /@__doodle__/
+    end
+    it 'should not include @__doodle__ in instance_variables' do
+      foo = Foo 2
+      foo.instance_variables.should == ['@var1']
+    end
+  end
+end
