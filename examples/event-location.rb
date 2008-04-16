@@ -26,11 +26,7 @@ class Event
       Date.parse(s)
     end
   end
-  has :locations, :init => [], :collect => {:place => "Location"} do
-    from Array do |array|
-      array.map{|x| Location(x)}
-    end
-  end
+  has :locations, :collect => {:place => :Location}
 end  
 
 event = Event "Festival" do
@@ -91,6 +87,10 @@ pp hash_data
 
 e = Event(hash_data)
 pp e
+
+src = e.to_doodle
+puts src
+puts eval(src).inspect
 
 __END__
 --- !ruby/object:Event 

@@ -51,14 +51,56 @@ module Doodle
   end
 
   # Set of utility functions to avoid changing base classes
-  module Utils    
-    # Unnest arrays by one level of nesting, e.g. [1, [[2], 3]] => [1, [2], 3].
-    def self.flatten_first_level(enum)
-      enum.inject([]) {|arr, i| if i.kind_of? Array then arr.push(*i) else arr.push(i) end }
-    end
-    # from facets/string/case.rb, line 80
-    def self.snake_case(camel_cased_word)
-      camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+  module Utils
+    class << self
+      # Unnest arrays by one level of nesting, e.g. [1, [[2], 3]] => [1, [2], 3].
+      def flatten_first_level(enum)
+        enum.inject([]) {|arr, i| if i.kind_of? Array then arr.push(*i) else arr.push(i) end }
+      end
+      # from facets/string/case.rb, line 80
+      def snake_case(camel_cased_word)
+        camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+      end
+      # format an object_id the same way Ruby does in inspect strings
+      def format_object_id(oid)
+        "%x" % ((oid << 1) & (2**32-1))
+      end
+      def try_methods(object, methods, *args, &block)
+        rv = nil
+        meth = nil
+        methods.each do |method|
+          if object.respond_to?(method)
+            rv = object.send(method, *args, &block)
+            break
+          end
+        end
+        rv
+      end
+      def doodleize(object)
+        case object
+        when String, Symbol, Float, Integer
+          result = object.inspect
+        when Date
+          result = "Date.new(#{[object.year, object.month, object.day].map{ |x| x.to_s }.join(', ')})"
+        when Enumerable
+          res = object.map { |o| doodleize(o) }.join(",\n")
+          case object
+          when Hash
+            result = "{\n#{res}\n}"
+          when Array
+            result = "[\n#{res}\n]"
+          end
+        else
+          result = try_methods(object, [:to_doodle, :inspect])
+        end
+        result
+      end
+      def doodle_format(object, name_values)
+        %[#{object.class}(\n#{name_values.map{|name, value| "#{name.to_s.to_sym.inspect} => #{Doodle::Utils.doodleize(value)}"}.join(",\n")}\n)]
+      end
+      def deep_copy(obj)
+        Marshal.load(Marshal.dump(obj))
+      end
     end
   end
 
@@ -259,14 +301,25 @@ module Doodle
     end
     private :__doodle__
 
-    # hack to fool yaml (and anything else that queries instance_variables)
-    # - pick a name that no-one else is likely to use
-    alias :seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6 :instance_variables
     # redefine instance_variables to ignore our private @__doodle__ variable
-    def instance_variables
-      seoh_doodle_instance_variables_8b016735_bd60_44d9_bda5_5f9d0aade5a6.reject{ |x| x == '@__doodle__'}
+    # (hack to fool yaml and anything else that queries instance_variables)
+    meth = Object.instance_method(:instance_variables)
+    define_method :instance_variables do
+      meth.bind(self).call.reject{ |x| x == '@__doodle__'}
     end
 
+    # redefine inspect to ignore @__doodle__
+#     real_inspect = Object.instance_method(:inspect)
+#     define_method :inspect do
+#       str = real_inspect.bind(self).call
+#       %[#<#{self.class}:0x#{Doodle::Utils.format_object_id(object_id)} #{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}>]
+#     end
+
+    # to_doodle
+    def to_doodle
+      Doodle::Utils.doodle_format(self, attributes.map{ |name, attr| [name, send(name)]})
+    end
+    
     # helper for Marshal.dump
     def marshal_dump
       # note: perhaps should also dump singleton attribute definitions?
@@ -609,6 +662,8 @@ module Doodle
             enum.map{|x|
               if x.kind_of?(tmp_klass)
                 x
+              elsif tmp_klass.conversions.key?(x.class)
+                tmp_klass.from(x)
               else
                 tmp_klass.new(x)
               end
@@ -652,6 +707,7 @@ module Doodle
                       instance_eval(&a.init.block)
                     else
                       #p [:init, :clone]
+                      #Doodle::Utils.deep_copy(a.init) 
                       a.init.clone 
                     end
                   rescue Exception => e
