@@ -61,46 +61,6 @@ module Doodle
       def snake_case(camel_cased_word)
         camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
-      # format an object_id the same way Ruby does in inspect strings
-      def format_object_id(oid)
-        "%x" % ((oid << 1) & (2**32-1))
-      end
-      def try_methods(object, methods, *args, &block)
-        rv = nil
-        meth = nil
-        methods.each do |method|
-          if object.respond_to?(method)
-            rv = object.send(method, *args, &block)
-            break
-          end
-        end
-        rv
-      end
-      def doodleize(object)
-        case object
-        when String, Symbol, Float, Integer
-          result = object.inspect
-        when Date
-          result = "Date.new(#{[object.year, object.month, object.day].map{ |x| x.to_s }.join(', ')})"
-        when Enumerable
-          res = object.map { |o| doodleize(o) }.join(",\n")
-          case object
-          when Hash
-            result = "{\n#{res}\n}"
-          when Array
-            result = "[\n#{res}\n]"
-          end
-        else
-          result = try_methods(object, [:to_doodle, :inspect])
-        end
-        result
-      end
-      def doodle_format(object, name_values)
-        %[#{object.class}(\n#{name_values.map{|name, value| "#{name.to_s.to_sym.inspect} => #{Doodle::Utils.doodleize(value)}"}.join(",\n")}\n)]
-      end
-      def deep_copy(obj)
-        Marshal.load(Marshal.dump(obj))
-      end
     end
   end
 
@@ -334,11 +294,6 @@ module Doodle
     end
     private :__doodle__
 
-    # to_doodle
-    def to_doodle
-      Doodle::Utils.doodle_format(self, attributes.map{ |name, attr| [name, send(name)]})
-    end
-    
     # helper for Marshal.dump
     def marshal_dump
       # note: perhaps should also dump singleton attribute definitions?
@@ -665,7 +620,6 @@ module Doodle
         define_collector name, collector_name, collector_klass
       end
       
-      # d { [:has_args, :params, params] }
       # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
       local_attributes[name] = attribute = Attribute.new(params, &block)
@@ -719,18 +673,13 @@ module Doodle
         hash[n] = begin
                     case a.init
                     when NilClass, TrueClass, FalseClass, Fixnum
-                      #p [:init, :no_clone]
                       a.init
                     when DeferredBlock
-                      #p [:init, :save_block]
                       instance_eval(&a.init.block)
                     else
-                      #p [:init, :clone]
-                      #Doodle::Utils.deep_copy(a.init) 
                       a.init.clone 
                     end
                   rescue Exception => e
-                    #p [:init, :rescue, e]
                     a.init
                   end
         ; hash }
