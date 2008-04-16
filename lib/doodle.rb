@@ -287,11 +287,44 @@ module Doodle
     end
   end
 
+  module SmokeAndMirrors
+    # redefine instance_variables to ignore our private @__doodle__ variable
+    # (hack to fool yaml and anything else that queries instance_variables)
+    meth = Object.instance_method(:instance_variables)
+    define_method :instance_variables do
+      meth.bind(self).call.reject{ |x| x == '@__doodle__'}
+    end
+
+    # more smoke and mirrors - hide @__doodle__ from inspect
+    # variants:
+    # #<Foo:0xb7de0064>
+    # #<Foo:0xb7c52d28 @name="Arthur Dent", @age=42>
+    # #<Class:#<Foo:0xb7de0064>>
+    # #<Class:Class>
+    # #<Class:#<Class:#<Foo:0xb7de0064>>>
+
+    # strip off all trailing > (count them = nesting)
+    # take leading chars up to first space (or EOS)
+    # rebuild rest
+
+    real_inspect = Object.instance_method(:inspect)
+    define_method :inspect do
+      str = real_inspect.bind(self).call
+      str = str.gsub(/(>+$)/, '')
+      trailing = $1
+      klass = str.split(/\s/, 2).first
+      separator = instance_variables.size > 0 ? ' ' : ''
+      %[#{klass}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
+    end
+   
+  end
+
   # the core module of Doodle - to get most facilities provided by Doodle
   # without inheriting from Doodle::Base, include Doodle::Helper, not this module
   module BaseMethods
     include SelfClass
     include Inherited
+    include SmokeAndMirrors
 
     # this is the only way to get at internal values. Note: this is
     # initialized on the fly rather than in #initialize because
@@ -300,20 +333,6 @@ module Doodle
       @__doodle__ ||= DoodleInfo.new(self)
     end
     private :__doodle__
-
-    # redefine instance_variables to ignore our private @__doodle__ variable
-    # (hack to fool yaml and anything else that queries instance_variables)
-    meth = Object.instance_method(:instance_variables)
-    define_method :instance_variables do
-      meth.bind(self).call.reject{ |x| x == '@__doodle__'}
-    end
-
-    # redefine inspect to ignore @__doodle__
-#     real_inspect = Object.instance_method(:inspect)
-#     define_method :inspect do
-#       str = real_inspect.bind(self).call
-#       %[#<#{self.class}:0x#{Doodle::Utils.format_object_id(object_id)} #{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}>]
-#     end
 
     # to_doodle
     def to_doodle
