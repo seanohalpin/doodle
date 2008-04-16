@@ -1,4 +1,19 @@
 = doodle to do list
+
+2008-04-16 22:08:39
+== TODO Fix inspect
+- don't include @__doodle__ in inspect string
+== TODO Fix parents
+- so doesn't rely on inspect
+== TODO Finish pretty printer (to_doodle)
+- is this pointless? can I ever get full coverage?
+- need to know instance variables in same way as yaml, etc.
+- maybe could use yaml as intermediate representation?
+== TODO Fix up half-assed features
+or get rid of them
+- errors collection
+- to_doodle
+
 == TODO Known bugs
 - [X] loading from yaml should apply conversions 2008-03-24
 - [X] sort out duplication of errors when calling validate! after
@@ -22,7 +37,7 @@
 - compare with AR
 - errors on attributes should be collected at the instance level
 - now not sure that Attributes should be Doodles - perhaps simpler
-== TODO fix singleton & class init
+== DONE fix singleton & class init
 - I'm not happy using the class_init directive
 - may be better to treat singleton attributes differently, e.g. to
   interpret the init at definition time rather than on object
@@ -30,16 +45,19 @@
 - the question then is how do you know you're in a singleton? it seems
   to be one of those things that by checking to see if you are one,
   you become it
-== TODO add typedef methods (e.g. date :name, string :name, etc.)
-- [ ] how should this be presented?
+- solution: done on first access
+== DONE add typedef methods (e.g. date :name, string :name, etc.)
+- [X] how should this be presented?
   - class level directives (at attr_accessor level)
-  - within block? to avoid too much namespace pollution
+  - [X] within block? to avoid too much namespace pollution
     - e.g. doodle do ... end
-== TODO check memory usage
+- see examples/datatypes.rb
+== DONE check memory usage
 - all those closures - are they leaking?
 - and DOODLES hash (are objects being finalised?)
 - check garbage collection of attributes
 - 2008-04-06 22:12:18 - used ruby-bleak-house - doesn't look good :(
+- fixed - used @__doodle__ instead of DOODLES in DoodleInfo
 == TODO profile performance against plain old attributes [0/4]]
 and compare with:
 - [ ] attr_accessor
