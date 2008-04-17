@@ -140,10 +140,23 @@ name: Sean
 end
 
 describe 'Doodle', 'hiding @__doodle__' do
-  temporary_constant :Foo do
+  temporary_constant :Foo, :Bar, :DString, :DHash, :DArray do
     before :each do
       class Foo < Doodle::Base
         has :var1, :kind => Integer
+      end
+      class Bar
+        include Doodle::Helper
+        has :var2, :kind => Integer
+      end
+      class DString < String
+        include Doodle::Helper
+      end
+      class DHash < Hash
+        include Doodle::Helper
+      end
+      class DArray < Array
+        include Doodle::Helper
       end
     end
     
@@ -154,6 +167,32 @@ describe 'Doodle', 'hiding @__doodle__' do
     it 'should not include @__doodle__ in instance_variables' do
       foo = Foo 2
       foo.instance_variables.should == ['@var1']
+    end
+    it 'should not reveal @__doodle__ in inspect string' do
+      foo = Bar 2
+      foo.inspect.should_not =~ /@__doodle__/
+    end
+    it 'should not include @__doodle__ in instance_variables' do
+      foo = Bar 2
+      foo.instance_variables.should == ['@var2']
+    end
+    it 'should correctly inspect when using included module' do
+      foo = Bar 2
+      foo.inspect.should =~ /#<Bar:0x[a-z0-9]+ @var2=2>/
+    end
+    it 'should correctly inspect string' do
+      foo = DString("Hello")
+      foo.inspect.should == '"Hello"'
+    end
+    it 'should correctly inspect hash' do
+      foo = DHash.new(2)
+      foo[:a] = 1
+      foo.inspect.should == '{:a=>1}'
+      foo[:b].should == 2
+    end
+    it 'should correctly inspect array' do
+      foo = DArray(3, 2)
+      foo.inspect.should == '[2, 2, 2]'
     end
   end
 end

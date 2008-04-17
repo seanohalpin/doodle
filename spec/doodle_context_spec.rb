@@ -20,9 +20,7 @@ describe Doodle, "doodle_context" do
           # during initialization - this is a way to capture that
           # value for ues later
           
-          init {
-            Doodle.parent
-          }
+          init { parent }
         end
       end
 
@@ -40,6 +38,7 @@ describe Doodle, "doodle_context" do
 
       sean = dad.children[0]
       sean.dad.name.should == 'Conn'
+      sean.parent.name.should == 'Conn'
     end
   end
 end

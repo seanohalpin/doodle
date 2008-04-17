@@ -50,6 +50,11 @@ module Doodle
     end
   end
 
+  # place to hold ref to built-in classes that need special handling
+  module BuiltIns
+    BUILTINS = [String, Hash, Array]
+  end
+
   # Set of utility functions to avoid changing base classes
   module Utils
     class << self
@@ -236,6 +241,7 @@ module Doodle
     attr_accessor :validation_on
     attr_accessor :arg_order
     attr_accessor :errors
+    attr_accessor :parent
 
     def initialize(object)
       @local_attributes = OrderedHash.new
@@ -244,6 +250,14 @@ module Doodle
       @local_conversions = {}
       @arg_order = []
       @errors = []
+      @parent = nil
+    end
+    real_inspect = Object.instance_method(:inspect)
+    define_method :real_inspect do
+      real_inspect.bind(self).call
+    end
+    def inspect
+      ''
     end
   end
 
@@ -255,7 +269,7 @@ module Doodle
       meth.bind(self).call.reject{ |x| x == '@__doodle__'}
     end
 
-    # more smoke and mirrors - hide @__doodle__ from inspect
+    # hide @__doodle__ from inspect
     # variants:
     # #<Foo:0xb7de0064>
     # #<Foo:0xb7c52d28 @name="Arthur Dent", @age=42>
@@ -268,13 +282,23 @@ module Doodle
     # rebuild rest
 
     real_inspect = Object.instance_method(:inspect)
+    define_method :real_inspect do
+      real_inspect.bind(self).call
+    end
     define_method :inspect do
-      str = real_inspect.bind(self).call
-      str = str.gsub(/(>+$)/, '')
-      trailing = $1
-      klass = str.split(/\s/, 2).first
-      separator = instance_variables.size > 0 ? ' ' : ''
-      %[#{klass}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
+      # have to handle some built-ins as special case
+      built_in = Doodle::BuiltIns::BUILTINS.select{ |x| self.kind_of?(x) }.first
+      if built_in
+        built_in.instance_method(:inspect).bind(self).call
+      else
+        istr = real_inspect.bind(self).call
+        str = istr.gsub(/(>+$)/, '')
+        trailing = $1
+        klass = str.split(/\s/, 2).first
+        separator = instance_variables.size > 0 ? ' ' : ''
+        #pp [:istr, istr, :str, str, :trailing, trailing, :klass, klass]
+        %[#{klass}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
+      end
     end
    
   end
@@ -531,12 +555,21 @@ module Doodle
       end
       value
     end
+
+    def sc_eval(*args, &block)
+      if self.kind_of?(Module)
+        klass = self
+      else
+        klass = self.singleton_class
+      end
+      klass.module_eval(*args, &block)
+    end
     
     # define a getter_setter
     def define_getter_setter(name, *args, &block)      
       # need to use string eval because passing block
-      module_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
-      module_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
+      sc_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
+      sc_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
 
       # this is how it should be done (in 1.9)      
 #       module_eval {
@@ -791,20 +824,25 @@ module Doodle
     end
     #private :initialize_from_hash
 
+    def parent
+      __doodle__.parent
+    end
+
     # object can be initialized from a mixture of positional arguments,
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
+      built_in = Doodle::BuiltIns::BUILTINS.select{ |x| self.kind_of?(x) }.first
+      if built_in
+        super
+      end
       __doodle__.validation_on = true
-      #p [:Doodle_context_push, self]
+      __doodle__.parent = Doodle.context[-1]
       Doodle.context.push(self)
       defer_validation do
-        # d { [:initialize, self.to_s, args, block] }
         initialize_from_hash(*args)
-        # d { [:initialize, self.to_s, args, block, :calling_block] }
         instance_eval(&block) if block_given?
       end
       Doodle.context.pop
-      #p [:Doodle_context_pop, ]
     end
 
   end

@@ -21,7 +21,7 @@ class Child < Doodle::Base
     # value for ues later
     
     init do
-      Doodle.parent
+      parent
     end
   end
 end
