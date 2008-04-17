@@ -1,14 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'doodle'
+require 'doodle/utils'
 require 'yaml'
-
-def try(&block)
-  begin
-    block.call
-  rescue Exception => e
-    e
-  end
-end
 
 class Foo < Doodle::Base
   has :name, :kind => String

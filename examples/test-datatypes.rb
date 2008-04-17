@@ -1,7 +1,8 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
 
-require 'datatypes'
+require 'doodle/datatypes'
+require 'doodle/utils'
 
 class DateRange < Doodle::Base
   doodle do
@@ -15,24 +16,28 @@ end
 
 #pp DateRange.instance_methods(false)
 
+module UserTypes
+  # include Doodle::DataTypes
+  def printable(name, params = { }, &block)
+    string(name, params, &block).instance_eval do
+      must "not contain non-printing characters" do |s|
+        s !~ /[\x00-\x1F]/
+      end
+    end
+  end
+  def name(name, params = { }, &block)
+    printable(name, { :size => 1..255 }.merge(params), &block)
+  end
+end
+
 class Person < Doodle::Base
-  doodle do
+  doodle UserTypes do
     #    string :name, :max => 10
     name :name, :size => 3..10
     integer :age
     email :email, :default => ''
   end
 end
-
-def try(&block)
-  begin
-    block.call
-  rescue Exception => e
-    e
-  end
-end
-
-require 'pp'
 
 pp try { DateRange "2007-01-18", :version => [0,0,9] }
 pp try { Person 'Sean', '45', 'someone@example.com' }

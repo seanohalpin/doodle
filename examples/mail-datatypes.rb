@@ -1,6 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'doodle'
+require 'doodle/datatypes'
 require 'net/smtp'
 require 'time'
 require 'datatypes'
@@ -47,7 +48,7 @@ class Mail < Doodle::Base
     end
   end
   
-  def send
+  def send_message
     if true
       puts msg
     else
@@ -76,7 +77,7 @@ class GMail < Mail
   has :host, :default => 'localhost.localdomain'
   has :message_format, :default => 'plain'
   
-  def send
+  def send_message
     puts msg
     return
     ::Net::SMTP.start(mail_server, 
@@ -99,4 +100,4 @@ Hi,
 this is a test email from Ruby.
 
 BODY
-end.send
+end.send_message
