@@ -88,10 +88,6 @@ pp hash_data
 e = Event(hash_data)
 pp e
 
-src = e.to_doodle
-puts src
-puts eval(src).inspect
-
 __END__
 --- !ruby/object:Event 
 date: 2000-04-01
