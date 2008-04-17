@@ -51,6 +51,14 @@ module DataTypes
       end
     end
   end
+
+  def symbol(name, params = { }, &block)
+    define name, params, block, { :kind => Symbol } do
+      from String do |s|
+        s.to_sym
+      end
+    end
+  end
   
   def string(name, params = { }, &block)
     # must extract non-standard attributes before processing with
