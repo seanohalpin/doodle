@@ -31,16 +31,15 @@ end
 
 module Doodle
   VERSION = '0.0.11'
-  # where are we? populated during initialization
   class << self
+    # provide somewhere to hold thread-specific context information
+    # (I'm claiming the :doodle_xxx namespace)
     def context
       Thread.current[:doodle_context] ||= []
     end
-    def parent
-      context[-2]
-    end
   end
 
+  # debugging utilities
   module Debug
     class << self
       # output result of block if ENV['DEBUG_DOODLE'] set
@@ -50,12 +49,12 @@ module Doodle
     end
   end
 
-  # place to hold ref to built-in classes that need special handling
+  # Place to hold ref to built-in classes that need special handling
   module BuiltIns
     BUILTINS = [String, Hash, Array]
   end
 
-  # Set of utility functions to avoid changing base classes
+  # Set of utility functions to avoid monkeypatching base classes
   module Utils
     class << self
       # Unnest arrays by one level of nesting, e.g. [1, [[2], 3]] => [1, [2], 3].
@@ -164,12 +163,8 @@ module Doodle
     def collect_inherited(message)
       result = []
       klasses = parents
-      #p [:parents, parents]
-      # d { [:collect_inherited, :parents, message, klasses] }
       klasses.each do |klass|
-        #p [:testing, klass]
         if klass.respond_to?(message)
-          # d { [:collect_inherited, :responded, message, klass] }
           result.unshift(*klass.__send__(message))
         else
           break
@@ -193,7 +188,6 @@ module Doodle
     def embrace(other, &block)
       # include in instance method chain
       include other
-      #extend other
       sc = class << self; self; end
       sc.class_eval {
         # class method chain
@@ -212,6 +206,7 @@ module Doodle
     end
   end
 
+  # save a block for later execution
   class DeferredBlock
     attr_accessor :block
     def initialize(arg_block = nil, &block)
@@ -234,6 +229,7 @@ module Doodle
     end
   end
 
+  # place to stash bookkeeping info
   class DoodleInfo
     attr_accessor :local_attributes
     attr_accessor :local_validations
@@ -261,6 +257,7 @@ module Doodle
     end
   end
 
+  # what it says on the tin! various hacks to hide @__doodle__ variable
   module SmokeAndMirrors
     # redefine instance_variables to ignore our private @__doodle__ variable
     # (hack to fool yaml and anything else that queries instance_variables)
@@ -334,7 +331,8 @@ module Doodle
     def errors
       __doodle__.errors
     end
-  
+
+    # clear out the errors collection
     def clear_errors
       #pp [:clear_errors, self, caller]
       __doodle__.errors.clear
@@ -342,8 +340,6 @@ module Doodle
     
     # handle errors either by collecting in :errors or raising an exception
     def handle_error(name, *args)
-      #pp [:caller, self, caller]
-      #pp [:handle_error, name, args]
       # don't include duplicates (FIXME: hacky - shouldn't have duplicates in the first place)
       if !self.errors.include?([name, *args])
         self.errors << [name, *args]
@@ -407,8 +403,6 @@ module Doodle
         # by name and kind respectively, so only the most recent
         # applies
         
-        #p [:inherited_validations, collect_inherited(:local_validations)]
-        #p [:local_validations, local_validations]
         local_validations + collect_inherited(:local_validations)
       else
         local_validations
@@ -418,7 +412,7 @@ module Doodle
     # lookup a single attribute by name, searching the singleton class first
     def lookup_attribute(name)
       # (look at singleton attributes first)
-      # fixme[this smells like a hack to me - why not handled in attributes?]
+      # fixme[this smells like a hack to me]
       singleton_class.attributes[name] || attributes[name]
     end
     private :lookup_attribute
@@ -426,10 +420,8 @@ module Doodle
     # either get an attribute value (if no args given) or set it
     # (using args and/or block)
     def getter_setter(name, *args, &block)
-      # d { [:getter_setter, name, args, block] }
       name = name.to_sym
       if block_given? || args.size > 0
-        # setter
         _setter(name, *args, &block)
       else
         _getter(name)
@@ -439,18 +431,14 @@ module Doodle
 
     # get an attribute by name - return default if not otherwise defined
     def _getter(name, &block)
-      ## d { [:_getter, 1, self.to_s, name, block, instance_variables] }
-      # getter
       ivar = "@#{name}"
       if instance_variable_defined?(ivar)
-        ## d { [:_getter, 2, name, block] }
         instance_variable_get(ivar)
       else
         # handle default
         # Note: use :init => value to cover cases where defaults don't work
         # (e.g. arrays that disappear when you go out of scope)
         att = lookup_attribute(name)
-        #d { [:getter, name, att, block] }
         # special case for class/singleton :init
         if att.init_defined?
           _setter(name, att.init)
@@ -528,10 +516,8 @@ module Doodle
           ancestors = value.class.ancestors
           matches = ancestors & conversions.keys
           indexed_matches = matches.map{ |x| ancestors.index(x)}
-          #p [matches, indexed_matches, indexed_matches.min]
           if indexed_matches.size > 0
             converter_class = ancestors[indexed_matches.min]
-            #p [:converter, converter_class]
             if converter = conversions[converter_class]
               value = converter[*args]
             end
@@ -629,7 +615,6 @@ module Doodle
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
       handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
-      # d { [:has_args, self, key_values, positional_args, args] }
       params = { :name => name }
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
 
@@ -684,7 +669,6 @@ module Doodle
     def arg_order(*args)
       if args.size > 0
         begin
-          #p [:arg_order, 1, self, self.class, args]
           args.uniq!
           args.each do |x|
             handle_error :arg_order, ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
@@ -692,11 +676,9 @@ module Doodle
           end
           __doodle__.arg_order = args
         rescue Exception => e
-          #p [InvalidOrderError, e.to_s]
           handle_error :arg_order, InvalidOrderError, e.to_s, [caller[-1]]
         end
       else
-        #p [:arg_order, 3, self, self.class, :default]
         __doodle__.arg_order + (attributes.keys - __doodle__.arg_order)
       end
     end
@@ -732,15 +714,12 @@ module Doodle
       if all
         clear_errors
       end
-      #Doodle::Debug.d { [:validate!, self] }
-      #Doodle::Debug.d { [:validate!, self, __doodle__.validation_on] }
       if __doodle__.validation_on
         if self.class == Class
           attribs = singleton_class.attributes
         else
           attribs = attributes
         end
-        #pp [:validate!, self, self.class, attributes]
         attribs.each do |name, att|
           # treat default as special case
           break if att.default_defined?
@@ -795,7 +774,6 @@ module Doodle
 
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
         arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
-        # d { [:initialize, :arg_keywords, arg_keywords] }
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
         init_values = get_init_values
@@ -824,6 +802,7 @@ module Doodle
     end
     #private :initialize_from_hash
 
+    # return containing object (set during initialization)
     def parent
       __doodle__.parent
     end
@@ -867,7 +846,6 @@ module Doodle
     class << self   
       # create a factory function in appropriate module for the specified class
       def factory(konst)
-        #p [:factory, name]
         name = konst.to_s
         names = name.split(/::/)
         name = names.pop
@@ -879,7 +857,7 @@ module Doodle
           end
         else
           klass = names.inject(self) {|c, n| c.const_get(n)}
-          # TODO: check how many times this is being called
+          # todo[check how many times this is being called]
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
             klass.class_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
@@ -888,7 +866,6 @@ module Doodle
 
       # inherit the factory function capability
       def included(other)
-        #p [:factory, :included, self, other ]
         super
         # make +factory+ method available
         factory other
@@ -901,7 +878,6 @@ module Doodle
   # methods).
   module Helper
     def self.included(other)
-      #p [:Helper, :included, self, other ]
       super
       other.module_eval {
         extend Embrace
@@ -916,8 +892,13 @@ module Doodle
     include Helper
   end
 
-  # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
+  # Attribute is itself a Doodle object that is created by #has and
+  # added to the #attributes collection in an object's DoodleInfo
+  #
+  # It is used to provide a context for defining #must and #from rules
+  #
   class Attribute < Doodle::Base
+  # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
     # must define these methods before using them in #has below
 
     # hack: bump off +validate!+ for Attributes - maybe better way of doing
