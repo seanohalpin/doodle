@@ -1,18 +1,18 @@
 = doodle to do list
 
 2008-04-16 22:08:39
-== TODO Fix inspect
+== DONE Fix inspect
 - don't include @__doodle__ in inspect string
 == TODO Fix parents
 - so doesn't rely on inspect
-== TODO Finish pretty printer (to_doodle)
+== Write proper pretty printer (to_doodle)
 - is this pointless? can I ever get full coverage?
 - need to know instance variables in same way as yaml, etc.
 - maybe could use yaml as intermediate representation?
-== TODO Fix up half-assed features
+== TODO Fix up half-assed features [1/2]
 or get rid of them
-- errors collection
-- to_doodle
+- [ ] errors collection
+- [X] to_doodle - gone
 
 == TODO Known bugs
 - [X] loading from yaml should apply conversions 2008-03-24
@@ -26,6 +26,8 @@ or get rid of them
   parent as neither would be garbage collected (bkz of cycle -
   better check this)
 - 2008-04-06 22:12:22 use Doodle.parent (inside initialization only)
+- 2008-04-17 15:57:15 use #parent instead of Doodle.parent 
+  (doesn't seem to affect memory usage)
 == Errors collection
 === TODO should be simpler way of getting to errors collection
 - the errors collection is for collecting all errors on an instance
