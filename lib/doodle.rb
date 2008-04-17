@@ -170,7 +170,7 @@ module Doodle
         #p [:testing, klass]
         if klass.respond_to?(message)
           # d { [:collect_inherited, :responded, message, klass] }
-          result.unshift(*klass.send(message))
+          result.unshift(*klass.__send__(message))
         else
           break
         end
@@ -203,8 +203,8 @@ module Doodle
         # ensure that subclasses are also embraced
         define_method :inherited do |klass|
           #p [:embrace, :inherited, klass]
-          klass.send(:embrace, other)       # n.b. closure
-          klass.send(:include, Factory)     # is there another way to do this? i.e. not in embrace
+          klass.__send__(:embrace, other)       # n.b. closure
+          klass.__send__(:include, Factory)     # is there another way to do this? i.e. not in embrace
           super(klass) if defined?(super)
         end
       }
@@ -357,9 +357,9 @@ module Doodle
       if tf
         collect_inherited(method).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
-        }.merge(send(method))
+        }.merge(__send__(method))
       else
-        send(method)
+        __send__(method)
       end
     end
     private :_handle_inherited_hash
@@ -748,7 +748,7 @@ module Doodle
           if instance_variable_defined?(ivar_name)
             if all
               Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
-              send(att.name, instance_variable_get(ivar_name))
+              __send__(att.name, instance_variable_get(ivar_name))
             end
           elsif self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
@@ -814,7 +814,7 @@ module Doodle
         key_values.keys.each do |key|
           Doodle::Debug.d { [self.class, :initialize_from_hash, :setting, key, key_values[key]] }
           if respond_to?(key)
-            send(key, key_values[key])
+            __send__(key, key_values[key])
           else
             # raise error if not defined
             handle_error key, Doodle::UnknownAttributeError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
