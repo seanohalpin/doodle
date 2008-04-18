@@ -61,10 +61,18 @@ describe Doodle::Attribute, 'basics' do
       @bar.singleton_class.parents.should == [Bar.singleton_class.singleton_class, Bar.singleton_class, Foo.singleton_class]
     end
 
+    it 'should have inherited class attributes in order of definition' do
+      Bar.singleton_class.attributes.map { |x| x[0]}.should == [:metadata, :doc]
+    end
+    
     it 'should have inherited singleton local_attributes in order of definition' do
       @bar.singleton_class.class_eval { collect_inherited(:local_attributes).map { |x| x[0]} }.should == [:metadata, :doc]
     end
 
+    it 'should have inherited singleton attributes(false) in order of definition' do
+      @bar.singleton_class.attributes.map { |x| x[0]} .should == [:metadata, :doc]
+    end
+    
     it 'should have inherited singleton attributes in order of definition' do
       @bar.singleton_class.attributes.keys.should == [:metadata, :doc]
     end

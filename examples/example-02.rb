@@ -1,6 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'date'
 require 'doodle'
+require 'doodle/utils' # for try
 
 class DateRange < Doodle 
   has :start_date, :kind => Date do
@@ -25,6 +26,8 @@ class DateRange < Doodle
     m = /(\d{4}-\d{2}-\d{2})\s*(?:to|-|\s)\s*(\d{4}-\d{2}-\d{2})/.match(s)
     if m
       self.new(*m.captures)
+    else
+      raise Exception, "Cannot parse date: '#{s}'"
     end
   end
 end
@@ -57,6 +60,14 @@ dr = DateRange.from '2007-01-01 2007-12-31'
 dr.start_date                   # =>
 dr.end_date                     # =>
 
-dr = DateRange '2008-01-01', '2007-12-31' 
-dr.start_date                   # =>
-dr.end_date                     # =>
+p try {
+  dr = DateRange.from 'Hello World'
+  dr.start_date                   # =>
+  dr.end_date                     # =>
+}
+
+p try {
+  dr = DateRange '2008-01-01', '2007-12-31' 
+  dr.start_date                   # =>
+  dr.end_date                     # =>
+}

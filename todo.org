@@ -1,6 +1,10 @@
 = doodle to do list
 
 2008-04-17 23:08:34
+== TODO Specs
+- [ ] Want specs for both flavours of use (e.g. class C < Doodle
+      and include Doodle::Core)
+  - so I probably want to generate the specs from templates
 == TODO Fixes
 === TODO fix messy code [0/3]
 - [ ] parents

@@ -1,5 +1,9 @@
 # doodle
-# Copyright (C) 2007 by Sean O'Halpin, 2007-11-24
+# Copyright (C) 2007-2008 by Sean O'Halpin
+# 2007-11-24 first version
+# 2008-04-18 latest release 0.0.12
+$:.unshift(File.dirname(__FILE__)) unless
+  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
 require 'pp'
@@ -14,7 +18,7 @@ if RUBY_VERSION < '1.8.6'
       define_method :instance_variable_defined? do |name|
         res = __doodle__inspect.bind(self).call
         rx = /\B#{name}=/
-        rx =~ res ? true : false
+          rx =~ res ? true : false
       end
     end
   end
@@ -30,7 +34,6 @@ end
 # Docs at http://doodle.rubyforge.org
 #
 class Doodle
-  VERSION = '0.0.12'
   class << self
     # provide somewhere to hold thread-specific context information
     # (I'm claiming the :doodle_xxx namespace)
@@ -76,14 +79,14 @@ class Doodle
   def self.raise_exception_on_error=(tf)
     @@raise_exception_on_error = tf
   end
-  
+
   # internal error raised when a default was expected but not found
   class NoDefaultError < Exception
   end
   # raised when a validation rule returns false
   class ValidationError < Exception
   end
-  # raised when a validation rule returns false
+  # raised when an unknown parameter is passed to initialize
   class UnknownAttributeError < Exception
   end
   # raised when a conversion fails
@@ -103,16 +106,42 @@ class Doodle
       sc.module_eval(&block) if block_given?
       sc
     end
+    # evaluate in class context of self, whether Class, Module or singleton
+    def sc_eval(*args, &block)
+      if self.kind_of?(Module)
+        klass = self
+      else
+        klass = self.singleton_class
+      end
+      klass.module_eval(*args, &block)
+    end
   end
 
   # provide an alternative inheritance chain that works for singleton
   # classes as well as modules, classes and instances
   module Inherited
 
+    def superclasses_of(obj)
+      klasses = []
+      if obj.respond_to?(:superclass)
+        s = obj.superclass
+      else
+        s = obj.class
+      end
+      if s && s != obj
+        klasses << s
+        klasses << superclasses_of(s)
+      end
+      klasses.flatten
+    end
+
+    def parents
+      superclasses_of(self)
+    end
+    
     # parents returns the set of parent classes of an object.
     # note[this is horribly complicated and kludgy - is there a better way?
     # could do with refactoring]
-
     # this function is a ~mess~ - refactor!!!
     def parents
       # d { [:parents, self.to_s, defined?(superclass)] }
@@ -159,6 +188,40 @@ class Doodle
       klasses
     end
 
+    def xparents
+      # d { [:parents, self.to_s, defined?(superclass)] }
+      klasses = []
+      if defined?(superclass)
+        klass = superclass
+        if self != superclass
+          k = self.ancestors.first
+          # push onto front of array
+          if k.respond_to?(:superclass) && k.superclass.respond_to?(:singleton_class)
+            klasses.unshift k.superclass.singleton_class
+          end
+          until klass.nil?
+            klasses.unshift klass
+            if klass == klass.superclass
+              return klasses # oof
+            end
+            klass = klass.superclass
+          end
+        else
+          until klass.nil?
+            klasses << klass
+            klass = klass.superclass
+          end
+        end
+      else
+        klass = self.class
+        until klass.nil?
+          klasses << klass
+          klass = klass.superclass
+        end
+      end
+      klasses
+    end
+    
     # send message to all parents and collect results 
     def collect_inherited(message)
       result = []
@@ -175,9 +238,11 @@ class Doodle
     private :collect_inherited
   end
 
-  # the intent of embrace is to provide a way to create directives that
-  # affect all members of a class 'family' without having to modify
-  # Module, Class or Object - in some ways, it's similar to Ara Howard's mixable[http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/197296]
+  # the intent of embrace is to provide a way to create directives
+  # that affect all members of a class 'family' without having to
+  # modify Module, Class or Object - in some ways, it's similar to Ara
+  # Howard's mixable[http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/197296]
+  # though not as tidy :S
   #
   # this works down to third level <tt>class << self</tt> - in practice, this is
   # perfectly good - it would be great to have a completely general
@@ -189,7 +254,7 @@ class Doodle
       # include in instance method chain
       include other
       sc = class << self; self; end
-      sc.class_eval {
+      sc.module_eval {
         # class method chain
         include other
         # singleton method chain
@@ -202,7 +267,7 @@ class Doodle
           super(klass) if defined?(super)
         end
       }
-      sc.class_eval(&block) if block_given?
+      sc.module_eval(&block) if block_given?
     end
   end
 
@@ -257,7 +322,7 @@ class Doodle
     end
   end
 
-  # what it says on the tin! various hacks to hide @__doodle__ variable
+  # what it says on the tin :) various hacks to hide @__doodle__ variable
   module SmokeAndMirrors
     # redefine instance_variables to ignore our private @__doodle__ variable
     # (hack to fool yaml and anything else that queries instance_variables)
@@ -294,14 +359,16 @@ class Doodle
         klass = str.split(/\s/, 2).first
         separator = instance_variables.size > 0 ? ' ' : ''
         #pp [:istr, istr, :str, str, :trailing, trailing, :klass, klass]
+        # note to self: changing klass to <self.class will highlight cases that need the hack in parents
+        #%[<#{self.class}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
         %[#{klass}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
       end
     end
-   
+    
   end
 
   # the core module of Doodle - to get most facilities provided by Doodle
-  # without inheriting from Doodle::Base, include Doodle::Helper, not this module
+  # without inheriting from Doodle, include Doodle::Core, not this module
   module BaseMethods
     include SelfClass
     include Inherited
@@ -523,7 +590,7 @@ class Doodle
             end
           end
         end
-      rescue => e
+      rescue Exception => e
         owner.handle_error name, ConversionError, e.to_s, [caller[-1]]
       end
       value
@@ -542,30 +609,21 @@ class Doodle
       value
     end
 
-    def sc_eval(*args, &block)
-      if self.kind_of?(Module)
-        klass = self
-      else
-        klass = self.singleton_class
-      end
-      klass.module_eval(*args, &block)
-    end
-    
     # define a getter_setter
     def define_getter_setter(name, *args, &block)      
       # need to use string eval because passing block
       sc_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
       sc_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
 
-      # this is how it should be done (in 1.9)      
-#       module_eval {
-#         define_method name do |*args, &block|
-#           getter_setter(name.to_sym, *args, &block)
-#         end
-#         define_method "#{name}=" do |*args, &block|
-#           _setter(name.to_sym, *args, &block)
-#         end
-#       }
+      # this is how it should be done (in 1.9)
+      #       module_eval {
+      #         define_method name do |*args, &block|
+      #           getter_setter(name.to_sym, *args, &block)
+      #         end
+      #         define_method "#{name}=" do |*args, &block|
+      #           _setter(name.to_sym, *args, &block)
+      #         end
+      #       }
     end
     private :define_getter_setter
 
@@ -574,9 +632,9 @@ class Doodle
     def define_collector(collection, name, klass = nil, &block)
       # need to use string eval because passing block
       if klass.nil?
-        module_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__
+        sc_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__
       else
-        module_eval "def #{name}(*args, &block);
+        sc_eval "def #{name}(*args, &block);
                           if args.all?{|x| x.kind_of?(#{klass})}
                             #{collection}.<<(*args)
                           else
@@ -725,6 +783,9 @@ class Doodle
           break if att.default_defined?
           ivar_name = "@#{att.name}"
           if instance_variable_defined?(ivar_name)
+            # if all == true, reset values so conversions and
+            # validations are applied to raw instance variables
+            # e.g. when loaded from YAML
             if all
               Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
               __send__(att.name, instance_variable_get(ivar_name))
@@ -732,14 +793,16 @@ class Doodle
           elsif self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
-          # if all == true, reset values so conversions and validations are applied to raw instance variables
-          # e.g. when loaded from YAML
         end
         # now apply instance level validations
         validations.each do |v|
           Doodle::Debug.d { [:validate!, self, v ] }
-          if !instance_eval(&v.block)
-            handle_error :validate!, ValidationError, "#{ self.inspect } must #{ v.message }", [caller[-1]]
+          begin
+            if !instance_eval(&v.block)
+              handle_error self, ValidationError, "#{ self.class } must #{ v.message }", [caller[-1]]
+            end
+          rescue Exception => e
+            handle_error self, ValidationError, e.to_s, [caller[-1]]
           end
         end
       end
@@ -859,7 +922,7 @@ class Doodle
           klass = names.inject(self) {|c, n| c.const_get(n)}
           # todo[check how many times this is being called]
           if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
-            klass.class_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+            klass.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         end
       end
@@ -893,7 +956,7 @@ class Doodle
   class Base
     include Helper
   end
-  include Helper
+  include Core
 end
 
 class Doodle
