@@ -1,16 +1,10 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
+
 require 'doodle'
-require 'date'
-require 'uri'
-require 'rfc822'
 
-module Doodle
-  module DataTypes
-  end
-
+class Doodle
   class DataTypeHolder
-    include DataTypes
     attr_accessor :klass
     def initialize(klass, &block)
       @klass = klass
@@ -24,15 +18,14 @@ module Doodle
       }
     end
   end
+
   # set up global datatypes
   def self.datatypes(*mods)
     mods.each do |mod|
       DataTypeHolder.class_eval { include mod }
     end
   end
-end
 
-class Doodle::Base
   # enable global datatypes and provide an interface that allows you
   # to add your own datatypes to this declaration
   def self.doodle(*mods, &block)
@@ -45,8 +38,12 @@ class Doodle::Base
 end
 
 ### user code
+require 'date'
+require 'uri'
+require 'rfc822'
 
-module Doodle
+# note: this doesn't have to be in Doodle namespace
+class Doodle
   module DataTypes
     def integer(name, params = { }, &block)
       define name, params, block, { :kind => Integer } do
