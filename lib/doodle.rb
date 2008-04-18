@@ -5,15 +5,6 @@ require 'molic_orderedhash'  # todo[replace this with own (required functions on
 require 'pp'
 #require 'bleak_house' if ENV['BLEAK_HOUSE']
 
-# *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
-# have pollute core Ruby objects such as Object, Class and Module.
-
-# While doodle itself is useful for defining classes, my main goal is to
-# come up with a useful DSL notation for class definitions which can be
-# reused in many contexts.
-
-# Docs at http://doodle.rubyforge.org
-
 # patch 1.8.5 to add instance_variable_defined?
 # note: this does not seem to work so well with singletons
 if RUBY_VERSION < '1.8.6'
@@ -29,8 +20,17 @@ if RUBY_VERSION < '1.8.6'
   end
 end
 
-module Doodle
-  VERSION = '0.0.11'
+# *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
+# have pollute core Ruby objects such as Object, Class and Module.
+#
+# While doodle itself is useful for defining classes, my main goal is to
+# come up with a useful DSL notation for class definitions which can be
+# reused in many contexts.
+#
+# Docs at http://doodle.rubyforge.org
+#
+class Doodle
+  VERSION = '0.0.12'
   class << self
     # provide somewhere to hold thread-specific context information
     # (I'm claiming the :doodle_xxx namespace)
@@ -873,10 +873,10 @@ module Doodle
     end
   end
 
-  # Include Doodle::Helper if you want to derive from another class
+  # Include Doodle::Core if you want to derive from another class
   # but still get Doodle goodness in your class (including Factory
   # methods).
-  module Helper
+  module Core
     def self.included(other)
       super
       other.module_eval {
@@ -886,19 +886,24 @@ module Doodle
       }
     end
   end
+  # deprecated: temporary
+  Helper = Core
 
-  # derive from Base if you want all the Doodle goodness
+  # deprecated: derive from Base if you want all the Doodle goodness
   class Base
     include Helper
   end
+  include Helper
+end
 
+class Doodle
   # Attribute is itself a Doodle object that is created by #has and
   # added to the #attributes collection in an object's DoodleInfo
   #
   # It is used to provide a context for defining #must and #from rules
   #
-  class Attribute < Doodle::Base
-  # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
+  class Attribute < Doodle
+    # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
     # must define these methods before using them in #has below
 
     # hack: bump off +validate!+ for Attributes - maybe better way of doing
