@@ -57,7 +57,7 @@ class Location < Doodle
   has :events, :collect => :Event
 end
 
-class Event < Doodle
+class Event
   # or if you want to inherit from another class
   include Doodle::Core
 
