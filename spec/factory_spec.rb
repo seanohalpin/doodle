@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe Doodle::Factory, " as part of Doodle::Base" do
+describe Doodle::Factory, " as part of Doodle" do
   temporary_constant :Foo, :Bar do
     before(:each) do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :var1
       end
       class Bar < Foo
@@ -32,7 +32,7 @@ describe Doodle::Factory, " included as module" do
   temporary_constant :Baz, :Qux, :MyDate, :AnotherDate do
     before(:each) do
       class Baz
-        include Doodle::Helper
+        include Doodle::Core
         has :var1
       end
       class Qux < Baz

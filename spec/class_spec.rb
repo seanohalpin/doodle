@@ -4,14 +4,14 @@ describe Doodle, 'class attributes' do
   temporary_constants :Bar, :Foo do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         class << self
           has :metadata
         end
       end
       @foo = Foo.new
       class Bar < Foo
-        include Doodle::Helper
+        include Doodle::Core
         class << self
           has :doc
         end

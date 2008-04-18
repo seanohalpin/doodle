@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + "/spec_helper.rb"
 describe Doodle, "singletons" do
   temporary_constant :Foo do    
     it "should allow creating attributes on classes via inheritance" do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         class << self
           has :c1
         end
@@ -17,7 +17,7 @@ describe Doodle, "singletons" do
 
     it "should allow creating attributes on classes via module inclusion" do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         class << self
           has :c2
         end
@@ -30,7 +30,7 @@ describe Doodle, "singletons" do
     end
 
     it "should allow creating attributes on singletons via inheritance" do
-      class Foo < Doodle::Base
+      class Foo < Doodle
       end
       foo = Foo.new
       class << foo
@@ -45,7 +45,7 @@ describe Doodle, "singletons" do
 
     it "should allow creating attributes on a singleton's singleton via module inclusion" do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
       end
       foo = Foo.new
       class << foo

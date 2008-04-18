@@ -7,7 +7,7 @@ describe Doodle, 'defaults which have not been set' do
   end
   before(:each) do
     raise_if_defined(:Foo)
-    class Foo < Doodle::Base
+    class Foo < Doodle
       has :start do
         default { Date.today }
         from String do |s|

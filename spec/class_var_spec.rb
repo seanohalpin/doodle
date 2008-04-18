@@ -3,13 +3,13 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 describe Doodle, 'class attributes:' do
   temporary_constant :Foo, :Bar do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :ivar
         class << self
           has :cvar, :kind => Integer, :init => 1
         end
       end
-      class Bar < Doodle::Base
+      class Bar < Doodle
       end
     end
 
@@ -28,7 +28,7 @@ describe Doodle, 'class attributes:' do
         class << Bar
           has :cvar, :init => 43
         end
-        class Bar < Doodle::Base
+        class Bar < Doodle
           has :ivar
         end
         Bar.cvar = 44
@@ -37,7 +37,7 @@ describe Doodle, 'class attributes:' do
 
     it 'should be possible to set a singleton variable without setting an instance var' do
       proc {
-        class Bar < Doodle::Base
+        class Bar < Doodle
           has :ivar
         end
         foo = Bar.new :ivar => 42
@@ -55,7 +55,7 @@ describe Doodle, 'class attributes:' do
           class << foo
             has :svar, :init => 43
           end
-          class Bar < Doodle::Base
+          class Bar < Doodle
             has :ivar
           end
           foo.svar = 44

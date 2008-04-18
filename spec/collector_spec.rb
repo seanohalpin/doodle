@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 describe Doodle, "Simple collector" do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :list, :init => [], :collect => :item
       end
       @foo = Foo do
@@ -29,10 +29,10 @@ end
 describe Doodle, "Typed collector with default collector name" do
   temporary_constant :Event, :Location do
     before :each do
-      class Location < Doodle::Base
+      class Location < Doodle
         has :name, :kind => String
       end
-      class Event < Doodle::Base
+      class Event < Doodle
         has :locations, :init => [], :collect => Location
       end
       @event = Event do
@@ -58,10 +58,10 @@ end
 describe Doodle, "Typed collector with specified collector name" do
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle::Base
+      class Location < Doodle
         has :name, :kind => String
       end
-      class Event < Doodle::Base
+      class Event < Doodle
         has :locations, :init => [], :collect => { :place => :Location }
       end
     end
@@ -74,10 +74,10 @@ end
 describe Doodle, "typed collector with specified collector name" do
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle::Base
+      class Location < Doodle
         has :name, :kind => String
       end
-      class Event < Doodle::Base
+      class Event < Doodle
         has :locations, :init => [], :collect => { :place => Location }
       end
     end
@@ -98,11 +98,11 @@ end
 describe Doodle, "typed collector with specified collector name initialized from hash (with default :init param)" do
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle::Base
+      class Location < Doodle
         has :name, :kind => String
         has :events, :collect => :Event
       end
-      class Event < Doodle::Base
+      class Event < Doodle
         has :name, :kind => String
         has :locations, :collect => :Location
       end

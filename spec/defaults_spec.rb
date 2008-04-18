@@ -4,7 +4,7 @@ describe Doodle, 'attributes with defaults' do
   temporary_constant :Foo do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => 'D1'
         class << self
           has :metadata, :default => 'D2'
@@ -62,7 +62,7 @@ end
 describe Doodle, 'defaults which have not been set' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :baz
       end
     end
@@ -80,7 +80,7 @@ end
 describe Doodle, 'defaults which have been set' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :baz, :default => 'Hi!'
         has :start do
           default { Date.today }
@@ -102,7 +102,7 @@ end
 describe Doodle, "overriding inherited defaults" do
   temporary_constant :Text, :Text2, :KeyValue do
     before :each do
-      class KeyValue < Doodle::Base
+      class KeyValue < Doodle
         has :name
         has :value
       end

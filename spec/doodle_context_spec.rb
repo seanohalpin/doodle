@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe Doodle, "doodle_context" do
   temporary_constants :Foo, :Bar do
     before :each do
-      class Child < Doodle::Base
+      class Child < Doodle
         has :name
         has :dad do
           # there is an important difference between a block argument

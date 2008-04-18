@@ -4,7 +4,7 @@ require 'yaml'
 describe 'Doodle', 'parents' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :var1, :kind => Integer
         has :var2, :kind => Integer, :default => 1
         must 'have var1 != var2' do
@@ -24,7 +24,7 @@ end
 describe 'Doodle', ' loading good data from yaml' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -57,7 +57,7 @@ end
 describe 'Doodle', ' loading bad data from yaml' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -83,7 +83,7 @@ end
 describe Doodle, 'class attributes:' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :ivar
         class << self
           has :cvar
@@ -100,11 +100,11 @@ end
 describe Doodle, 'initializing from hashes and yaml' do
   temporary_constants :AddressLine, :Person do
     before :each do
-      class AddressLine < Doodle::Base
+      class AddressLine < Doodle
         has :text, :kind => String
       end
 
-      class Person < Doodle::Base
+      class Person < Doodle
         has :name, :kind => String
         has :address, :collect => { :line => AddressLine }
       end
@@ -142,21 +142,21 @@ end
 describe 'Doodle', 'hiding @__doodle__' do
   temporary_constant :Foo, :Bar, :DString, :DHash, :DArray do
     before :each do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :var1, :kind => Integer
       end
       class Bar
-        include Doodle::Helper
+        include Doodle::Core
         has :var2, :kind => Integer
       end
       class DString < String
-        include Doodle::Helper
+        include Doodle::Core
       end
       class DHash < Hash
-        include Doodle::Helper
+        include Doodle::Core
       end
       class DArray < Array
-        include Doodle::Helper
+        include Doodle::Core
       end
     end
     

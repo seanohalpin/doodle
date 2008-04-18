@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 describe Doodle, ' unspecified attributes' do
   temporary_constants :Foo do
     before :each do 
-      class Foo < Doodle::Base
+      class Foo < Doodle
       end
     end
   

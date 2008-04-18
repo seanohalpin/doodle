@@ -33,7 +33,7 @@ shared_code = proc do
       td.instance_eval(&b) if block_given? # user's block should override default
     end
   end
-  class Base < Doodle::Base
+  class Base < Doodle
     extend AttributeDate
   end
 

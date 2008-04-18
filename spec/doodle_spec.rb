@@ -4,7 +4,7 @@ describe Doodle, 'instance attributes' do
   temporary_constant :Foo do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => nil
       end
       @foo = Foo.new
@@ -41,7 +41,7 @@ describe Doodle, 'class attributes(false)' do
   temporary_constant :Foo do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         class << self
           has :metadata
         end
@@ -81,7 +81,7 @@ describe Doodle, 'inherited class attributes(false)' do
   temporary_constant :Foo, :Bar do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => nil
         class << self
           has :metadata
@@ -163,7 +163,7 @@ describe Doodle, 'singleton class attributes' do
     before(:each) do
   
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => nil
         class << self
           has :metadata
@@ -197,7 +197,7 @@ describe Doodle, 'inherited singleton class attributes' do
   temporary_constant :Foo, :Bar do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => nil
         class << self
           has :metadata

@@ -5,7 +5,7 @@ describe Doodle, 'init' do
     
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :moniker, :init => 'D1'
         class << self
           has :metadata, :init => 'D2'
@@ -56,7 +56,7 @@ end
 describe Doodle, 'init' do  
   temporary_constant :Foo do
     it 'should accept nil as :init' do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :value, :init => nil
       end
       foo = Foo.new
@@ -65,7 +65,7 @@ describe Doodle, 'init' do
   end
   temporary_constant :Foo do
     it 'should accept true as :init' do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :value, :init => true
       end
       foo = Foo.new
@@ -74,7 +74,7 @@ describe Doodle, 'init' do
   end
   temporary_constant :Foo do
     it 'should accept Fixnum as :init' do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :value, :init => 42
       end
       foo = Foo.new
@@ -83,7 +83,7 @@ describe Doodle, 'init' do
   end
   temporary_constant :Foo do
     it 'should not evaluate value when proc given as :init' do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :value, :init => proc { 42 }
       end
       foo = Foo.new
@@ -92,7 +92,7 @@ describe Doodle, 'init' do
   end
   temporary_constant :Foo do
     it 'should evaluate value when block given as :init' do
-      class Foo < Doodle::Base
+      class Foo < Doodle
         has :value do
           init do
             42

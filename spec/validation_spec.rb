@@ -34,7 +34,7 @@ describe :DateRange, 'validation & conversions' do
         end
       end
 
-      class Base < Doodle::Base
+      class Base < Doodle
         extend ClassMethods
       end
 
@@ -101,7 +101,7 @@ end
 # describe Doodle, 'validations' do
 #   temporary_constants :Foo do
 #     before :each do
-#       class Foo < Doodle::Base
+#       class Foo < Doodle
 #         has :identifier, :kind => [String, Symbol]
 #       end
 #     end

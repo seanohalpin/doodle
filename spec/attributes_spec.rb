@@ -4,7 +4,7 @@ describe Doodle::Attribute, 'basics' do
   temporary_constants :Foo, :Bar do
     before(:each) do
       class Foo
-        include Doodle::Helper
+        include Doodle::Core
         has :name, :default => 'Hello'
         class << self
           has :metadata
@@ -74,7 +74,7 @@ end
 describe Doodle::Attribute, 'attribute order' do
   temporary_constants :A, :B, :C do
     before :each do
-      class A < Doodle::Base
+      class A < Doodle
         has :a
       end
 
@@ -88,7 +88,7 @@ describe Doodle::Attribute, 'attribute order' do
     end
   
     it 'should keep order of inherited attributes' do
-      C.parents.should == [B, A, Doodle::Base, Object]
+      C.parents.should == [B, A, Doodle, Object]
     end
 
     it 'should keep order of inherited attributes' do
