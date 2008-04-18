@@ -1,34 +1,29 @@
 = doodle to do list
 
-2008-04-16 22:08:39
-== DONE Fix inspect
-- don't include @__doodle__ in inspect string
-== TODO Fix parents
-- so doesn't rely on inspect
-== Write proper pretty printer (to_doodle)
-- is this pointless? can I ever get full coverage?
-- need to know instance variables in same way as yaml, etc.
-- maybe could use yaml as intermediate representation?
-== TODO Fix up half-assed features [1/2]
-or get rid of them
-- [ ] errors collection
-- [X] to_doodle - gone
+2008-04-17 23:08:34
+== TODO Fixes
+=== TODO fix messy code [0/3]
+- [ ] parents
+- [ ] collect_inherited
+- [ ] embrace - maybe replace?
+=== DONE simplify usage
+class Foo < Doodle
+end
+class Bar
+  include Doodle::Core
+end
 
-== TODO Known bugs
-- [X] loading from yaml should apply conversions 2008-03-24
-- [X] sort out duplication of errors when calling validate! after
-      setting incorrect value has already generated entry 2008-03-26
-- [X] validate! sets instance variables with defaults
-== DONE need some way of accessing containing object from attribute
-- why?
-  - to put errors on instance
-- though this is somewhat tricky - can't use simple reference to
-  parent as neither would be garbage collected (bkz of cycle -
-  better check this)
-- 2008-04-06 22:12:22 use Doodle.parent (inside initialization only)
-- 2008-04-17 15:57:15 use #parent instead of Doodle.parent 
-  (doesn't seem to affect memory usage)
-== Errors collection
+i.e. have a top-level class rather than mod
+== TODO Documentation [0/2]
+- [ ] provide full example of before vs after 
+      - i.e. write out in full what you'd have to do to get same
+        functionality perhaps also using traits and fattr
+- [ ] example of using doodle to generate classes 
+- (e.g. write out optimised Ruby code rather than use framework)
+i.e. I could use the information gathered to generate a source file
+- could also be in other language (e.g. Java, SQL DDL, etc.)
+  (see SQL tables definition example)
+== TODO Fix errors collection
 === TODO should be simpler way of getting to errors collection
 - the errors collection is for collecting all errors on an instance
   rather than raising an exception on the first error
@@ -39,7 +34,56 @@ or get rid of them
 - compare with AR
 - errors on attributes should be collected at the instance level
 - now not sure that Attributes should be Doodles - perhaps simpler
-== DONE fix singleton & class init
+=== TODO formalize content of errors collection [1/2]
+- [X] include attribute name
+- [ ] do I want to save the call stack? probably
+=== DONE Fixes
+- compatibility with AR? do I need/want that?
+- [X] make raise exception on invalid values optional
+== TODO Profile performance against plain old attributes [0/4]]
+and compare with:
+- [ ] attr_accessor
+- [ ] attributes
+- [ ] traits
+- [ ] fattr
+== TODO Reorganize library layout to follow newgem
+- only because this seems to be emerging standard (but ~don't~ use web
+  page generation)
+== Compatibility
+=== TODO check compatibility with ActiveRecord
+- may need to rename :attributes to :doodles or something similar to
+  avoid name clash
+- or to access through __doodle__ method
+- also, validate! method, etc.
+=== TODO Sequel
+- doesn't work with sequel_model at moment - conflict over initialization
+=== TODO compare with moose
+== Write proper pretty printer (to_doodle)
+- is this pointless? can I ever get full coverage?
+- need to know instance variables in same way as yaml, etc.
+- maybe could use yaml as intermediate representation?
+== DONE Fix up half-assed features [1/1]
+or get rid of them
+- [X] to_doodle - gone
+
+== DONE Fix inspect [2/2]
+- [X] don't include @__doodle__ in inspect string
+- [X] don't break built-ins
+== DONE Known bugs
+- [X] loading from yaml should apply conversions 2008-03-24
+- [X] sort out duplication of errors when calling validate! after
+      setting incorrect value has already generated entry 2008-03-26
+- [X] validate! sets instance variables with defaults
+== DONE Need some way of accessing containing object from attribute
+- why?
+  - to put errors on instance
+- though this is somewhat tricky - can't use simple reference to
+  parent as neither would be garbage collected (bkz of cycle -
+  better check this)
+- 2008-04-06 22:12:22 use Doodle.parent (inside initialization only)
+- 2008-04-17 15:57:15 use #parent instead of Doodle.parent 
+  (doesn't seem to affect memory usage)
+== DONE Fix singleton & class init
 - I'm not happy using the class_init directive
 - may be better to treat singleton attributes differently, e.g. to
   interpret the init at definition time rather than on object
@@ -48,64 +92,15 @@ or get rid of them
   to be one of those things that by checking to see if you are one,
   you become it
 - solution: done on first access
-== DONE add typedef methods (e.g. date :name, string :name, etc.)
+== DONE Add typedef methods (e.g. date :name, string :name, etc.)
 - [X] how should this be presented?
   - class level directives (at attr_accessor level)
   - [X] within block? to avoid too much namespace pollution
     - e.g. doodle do ... end
 - see examples/datatypes.rb
-== DONE check memory usage
+== DONE Check memory usage
 - all those closures - are they leaking?
 - and DOODLES hash (are objects being finalised?)
 - check garbage collection of attributes
 - 2008-04-06 22:12:18 - used ruby-bleak-house - doesn't look good :(
 - fixed - used @__doodle__ instead of DOODLES in DoodleInfo
-== TODO profile performance against plain old attributes [0/4]]
-and compare with:
-- [ ] attr_accessor
-- [ ] attributes
-- [ ] traits
-- [ ] fattr
-== TODO Documentation [0/2]
-- [ ] provide full example of before vs after 
-      - i.e. write out in full what you'd have to do to get same
-        functionality perhaps also using traits and fattr
-- [ ] example of using doodle to generate classes 
-- (e.g. write out optimised Ruby code rather than use framework)
-i.e. I could use the information gathered to generate a source file
-- could also be in other language (e.g. Java, SQL DDL, etc.)
-  (see SQL tables definition example)
-== TODO Integration
-=== TODO add errors collection [1/1]
-- compatibility with AR? do I need/want that?
-- [X] make raise exception on invalid values optional
-==== TODO formalize content of errors collection [/]
-- [X] include attribute name
-- [ ] do I want to save the call stack? probably
-=== TODO compare with moose
-=== TODO check compatibility with ActiveRecord
-- may need to rename :attributes to :doodles or something similar to
-  avoid name clash
-- or to access through __doodle__ method
-- also, validate! method, etc.
-=== TODO Sequel
-- doesn't work with sequel_model at moment - conflict over initialization
-== Fixes
-=== TODO fix messy code [0/3]
-- [ ] parents
-- [ ] collect_inherited
-- [ ] embrace - maybe replace?
-=== TODO simplify usage
-class Foo < Doodle
-end
-class Bar
-  include Doodling # or something similar
-  include ModDoodle
-  include Doodle::Methods
-  include Doodle::BaseMethods
-end
-
-i.e. have a top-level class rather than module
-
-== TODO reorganize library layout to follow newgem
-- only because this seems to be evolving standard
