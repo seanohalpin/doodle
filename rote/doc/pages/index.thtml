@@ -227,7 +227,7 @@ This becomes more useful when you have dependent attributes, as in this example:
   
   event.start_date.to_s
   => "2008-03-05"
-  event.start_date.to_s
+  event.end_date.to_s
   => "2008-03-06"
 #:code#
 
