@@ -1,0 +1,9 @@
+coverage.html
+coverage/*
+experiments/*
+pkg/*
+doc/*
+rote/*.rake_cache
+rote/tidy.log
+gitlog
+regem
