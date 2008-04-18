@@ -204,6 +204,12 @@ value.
   class Event < Doodle
     has :time, :default => proc { Time.now }
   end
+  # or
+  class Event < Doodle
+    has :time do
+      default { Time.now }
+    end
+  end
 
   event.time
   => Wed Mar 05 14:44:01 +0000 2008

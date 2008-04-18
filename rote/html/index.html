@@ -394,6 +394,18 @@
 "punct">.</span><span class="ident">now</span> <span class=
 "punct">}</span>
   <span class="keyword">end</span>
+  <span class="comment"># or</span>
+  <span class="keyword">class </span><span class=
+"class">Event</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span>
+    <span class="ident">has</span> <span class=
+"symbol">:time</span> <span class="keyword">do</span>
+      <span class="ident">default</span> <span class=
+"punct">{</span> <span class="constant">Time</span><span class=
+"punct">.</span><span class="ident">now</span> <span class=
+"punct">}</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
 
   <span class="ident">event</span><span class=
 "punct">.</span><span class="ident">time</span>
