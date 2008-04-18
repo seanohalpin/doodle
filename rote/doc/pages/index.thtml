@@ -52,7 +52,7 @@ require 'date'
 require 'pp'
 require 'doodle'
 
-class Location < Doodle::Base
+class Location < Doodle
   has :name, :kind => String
   has :events, :collect => :Event
 end
@@ -94,7 +94,7 @@ On Windows:
 h2. initialization
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :date
   end
 #:code#
@@ -153,7 +153,7 @@ will result in:
 To specify a default, use the @default@ option:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :date, :default => Date.today
   end
 #:code#
@@ -202,7 +202,7 @@ value to be recalculated every time, use a Proc object or block as the default
 value.
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :time, :default => proc { Time.now }
   end
 
@@ -215,7 +215,7 @@ value.
 This becomes more useful when you have dependent attributes, as in this example:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :start_date, :default => Date.today
     has :end_date, :default => proc { start_date + 1 }
   end
@@ -235,7 +235,7 @@ fine for simple scalar objects, but can cause problems with aggregates
 such as Arrays because you end up sharing them among all instances:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :locations, :default => []
   end
 
@@ -248,7 +248,7 @@ such as Arrays because you end up sharing them among all instances:
 In these cases, use @init@ instead of @default@:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :locations, :init => []
   end
 
@@ -279,7 +279,7 @@ h2. validations
 h3. by kind
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :start_date, :kind => Date
   end
 #:code#
@@ -304,7 +304,7 @@ h3. specific validations with @must@
 To specify a validation on an attribute, use @must@ inside the attribute's definition block:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :start_date, :kind => Date do
       must "be >= today" do |value|
         value >= Date.today
@@ -326,7 +326,7 @@ Attribute validations happen before the instance variable is changed.
 You can also specify validations for the object as a whole:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :start_date, :kind => Date do
       must "be >= today" do |value|
         value >= Date.today
@@ -372,7 +372,7 @@ The following will raise an exception, complaining that 'name' is missing:
   require "rubygems"
   require "doodle"
   require "yaml"
-  class Foo < Doodle::Base
+  class Foo < Doodle
     has :name
     has :date
   end
@@ -393,7 +393,7 @@ converted to the target type. To do this in Doodle, use the @from@
 method inside an attribute's definition block:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     has :start_date, :kind => Date do
       from String do |value|
         Date.parse(value)
@@ -425,7 +425,7 @@ ensure that it makes sense to do so. For example:
 @from@ also works on the class level:
 
 #:code#ruby#
-  class Event < Doodle::Base
+  class Event < Doodle
     ...
     from String do |value|
       args = value.split(' to ')
@@ -445,10 +445,10 @@ Collectors provide a means to define a convenience method you can use to add ite
 to a collection. For example:
 
 #:code#ruby#
-  class Location < Doodle::Base
+  class Location < Doodle
     has :name
   end
-  class Event < Doodle::Base
+  class Event < Doodle
     has :locations, :init => [], :collect => Location
   end
   
@@ -499,7 +499,7 @@ h2. class and singleton level definitions
 You can also use @has@ for class attributes:
 
 #:code#ruby#
-  class Foo < Doodle::Base
+  class Foo < Doodle
     class << self
       has :doc, :default => "This is the Foo class"
     end
@@ -509,7 +509,7 @@ You can also use @has@ for class attributes:
 or singleton instances:
 
 #:code#ruby#
-  class Foo < Doodle::Base
+  class Foo < Doodle
     class << self
       has :doc, :default => "This is the Foo class"
     end
