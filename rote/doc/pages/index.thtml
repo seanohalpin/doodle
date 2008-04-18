@@ -57,7 +57,7 @@ class Location < Doodle
   has :events, :collect => :Event
 end
 
-class Event
+class Event < Doodle
   # or if you want to inherit from another class
   include Doodle::Core
 
@@ -134,7 +134,7 @@ without providing values for all required attributes, Doodle will
 raise an exception. For example:
 
 #:code#ruby#
-  class Event
+  class Event < Doodle
     has :date
   end
 
