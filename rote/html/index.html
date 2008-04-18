@@ -39,8 +39,12 @@
 
     <p>Doodle is eco-friendly – it does not globally modify Object,
     Class or Module, nor does it pollute instances with its own
-    instance variables (i.e. it plays nice with yaml).</p><a name=
-    'features' id="features"></a>
+    instance variables (i.e. it plays nice with yaml).</p>
+
+    <p>Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It
+    also has limited support for Ruby 1.8.5. It does not yet work
+    with Ruby 1.9 or Rubinius.</p><a name='features' id=
+    "features"></a>
 
     <h3>features</h3>
 
@@ -134,16 +138,15 @@
 
 <span class="keyword">class </span><span class=
 "class">Location</span> <span class=
-"punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"punct">&lt;</span> <span class="constant">Doodle</span>
   <span class="ident">has</span> <span class=
 "symbol">:name</span><span class="punct">,</span> <span class=
 "symbol">:kind</span> <span class="punct">=&gt;</span> <span class=
 "constant">String</span>
   <span class="ident">has</span> <span class=
 "symbol">:events</span><span class="punct">,</span> <span class=
-"symbol">:init</span> <span class="punct">=&gt;</span> <span class=
-"punct">[],</span> <span class=
-"symbol">:collect</span> <span class="punct">=&gt;</span> <span class="symbol">:Event</span>
+"symbol">:collect</span> <span class=
+"punct">=&gt;</span> <span class="symbol">:Event</span>
 <span class="keyword">end</span>
 
 <span class="keyword">class </span><span class="class">Event</span>
@@ -151,10 +154,7 @@
 "comment"># or if you want to inherit from another class</span>
   <span class="ident">include</span> <span class=
 "constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Helper</span>
-  <span class="ident">include</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Factory</span>
+"constant">Core</span>
 
   <span class="ident">has</span> <span class=
 "symbol">:name</span><span class="punct">,</span> <span class=
@@ -200,7 +200,7 @@
 
     <h2>installation</h2>
 
-    <p>On Linux:</p>
+    <p>On Linux or Mac <span class="caps">OS X</span>:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class="global">$ </span><span class=
 "ident">sudo</span> <span class="ident">gem</span> <span class=
@@ -217,7 +217,7 @@
     <h2>initialization</h2>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:date</span>
   <span class="keyword">end</span></code>
@@ -270,10 +270,11 @@
 
     <h2>defaults</h2>
 
-    <p>Doodle assumes that if you specify an attribute without a
-    default, it is required. If you try to initialize an instance
-    without specifying all required attributes, it will complain.
-    For example:</p>
+    <p>Doodle assumes that attributes specified without defaults or
+    initial values (see below) are required. If you try to
+    initialize an instance without providing values for all
+    required attributes, Doodle will raise an exception. For
+    example:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
 "keyword">class </span><span class="class">Event</span>
@@ -302,7 +303,7 @@
     option:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:date</span><span class="punct">,</span> <span class=
 "symbol">:default</span> <span class=
@@ -338,7 +339,7 @@
 "punct">))</span>
   <span class="punct">=&gt;</span> <span class=
 "comment">#&lt;Event:0x7036e0 @date=#&lt;Date: 4909053/2,0,2299161&gt;&gt;</span>
-   <span class="ident">event</span><span class=
+  <span class="ident">event</span><span class=
 "punct">.</span><span class="ident">date</span> <span class=
 "punct">=</span> <span class="constant">Date</span><span class=
 "punct">.</span><span class="ident">new</span><span class=
@@ -379,10 +380,10 @@
     <p>With the default specified as above, the <code>date</code>
     attribute will take on the value current when the class is
     defined. If you want the default value to be recalculated every
-    time, use a Proc object as the default value.</p>
+    time, use a Proc object or block as the default value.</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:time</span><span class="punct">,</span> <span class=
 "symbol">:default</span> <span class=
@@ -416,7 +417,7 @@
     as in this example:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:start_date</span><span class=
 "punct">,</span> <span class="symbol">:default</span> <span class=
@@ -449,14 +450,14 @@
 
     <p>Sometimes, you don’t want <em>default</em> values set when
     the <em>class</em> is <em>defined</em> or recalculated every
-    time, you want <em>initial</em> values which are set when the
-    <em>object</em> is <em>instantiated</em>. Also, default values
-    are fine for simple scalar objects, but can cause problems with
-    aggregates such as Arrays because you end up sharing them among
-    all instances.</p>
+    time. Instead you want <em>initial</em> values which are set
+    when the <em>object</em> is <em>instantiated</em>. Also,
+    default values are fine for simple scalar objects, but can
+    cause problems with aggregates such as Arrays because you end
+    up sharing them among all instances:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
 "symbol">:default</span> <span class=
@@ -483,7 +484,7 @@
     <code>default</code>:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
 "symbol">:init</span> <span class="punct">=&gt;</span> <span class=
@@ -540,19 +541,18 @@
 
     <h3>by kind</h3>
     <pre class='ruby'>
-<code class='ruby'><span class="keyword">class </span><span class=
-"class">Event</span> <span class="punct">&lt;</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
-  <span class="ident">has</span> <span class=
+<code class='ruby'>  <span class=
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
+    <span class="ident">has</span> <span class=
 "symbol">:start_date</span><span class=
 "punct">,</span> <span class="symbol">:kind</span> <span class=
 "punct">=&gt;</span> <span class="constant">Date</span>
-<span class="keyword">end</span></code>
+  <span class="keyword">end</span></code>
 </pre>
 
-    <p>(We use <code>kind</code> because Doodle uses
-    <code>kind_of?</code> to test the value.)</p>
+    <p>Doodle uses <code>kind_of?</code> to test the value, so
+    <code>kind</code> can be set to any Module (e.g. Enumerable),
+    Class or superclass that makes sense for your application.</p>
 
     <p>If you now try to initialize Event#date with something that
     isn’t a Date:</p>
@@ -567,7 +567,7 @@
 
     <p>you’ll get a Doodle::ValidationError exception:</p>
     <pre class='ruby'>
-<code class='ruby'> <span class="ident">date</span> <span class=
+<code class='ruby'>  <span class="ident">date</span> <span class=
 "ident">must</span> <span class="ident">be</span> <span class=
 "constant">Date</span> <span class="punct">-</span> <span class=
 "ident">got</span> <span class="constant">String</span><span class=
@@ -585,7 +585,7 @@
     <code>must</code> inside the attribute’s definition block:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:start_date</span><span class=
 "punct">,</span> <span class="symbol">:kind</span> <span class=
@@ -635,7 +635,7 @@
     whole:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:start_date</span><span class=
 "punct">,</span> <span class="symbol">:kind</span> <span class=
@@ -686,7 +686,8 @@
 </pre>
 
     <p>Note that you don’t need to project the value into the block
-    but you can if you like – its value is <code>self</code>.</p>
+    but you can if you like – its value is the object instance
+    itself.</p>
 
     <p>Object level validations occur after all instance variables
     have been set.</p><a name=
@@ -726,8 +727,7 @@
 "punct">"</span>
   <span class="keyword">class </span><span class=
 "class">Foo</span> <span class="punct">&lt;</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
+"constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:name</span>
     <span class="ident">has</span> <span class=
@@ -757,7 +757,7 @@
     definition block:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:start_date</span><span class=
 "punct">,</span> <span class="symbol">:kind</span> <span class=
@@ -835,7 +835,7 @@
     <p><code>from</code> also works on the class level:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="punct">...</span>
     <span class="ident">from</span> <span class=
 "constant">String</span> <span class=
@@ -877,14 +877,13 @@
     you can use to add items to a collection. For example:</p>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Location</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span><span class="punct">::</span><span class="constant">Base</span>
+"keyword">class </span><span class="class">Location</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:name</span>
   <span class="keyword">end</span>
   <span class="keyword">class </span><span class=
 "class">Event</span> <span class="punct">&lt;</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
+"constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:locations</span><span class="punct">,</span> <span class=
 "symbol">:init</span> <span class="punct">=&gt;</span> <span class=
@@ -913,7 +912,7 @@
     <code>locations</code> array</p>
 
     <p>You can leave out the <code>:init</code> option if all you
-    want is to collect into an array - doodle will supply one for
+    want is to collect into an array – doodle will supply one for
     you. Otherwise, you need to supply an Enumerable that provides
     the <code>&lt;&lt;</code> method.</p>
 
@@ -940,8 +939,8 @@
     <span class="keyword">end</span></code>
 </pre>
 
-    <p>The classname can be a class constant, a symbol or a
-    string.</p>
+    <p><code>ClassName</code> can be a ClassConstant, a :Symbol or
+    a “String”.</p>
 
     <p>Finally, if you don’t want to restrict the value to a
     particular class, you can just specify a method name:</p>
@@ -958,8 +957,7 @@
 "punct">"</span><span class="string">Stage 1</span><span class=
 "punct">"</span>
       <span class="ident">place</span> <span class=
-"constant">SomeOtherObject</span><span class=
-"punct">.</span><span class="ident">new</span>
+"number">42</span>
     <span class="keyword">end</span></code>
 </pre><a name='class_and_singleton_level_definitions' id=
 "class_and_singleton_level_definitions"></a>
@@ -970,9 +968,7 @@
     <pre class='ruby'>
 <code class='ruby'>  <span class=
 "keyword">class </span><span class="class">Foo</span> <span class=
-"punct">&lt;</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
+"punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="keyword">class </span><span class=
 "punct">&lt;&lt;</span> <span class="constant">self</span>
       <span class="ident">has</span> <span class=
@@ -988,9 +984,7 @@
     <pre class='ruby'>
 <code class='ruby'>  <span class=
 "keyword">class </span><span class="class">Foo</span> <span class=
-"punct">&lt;</span> <span class=
-"constant">Doodle</span><span class="punct">::</span><span class=
-"constant">Base</span>
+"punct">&lt;</span> <span class="constant">Doodle</span>
     <span class="keyword">class </span><span class=
 "punct">&lt;&lt;</span> <span class="constant">self</span>
       <span class="ident">has</span> <span class=
