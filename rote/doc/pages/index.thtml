@@ -59,8 +59,7 @@ end
 
 class Event
   # or if you want to inherit from another class
-  include Doodle::Helper
-  include Doodle::Factory
+  include Doodle::Core
 
   has :name, :kind => String
   has :date do
