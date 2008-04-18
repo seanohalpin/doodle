@@ -2,7 +2,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'doodle'
 require 'yaml'
 
-class Child < Doodle::Base
+class Child < Doodle
   has :name
   has :dad do
     # I'm treating block arguments and Proc object (proc/lambda) arguments

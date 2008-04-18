@@ -4,7 +4,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'doodle/datatypes'
 require 'doodle/utils'
 
-class DateRange < Doodle::Base
+class DateRange < Doodle
   doodle do
     date :start
     date :end do
@@ -30,7 +30,7 @@ module UserTypes
   end
 end
 
-class Person < Doodle::Base
+class Person < Doodle
   doodle UserTypes do
     #    string :name, :max => 10
     name :name, :size => 3..10

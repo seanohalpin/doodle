@@ -1,5 +1,6 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
+
 require 'doodle'
 require 'doodle/datatypes'
 require 'net/smtp'
@@ -9,7 +10,7 @@ require 'smtp_tls'
 
 # note: translated from Florian Frank's example in dslkit [http://dslkit.rubyforge.org/]
 
-class Mail < Doodle::Base
+class Mail < Doodle
   doodle do
     string :mail_server, :default => ENV['MAILSERVER'] || 'mail'
     string :body

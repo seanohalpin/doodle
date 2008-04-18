@@ -1,13 +1,13 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'doodle'
+require 'doodle/rfc822'
 require 'net/smtp'
-require 'rfc822'
 require 'time'
 
 # note: translated from Florian Frank's example in dslkit [http://dslkit.rubyforge.org/]
 
-class Mail < Doodle::Base
+class Mail < Doodle
   has :mail_server, :default => ENV['MAILSERVER'] || 'mail'
   has :body, :kind => String
 

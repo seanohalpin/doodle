@@ -2,7 +2,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'date'
 require 'doodle'
 
-class DateRange < Doodle::Base 
+class DateRange < Doodle 
   has :start_date, :kind => Date do
     default { Date.today }
     from String do |s|
@@ -30,34 +30,34 @@ class DateRange < Doodle::Base
 end
 
 dr = DateRange.new '2007-12-31', '2008-01-01'
-dr.start_date                   # => #<Date: 4908931/2,0,2299161>
-dr.end_date                     # => #<Date: 4908933/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 dr = DateRange '2007-12-31', '2008-01-01'
-dr.start_date                   # => #<Date: 4908931/2,0,2299161>
-dr.end_date                     # => #<Date: 4908933/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 dr = DateRange :start_date => '2007-12-31', :end_date => '2008-01-01'
-dr.start_date                   # => #<Date: 4908931/2,0,2299161>
-dr.end_date                     # => #<Date: 4908933/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 dr = DateRange do
   start_date '2007-12-31'
   end_date '2008-01-01'
 end
-dr.start_date                   # => #<Date: 4908931/2,0,2299161>
-dr.end_date                     # => #<Date: 4908933/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 
 dr = DateRange.from '2007-01-01 to 2008-12-31'
-dr.start_date                   # => #<Date: 4908203/2,0,2299161>
-dr.end_date                     # => #<Date: 4909663/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 dr = DateRange.from '2007-01-01 2007-12-31'
-dr.start_date                   # => #<Date: 4908203/2,0,2299161>
-dr.end_date                     # => #<Date: 4908931/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
 dr = DateRange '2008-01-01', '2007-12-31' 
 dr.start_date                   # => 
 dr.end_date                     # => 
-# ~> -:60: #<DateRange:0xb7a52640 @end_date=#<Date: 4908931/2,0,2299161>, @start_date=#<Date: 4908933/2,0,2299161>> must have end_date >= start_date (Doodle::ValidationError)
+# ~> -:5: superclass must be a Class (Module given) (TypeError)

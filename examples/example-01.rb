@@ -2,7 +2,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'date'
 require 'doodle'
 
-class DateRange < Doodle::Base 
+class DateRange < Doodle 
   has :start_date do
     default { Date.today }
   end

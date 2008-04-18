@@ -2,7 +2,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'date'
 require 'doodle'
 
-class DateRange < Doodle::Base 
+class DateRange < Doodle 
   has :start_date do
     default { Date.today }
   end
@@ -12,6 +12,7 @@ class DateRange < Doodle::Base
 end
 
 dr = DateRange.new
-dr.start_date                   # => #<Date: 4909137/2,0,2299161>
-dr.end_date                     # => #<Date: 4909137/2,0,2299161>
+dr.start_date                   # => 
+dr.end_date                     # => 
 
+# ~> -:5: superclass must be a Class (Module given) (TypeError)

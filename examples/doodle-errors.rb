@@ -4,7 +4,7 @@ require 'doodle/utils'
 require 'pp'
 require 'yaml'
 
-class Foo < Doodle::Base
+class Foo < Doodle
   has :name, :kind => String
 end
 

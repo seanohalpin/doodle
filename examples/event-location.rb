@@ -5,14 +5,14 @@ require 'doodle'
 require "yaml"
 require "pp"
 
-class Location < Doodle::Base
+class Location < Doodle
   has :name, :kind => String
   has :events, :init => [], :collect => :Event
 end
 
 class Event
   # or if you want to inherit from another class
-  include Doodle::Helper
+  include Doodle::Core
   include Doodle::Factory
 
   has :name, :kind => String
