@@ -8,6 +8,10 @@
 # be loaded.
 
 @page_index = Dir["#{File.dirname(__FILE__)}/*"].reject{|x| x =~ /\.rb$/}.map{|x| File.basename(x, File.extname(x))}
+dir = File.join(File.dirname(__FILE__), '..', '..', '..', 'lib', 'doodle')
+@dir = dir
+require File.join(dir, 'version')
+@version = Doodle::VERSION::STRING
 
 @site_title = "doodle"
 page_filter Filters::Syntax.new
@@ -29,6 +33,10 @@ foomacro
 <b>#{body}</b>
 ]
   txt
+}
+
+page_filter Rote::Filters::MacroFilter.new([:version], code_re) { |tag, args, body|
+  "Version #{@version}"
 }
 
 page_filter Rote::Filters::MacroFilter.new([:note], code_re) { |tag, args, body|

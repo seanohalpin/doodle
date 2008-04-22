@@ -30,7 +30,6 @@
 		<div id="subnav"><%= @toc.links.select { |l| l.tag =~ /h2/ }.join(' - ') %></div>
 		<% end %>		
 		</div>
-
     	<%# Insert page content #%>
     	<%= @content_for_layout %>
 

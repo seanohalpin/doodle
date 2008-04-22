@@ -1,13 +1,19 @@
 h1(logo). #d00d1e
 
+#:version#
+#:version#
+
 Doodle is a Ruby library and gem for simplifying the definition of Ruby classes
 by making attributes and their properties more declarative.
 
 Doodle is eco-friendly - it does not globally modify Object, Class or Module,
 nor does it pollute instances with its own instance variables (i.e. it plays nice with yaml).
 
-Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It also has
-limited support for Ruby 1.8.5. It does not yet work with Ruby 1.9 or Rubinius.
+Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It does not yet work with Ruby 1.9 or Rubinius.
+
+Please feel free to post bug reports, feature requests, and any comments or
+discussion topics to 
+the "doodle mailing list":http://rubyforge.org/pipermail/doodle-talk/
 
 h3. features
 
@@ -514,12 +520,6 @@ You can also use @has@ for class attributes:
 or singleton instances:
 
 #:code#ruby#
-  class Foo < Doodle
-    class << self
-      has :doc, :default => "This is the Foo class"
-    end
-  end
-  
   foo = Foo.new
   class << foo
     has :special, :default => 'This object is special'
@@ -531,5 +531,4 @@ or singleton instances:
 h2. links
 
 * "Rubyforge project":http://rubyforge.org/projects/doodle
-* "Forum":http://rubyforge.org/forum/?group_id=5159
-* "Bug reports":http://rubyforge.org/tracker/?atid=19938&group_id=5159&func=browse
+* Post bug reports, questions, answers to "the doodle mailing list":http://rubyforge.org/pipermail/doodle-talk/
