@@ -6,22 +6,12 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
-#require 'pp'
 #require 'bleak_house' if ENV['BLEAK_HOUSE']
 
 # patch 1.8.5 to add instance_variable_defined?
 # note: this does not seem to work so well with singletons
 if RUBY_VERSION < '1.8.6'
-  if !Object.method_defined?(:instance_variable_defined?)
-    class Object
-      __doodle__inspect = instance_method(:inspect)
-      define_method :instance_variable_defined? do |name|
-        res = __doodle__inspect.bind(self).call
-        rx = /\B#{name}=/
-          rx =~ res ? true : false
-      end
-    end
-  end
+  raise Exception, "Sorry - doodle does not work with versions of Ruby below 1.8.6"
 end
 
 # *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
@@ -121,64 +111,9 @@ class Doodle
   # classes as well as modules, classes and instances
   module Inherited
 
-    # returns the set of superclasses of an object
-    def superclasses_of(obj)
-      klasses = []
-      if obj.respond_to?(:superclass)
-        s = obj.superclass
-      else
-        s = obj.class
-      end
-      if s && s != obj
-        klasses << s
-        klasses << superclasses_of(s)
-      end
-      klasses.flatten
-    end
-
-    # parents returns the set of parent classes of an object
-    def parents
-      superclasses_of(self)
-    end
-
-    def self_is_instance?
-      !self.respond_to?(:superclass)
-    end
-
-    RX_SINGLETON_CLASS = /Class:(?:#<)?([A-Z_][A-Z0-9a-z_]+)/
-    def is_singleton_class?
-      self.to_s.match(RX_SINGLETON_CLASS)
-    end
-    def singleton_instance_class
-      cap = self.to_s.match(RX_SINGLETON_CLASS)
-      const_get(cap[1])
-    end
-    RX_META_CLASS = /Class:([A-Z_][A-Z0-9a-z_]+)>+$/
-    def is_meta_class?
-      self.to_s.match(RX_META_CLASS)
-    end
-    def singleton_meta_class
-      cap = self.to_s.match(RX_META_CLASS)
-      const_get(cap[1])
-    end
-    
-    def self_is_own_superclass?
-      self == superclass
-    end
-
-    def what_am_i
-      if self_is_instance?
-        :instance
-      elsif self.is_singleton_class?
-        :singleton_class
-      elsif self_is_own_superclass?
-        :own_superclass
-      else
-        :other
-      end
-    end
-
     def category
+      # note[this uses regex match on object's inspect string - kludgy
+      # - is there a better way?]
       return :nil if self.class == NilClass
       case self.real_inspect
       when /#<Class:#<.*0x[a-z0-9]+>+$/
@@ -195,48 +130,18 @@ class Doodle
     end
     
     # parents returns the set of parent classes of an object
-    # note[this uses regex match on object's inspect string - kludgy - is there a better way?]
     def parents
-      # if singleton class of instance (e.g. class << foo; self; end)
-      # then has no parents
-      klasses = []
-      if self_is_instance?
-        Doodle::Debug.d { [:no_superclass, self.object_id, self.to_s, self.class] }
-        klass = self.class
-      elsif self.is_singleton_class?
-        Doodle::Debug.d { [:singleton_match, self.object_id, self.to_s, self.class, self.superclass, self.superclass.class] }
-        klass = singleton_instance_class.superclass
-        #klass = nil # 'singleton_instance_class
-      elsif self_is_own_superclass?
-        Doodle::Debug.d { [:self_is_superclass, self.object_id, self.to_s, self.class] }
-        klass = nil
-      else
-        Doodle::Debug.d { [:self_is_not_superclass, self.object_id, self.to_s, self.class, self.superclass, self.superclass.class] }
-        klass = superclass
-      end
-      until klass.nil?
-        klasses << klass
-        klass = klass.superclass
-      end
-      klasses
-    end
-
-
-    # parents returns the set of parent classes of an object
-    # note[this uses regex match on object's inspect string - kludgy - is there a better way?]
-    def parents
-      # if singleton class of instance (e.g. class << foo; self; end)
-      # then has no parents
+      # if singleton class (e.g. class << [Ff]oo; self; end) then it has
+      # no parents
       case category
-        when :instance
+      when :instance
         klass = self.class
-        when :instance_singleton_class
+      when :instance_singleton_class
         klass = nil
-        when :class
+      when :class
         klass = superclass
-        when :class_singleton_class
+      when :class_singleton_class
         klass = nil
-        #klass = superclass
       end
       klasses = []
       until klass.nil? || klass == klass.superclass
@@ -251,41 +156,7 @@ class Doodle
     # - instance_attributes
     # - singleton_attributes
     # - class_attributes
-    
-    def xparents
-      # d { [:parents, self.to_s, defined?(superclass)] }
-      klasses = []
-      if defined?(superclass)
-        klass = superclass
-        if self != superclass
-          k = self.ancestors.first
-          # push onto front of array
-          if k.respond_to?(:superclass) && k.superclass.respond_to?(:singleton_class)
-            klasses.unshift k.superclass.singleton_class
-          end
-          until klass.nil?
-            klasses.unshift klass
-            if klass == klass.superclass
-              return klasses # oof
-            end
-            klass = klass.superclass
-          end
-        else
-          until klass.nil?
-            klasses << klass
-            klass = klass.superclass
-          end
-        end
-      else
-        klass = self.class
-        until klass.nil?
-          klasses << klass
-          klass = klass.superclass
-        end
-      end
-      klasses
-    end
-    
+   
     # send message to all parents and collect results 
     def collect_inherited(message)
       result = []
@@ -502,17 +373,14 @@ class Doodle
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
-      attrs = _handle_inherited_hash(tf, :local_attributes)
+      results = _handle_inherited_hash(tf, :local_attributes)
       if !kind_of?(Class) && singleton_class.respond_to?(:attributes)
-        attrs = attrs.merge(singleton_class.attributes)
+        results = results.merge(singleton_class.attributes)
       end
-      attrs
+      results
     end
 
-    def parent_class
-      parents[0]
-    end
-    
+    # return attributes for class
     def class_attributes(tf = true)
       attrs = OrderedHash.new
       if self.kind_of?(Class)
@@ -565,7 +433,11 @@ class Doodle
     def lookup_attribute(name)
       # (look at singleton attributes first)
       # fixme[this smells like a hack to me]
-      singleton_class.attributes[name] || attributes[name]
+      if self.class == Class
+        class_attributes[name]
+      else
+        attributes[name]
+      end
     end
     private :lookup_attribute
 
@@ -613,6 +485,7 @@ class Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
+      Doodle::Debug.d { [:_setter, name, args] }
       ivar = "@#{name}"
       if block_given?
         args.unshift(DeferredBlock.new(block))
@@ -621,6 +494,7 @@ class Doodle
         Doodle::Debug.d { [:_setter, name, args] }
         v = instance_variable_set(ivar, att.validate(self, *args))
       else
+        Doodle::Debug.d { [:_setter, "no attribute"] }
         v = instance_variable_set(ivar, *args)
       end
       validate!(false)
@@ -859,13 +733,18 @@ class Doodle
       end
       if __doodle__.validation_on
         if self.class == Class
-          attribs = singleton_class.attributes
+          attribs = class_attributes
+          Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
         else
           attribs = attributes
+          Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
         end
         attribs.each do |name, att|
           # treat default as special case
-          break if att.default_defined?
+          if att.default_defined?
+            Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
+            break
+          end
           ivar_name = "@#{att.name}"
           if instance_variable_defined?(ivar_name)
             # if all == true, reset values so conversions and
@@ -880,6 +759,8 @@ class Doodle
           end
         end
         # now apply instance level validations
+        
+        Doodle::Debug.d { [:validate!, "validations", validations ]}
         validations.each do |v|
           Doodle::Debug.d { [:validate!, self, v ] }
           begin
