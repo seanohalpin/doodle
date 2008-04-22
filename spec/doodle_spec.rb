@@ -148,10 +148,14 @@ describe Doodle, 'inherited class attributes(false)' do
       Bar.singleton_class.attributes(false).keys.should == [:doc]
     end
 
-    it "should list all inherited meta class attributes" do
-      Bar.singleton_class.attributes.keys.should == [:metadata, :doc]
+    it "should list all singleton class attributes" do
+      Bar.singleton_class.attributes.keys.should == [:doc]
     end
 
+    it "should list all inherited meta class attributes" do
+      Bar.class_attributes.keys.should == [:metadata, :doc]
+    end
+    
     it "should list all inherited class's attributes" do
       Bar.attributes.keys.should == [:name, :location]
     end
@@ -183,13 +187,18 @@ describe Doodle, 'singleton class attributes' do
       @foo.special.should == 42
     end
 
-    it 'should list instance attributes' do
+    it 'should list singleton instance attributes(false)' do
       @foo.singleton_class.attributes(false).keys.should == [:special]
     end
 
-    it 'should list instance attributes' do
-      @foo.singleton_class.attributes.keys.should == [:metadata, :special]
+    it 'should list singleton instance attributes' do
+      @foo.singleton_class.attributes.keys.should == [:special]
     end
+
+    it 'should list instance attributes' do
+      @foo.attributes.keys.should == [:name, :special]
+    end
+
   end
 end
 
@@ -246,9 +255,9 @@ describe Doodle, 'inherited singleton class attributes' do
       @bar.singleton_class.attributes(false).keys.should == [:extra]
     end
 
-    it 'should list instance attributes' do
-      @foo.singleton_class.attributes.keys.should == [:metadata, :special]
-      @bar.singleton_class.attributes.keys.should == [:metadata, :doc, :extra]
+    it 'should list singleton attributes only' do
+      @foo.singleton_class.attributes.keys.should == [:special]
+      @bar.singleton_class.attributes.keys.should == [:extra]
     end
   
     it 'should keep meta attributes separate' do

@@ -7,3 +7,5 @@ rote/*.rake_cache
 rote/tidy.log
 gitlog
 regem
+TAGS
+semantic.cache

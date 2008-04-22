@@ -76,8 +76,11 @@ describe Doodle, 'class attributes' do
       Bar.singleton_class.attributes(false).keys.should == [:doc]
     end
   
-    it "should list all class's own attributes" do
-      Bar.singleton_class.attributes.keys.should == [:metadata, :doc]
+    it "should list all class's singleton attributes" do
+      Bar.singleton_class.attributes.keys.should == [:doc]
+    end
+    it "should list all class's class_attributes" do
+      Bar.class_attributes.keys.should == [:metadata, :doc]
     end
   end
 end

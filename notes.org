@@ -380,3 +380,88 @@ instance variable
   wrong - keep hitting problems - maybe time for a complete rethink
 
   
+== 2008-04-18 03:31:00
+- well, using a simpler superclass-based version of parents has
+  resulted in 9 specs failing, all to do with singletons in one way or
+  another. They are mostly somewhat suspect anyway I think. I'll have
+  to review them in detail.
+
+  Perhaps now would be a good time to get my head straightened out on
+  exactly what inheritance patterns make sense and were the metadata
+  relating to them should be stored.
+
+  Even though an attribute can be added to an instance's singleton
+  class, it should be visible through its attributes collection
+  (e.g. instance.attributes) in the same way that a singleton method
+  appears in the methods collection. So should probably rethink the
+  interfaces too, e.g.
+
+  | attributes           | all, including inherited         |
+  | attributes(false)    | only attributes defined in class |
+  | singleton_attributes | only singleton attributes        |
+  | instance_attributes  | ?                                |
+
+  There are also the public_methods, protected_methods and
+  private_methods methods. Doodle does not interact well with #private
+  and #protected at the moment, so I'll park those.
+
+  (While I'm at it, I could probably get rid of all private methods
+  and make them functions of __doodle__.)
+
+  Also, #public_methods and #protected_methods could probably do with
+  a clean out.
+
+  Move to a more functional way of doing things - might be a bit
+  tedious but would certainly remove some noise pollution.
+
+  But certainly, I need to decide what I want for the singleton
+  inheritance chain. Makes sense for classes to inherit methods
+  defined in their superclass singleton classes (~ class methods). But
+  does it make sense for there to be any inheritance chain at all for
+  instance singletons? Shouldn't they simply be like instances with
+  their own special behaviour? Objects of a class of one.
+
+
+
+= Inheritance
+
+Bar.class_attributes = Bar.singleton_attributes + class attributes (inherited along superclass singletons)
+bar.class_attributes = Bar.class_attributes
+bar.attributes = bar.singleton_attributes + Bar.attributes
+Bar.attributes = attribute definitions
+
+Bar.instance_attributes = ones that define instances
+Bar.singleton_attributes = ones defined only in Bar
+Bar.class_attributes = full list of class attributes
+
+bar.attributes = bar.singleton_attributes + Bar.instance_attributes
+bar.instance_attributes = ones held at class level
+bar.singleton_attributes = singleton only
+bar.class_attributes = ones defined in class
+
+when I ask for self.attributes, I want the ones that apply to self
+
+so for Bar, I want its class_attributes
+for bar, I want the singleton_attributes + instance_attributes
+
+then what happens inside singleton?
+
+
+= 2008-04-18 16:25:57
+Now have only a few tests failing, the ones relating to class
+attribute inheritance
+
+= 2008-04-22 01:15:59
+Got all specs working! Changed interpretation of
+klass.singleton_class.attributes to be consistent with
+instance.singleton_class.attributes to return only those attributes
+defined on singleton_class (so works similarly to
+local_attributes). To access full list of inherited class attributes,
+use klass.class_attributes
+
+now make consistent throughout:
+- instance_attributes
+- class_attributes
+- singleton_attributes
+
+and same with conversions and validations

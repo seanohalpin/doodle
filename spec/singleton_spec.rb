@@ -36,7 +36,7 @@ describe Doodle, "singletons" do
       class << foo
         has :i1
       end
-      foo.attributes.should == OrderedHash.new
+      foo.attributes.keys.should == [:i1]
       foo.singleton_class.attributes.should_not == OrderedHash.new
       foo.singleton_class.attributes.map{ |name, attr| name }.should == [:i1]
       foo.i1 = 1

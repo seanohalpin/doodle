@@ -6,7 +6,7 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
-require 'pp'
+#require 'pp'
 #require 'bleak_house' if ENV['BLEAK_HOUSE']
 
 # patch 1.8.5 to add instance_variable_defined?
@@ -121,6 +121,7 @@ class Doodle
   # classes as well as modules, classes and instances
   module Inherited
 
+    # returns the set of superclasses of an object
     def superclasses_of(obj)
       klasses = []
       if obj.respond_to?(:superclass)
@@ -135,59 +136,122 @@ class Doodle
       klasses.flatten
     end
 
+    # parents returns the set of parent classes of an object
     def parents
       superclasses_of(self)
     end
+
+    def self_is_instance?
+      !self.respond_to?(:superclass)
+    end
+
+    RX_SINGLETON_CLASS = /Class:(?:#<)?([A-Z_][A-Z0-9a-z_]+)/
+    def is_singleton_class?
+      self.to_s.match(RX_SINGLETON_CLASS)
+    end
+    def singleton_instance_class
+      cap = self.to_s.match(RX_SINGLETON_CLASS)
+      const_get(cap[1])
+    end
+    RX_META_CLASS = /Class:([A-Z_][A-Z0-9a-z_]+)>+$/
+    def is_meta_class?
+      self.to_s.match(RX_META_CLASS)
+    end
+    def singleton_meta_class
+      cap = self.to_s.match(RX_META_CLASS)
+      const_get(cap[1])
+    end
     
-    # parents returns the set of parent classes of an object.
-    # note[this is horribly complicated and kludgy - is there a better way?
-    # could do with refactoring]
-    # this function is a ~mess~ - refactor!!!
-    def parents
-      # d { [:parents, self.to_s, defined?(superclass)] }
-      klasses = []
-      if defined?(superclass)
-        klass = superclass
-        if self != superclass
-          #
-          # fixme[any other way to do this? seems really clunky to have to hack strings]
-          #
-          # What's this doing? Finding the class of which this is the singleton class
-          regexen = [/Class:(?:#<)?([A-Z_][A-Za-z_]+)/, /Class:(([A-Z_][A-Za-z_]+))/]
-          regexen.each do |regex|
-            if cap = self.to_s.match(regex)
-              if cap.captures.size > 0
-                k = const_get(cap[1])
-                # push onto front of array
-                if k.respond_to?(:superclass) && k.superclass.respond_to?(:singleton_class)
-                  klasses.unshift k.superclass.singleton_class
-                end
-              end
-              until klass.nil?
-                klasses.unshift klass
-                if klass == klass.superclass
-                  return klasses # oof
-                end
-                klass = klass.superclass
-              end
-            else
-              until klass.nil?
-                klasses << klass
-                klass = klass.superclass
-              end
-            end
-          end
-        end
+    def self_is_own_superclass?
+      self == superclass
+    end
+
+    def what_am_i
+      if self_is_instance?
+        :instance
+      elsif self.is_singleton_class?
+        :singleton_class
+      elsif self_is_own_superclass?
+        :own_superclass
       else
-        klass = self.class
-        until klass.nil?
-          klasses << klass
-          klass = klass.superclass
+        :other
+      end
+    end
+
+    def category
+      return :nil if self.class == NilClass
+      case self.real_inspect
+      when /#<Class:#<.*0x[a-z0-9]+>+$/
+        :instance_singleton_class
+      when /#<Class:[A-Z]/
+        :class_singleton_class
+      else
+        if self.kind_of?(Module)
+          :class
+        else
+          :instance
         end
+      end
+    end
+    
+    # parents returns the set of parent classes of an object
+    # note[this uses regex match on object's inspect string - kludgy - is there a better way?]
+    def parents
+      # if singleton class of instance (e.g. class << foo; self; end)
+      # then has no parents
+      klasses = []
+      if self_is_instance?
+        Doodle::Debug.d { [:no_superclass, self.object_id, self.to_s, self.class] }
+        klass = self.class
+      elsif self.is_singleton_class?
+        Doodle::Debug.d { [:singleton_match, self.object_id, self.to_s, self.class, self.superclass, self.superclass.class] }
+        klass = singleton_instance_class.superclass
+        #klass = nil # 'singleton_instance_class
+      elsif self_is_own_superclass?
+        Doodle::Debug.d { [:self_is_superclass, self.object_id, self.to_s, self.class] }
+        klass = nil
+      else
+        Doodle::Debug.d { [:self_is_not_superclass, self.object_id, self.to_s, self.class, self.superclass, self.superclass.class] }
+        klass = superclass
+      end
+      until klass.nil?
+        klasses << klass
+        klass = klass.superclass
       end
       klasses
     end
 
+
+    # parents returns the set of parent classes of an object
+    # note[this uses regex match on object's inspect string - kludgy - is there a better way?]
+    def parents
+      # if singleton class of instance (e.g. class << foo; self; end)
+      # then has no parents
+      case category
+        when :instance
+        klass = self.class
+        when :instance_singleton_class
+        klass = nil
+        when :class
+        klass = superclass
+        when :class_singleton_class
+        klass = nil
+        #klass = superclass
+      end
+      klasses = []
+      until klass.nil? || klass == klass.superclass
+        klasses << klass
+        klass = klass.superclass
+      end
+      klasses
+    end
+    
+    # need concepts of
+    # - attributes
+    # - instance_attributes
+    # - singleton_attributes
+    # - class_attributes
+    
     def xparents
       # d { [:parents, self.to_s, defined?(superclass)] }
       klasses = []
@@ -225,8 +289,7 @@ class Doodle
     # send message to all parents and collect results 
     def collect_inherited(message)
       result = []
-      klasses = parents
-      klasses.each do |klass|
+      parents.each do |klass|
         if klass.respond_to?(message)
           result.unshift(*klass.__send__(message))
         else
@@ -357,11 +420,13 @@ class Doodle
         str = istr.gsub(/(>+$)/, '')
         trailing = $1
         klass = str.split(/\s/, 2).first
-        separator = instance_variables.size > 0 ? ' ' : ''
+        ivars = self.kind_of?(Module) ? [] : instance_variables
+        separator = ivars.size > 0 ? ' ' : ''
+        
         #pp [:istr, istr, :str, str, :trailing, trailing, :klass, klass]
         # note to self: changing klass to <self.class will highlight cases that need the hack in parents
         #%[<#{self.class}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
-        %[#{klass}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
+        %[#{klass}#{separator}#{ivars.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
       end
     end
     
@@ -437,7 +502,27 @@ class Doodle
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
-      _handle_inherited_hash(tf, :local_attributes)
+      attrs = _handle_inherited_hash(tf, :local_attributes)
+      if !kind_of?(Class) && singleton_class.respond_to?(:attributes)
+        attrs = attrs.merge(singleton_class.attributes)
+      end
+      attrs
+    end
+
+    def parent_class
+      parents[0]
+    end
+    
+    def class_attributes(tf = true)
+      attrs = OrderedHash.new
+      if self.kind_of?(Class)
+        attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
+          hash.merge(OrderedHash[*item])
+        }.merge(singleton_class.respond_to?(:attributes) ? singleton_class.attributes : { })
+        attrs
+      else
+        self.class.class_attributes
+      end
     end
 
     # the set of conversions defined in the current class (i.e. without inheritance)
