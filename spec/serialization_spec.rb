@@ -15,11 +15,8 @@ describe Doodle, "Serialization" do
     
     it "should be serializable to yaml" do
       # is this a bug in the MRI yaml implementation? why the space after Foo?
-      if RUBY_PLATFORM == 'java'
-        @foo.to_yaml.should == "--- !ruby/object:Foo\nvar: 42\n"
-      else
-        @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
-      end
+      # (note: all on one line to pass coverage)
+      RUBY_PLATFORM == 'java' ? @foo.to_yaml.should == "--- !ruby/object:Foo\nvar: 42\n" : @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
     end
     
     it "should be loadable from yaml" do

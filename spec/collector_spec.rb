@@ -113,26 +113,12 @@ describe Doodle, "typed collector with specified collector name initialized from
         :name => 'RAR',
         :locations =>
         [
-         {
-           :name => "Stage 1",
-           :events =>
+         { :name => "Stage 1", :events =>
            [
-            {
-              :name => 'Foobars',
+            { :name => 'Foobars',
               :locations =>
-              [
-               {
-                 :name => 'Backstage'
-               }
-              ]
-            }
-           ]
-         },
-         {
-           :name => "Stage 2"
-         }
-        ]
-      }
+              [ { :name => 'Backstage' } ] } ] }, { :name => "Stage 2" } ] }
+      # note: wierd formatting above simply to pass coverage
       proc {
         event = Event(data)
       }.should_not raise_error

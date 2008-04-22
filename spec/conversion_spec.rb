@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'date'
 
-describe Doodle, 'defaults which have not been set' do
+describe Doodle, 'conversions' do
   after :each do
     undefine_const(:Foo)
   end
@@ -45,5 +45,10 @@ describe Doodle, 'defaults which have not been set' do
     foo = Foo.from("2007-12-31")
     foo.start.should == Date.new(2007, 12, 31)
   end
+
+  it 'should return class_conversions' do
+    Foo.conversions.keys.should == [String]
+  end
+
 end
 

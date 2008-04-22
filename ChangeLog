@@ -1,5 +1,14 @@
 = ChangeLog for doodle
 
+== 0.1.0 / 2008-04-22
+- major change: changed Doodle from module to class so you now use
+  class Foo < Doodle instead of class Foo < Doodle::Base
+- Doodle::Helper renamed Doodle::Core
+- added more specs
+- fixed class and singleton attribute inheritance
+- removed (half-hearted) support for 1.8.5
+- removed redundant methods
+
 == 0.0.11 / 2008-04-13
 - refactored attributes and conversions
 

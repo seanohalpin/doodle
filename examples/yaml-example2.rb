@@ -4,6 +4,7 @@ $:.unshift(File.join(File.dirname(__FILE__), '.'))
 require 'rubygems'
 require 'yaml'
 require 'doodle'
+require 'pp'
 
 class AddressLine < Doodle
   has :text, :kind => String
