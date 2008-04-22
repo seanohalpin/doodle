@@ -98,11 +98,15 @@ task :flog do
   system "flog doodle.rb lib/*.rb"
 end
 
-DOODLE_VERSION = "0.0.11"
+desc "Check version"
+load 'lib/doodle/version.rb'
+task :check_version do
+  puts Doodle::VERSION::STRING
+end
 
 spec = Gem::Specification.new do |s| 
   s.name = "doodle"
-  s.version = DOODLE_VERSION
+  s.version = Doodle::VERSION::STRING
   s.author = "Sean O'Halpin"
   s.email = "sean.ohalpin@gmail.com"
   s.homepage = "http://doodle.rubyforge.org/"
