@@ -1,7 +1,7 @@
 = README
 == doodle
 
-Version 0.0.1
+Version 0.1.0
 
 *doodle* is my attempt at a metaprogramming framework that tries not to
 have to inject methods into core Ruby objects such as Object, Class
@@ -15,7 +15,7 @@ Note that this is very much the first version of a
 work-in-progress. Despite a fair number of specifications, you can
 expect there to be bugs and unexpected behaviours.
 
-Read more at http://doodle.rubyforge.org
+Full docs at http://doodle.rubyforge.org
 
 == Examples
 === Simple example
