@@ -8,8 +8,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
 #require 'bleak_house' if ENV['BLEAK_HOUSE']
 
-# patch 1.8.5 to add instance_variable_defined?
-# note: this does not seem to work so well with singletons
+# require Ruby 1.8.6 or higher
 if RUBY_VERSION < '1.8.6'
   raise Exception, "Sorry - doodle does not work with versions of Ruby below 1.8.6"
 end
