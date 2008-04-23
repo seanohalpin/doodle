@@ -58,6 +58,24 @@ class Doodle
       def snake_case(camel_cased_word)
         camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
+      # what kind of object are we dealing with?
+      def doodle_category(obj)
+        # note[this uses regex match on object's inspect string - kludgy
+        # - is there a better way?]
+        return :nil if obj.class == NilClass
+        case obj.real_inspect
+        when /#<Class:#<.*0x[a-z0-9]+>+$/
+          :instance_singleton_class
+        when /#<Class:[A-Z]/
+            :class_singleton_class
+        else
+          if obj.kind_of?(Module)
+            :class
+          else
+            :instance
+          end
+        end
+      end
     end
   end
 
@@ -111,29 +129,11 @@ class Doodle
   # classes as well as modules, classes and instances
   module Inherited
 
-    def category
-      # note[this uses regex match on object's inspect string - kludgy
-      # - is there a better way?]
-      return :nil if self.class == NilClass
-      case self.real_inspect
-      when /#<Class:#<.*0x[a-z0-9]+>+$/
-        :instance_singleton_class
-      when /#<Class:[A-Z]/
-        :class_singleton_class
-      else
-        if self.kind_of?(Module)
-          :class
-        else
-          :instance
-        end
-      end
-    end
-    
     # parents returns the set of parent classes of an object
     def parents
       # if singleton class (e.g. class << [Ff]oo; self; end) then it has
       # no parents
-      case category
+      case Doodle::Utils.doodle_category(self)
       when :instance
         klass = self.class
       when :instance_singleton_class
