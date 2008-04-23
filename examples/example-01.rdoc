@@ -12,7 +12,6 @@ class DateRange < Doodle
 end
 
 dr = DateRange.new
-dr.start_date                   # => 
-dr.end_date                     # => 
+dr.start_date                   # => #<Date: 4909159/2,0,2299161>
+dr.end_date                     # => #<Date: 4909159/2,0,2299161>
 
-# ~> -:5: superclass must be a Class (Module given) (TypeError)
