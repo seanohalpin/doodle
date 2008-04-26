@@ -871,7 +871,7 @@ class Doodle
   # etc.
   module Factory
     RX_IDENTIFIER = /^[A-Za-z_][A-Za-z_0-9]+\??$/
-    class << self   
+    class << self
       # create a factory function in appropriate module for the specified class
       def factory(konst)
         name = konst.to_s
@@ -880,7 +880,14 @@ class Doodle
         if names.empty?
           # top level class - should be available to all
           klass = Object
-          if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
+          method_defined = begin
+                             method(name)
+                             true
+                           rescue
+                             false
+                           end
+
+          if !method_defined && !klass.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING) && name =~ Factory::RX_IDENTIFIER
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
