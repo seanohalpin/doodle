@@ -123,11 +123,12 @@ describe Doodle, 'initializing from hashes and yaml' do
       person = Person(YAML.load(yaml))
       yaml = person.to_yaml
       # be careful here - Ruby yaml is finicky (spaces after class names)
-      yaml.should == %[--- !ruby/object:Person 
-address: 
-- !ruby/object:AddressLine 
+      yaml = yaml.gsub(/\s*\n/m, "\n")
+      yaml.should == %[--- !ruby/object:Person
+address:
+- !ruby/object:AddressLine
   text: Henry Wood House
-- !ruby/object:AddressLine 
+- !ruby/object:AddressLine
   text: London
 name: Sean
 ]
