@@ -4,45 +4,34 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 shared_code = proc do
-  module AttributeDate
-    def date(*a, &b)
-      #    if a.size > 0
-      name = a.shift
-      #    else
-      #      name = :date
-      #    end
-      td = has(name, { :kind => Date }, *a) do
-        # it is a bit clumsy to define these conversions &
-        # conditions for every attribute/typedef could define a
-        # subclass of Attribute which does this by default (so
-        # instances can override or defer to class level
-        # conversions and conditions)
-        from String do |s|
-          Date.parse(s)
-        end
-        from Array do |y,m,d|
-          #p [:from, Array, y, m, d]
-          Date.new(y, m, d)
-        end
-        from Integer do |jd|
-          #Doodle::Debug.d { [:converting_from, Integer, jd] }
-          Date.new(*Date.jd_to_civil(jd))
-        end
+  class DateRange < Doodle
+    has :start_date, :kind => Date do
+      from String do |s|
+        Date.parse(s)
       end
-      #Doodle::Debug.d { [:date, td] }
-      td.instance_eval(&b) if block_given? # user's block should override default
-    end
-  end
-  class Base < Doodle
-    extend AttributeDate
-  end
-
-  class DateRange < Base
-    date :start_date do
+      from Array do |y,m,d|
+        #p [:from, Array, y, m, d]
+        Date.new(y, m, d)
+      end
+      from Integer do |jd|
+        #Doodle::Debug.d { [:converting_from, Integer, jd] }
+        Date.new(*Date.send(:jd_to_civil, jd))
+      end
       #Doodle::Debug.d { [:start_date, self, self.class] }
       default { Date.today }
     end
-    date :end_date do
+    has :end_date, :kind => Date do
+      from String do |s|
+        Date.parse(s)
+      end
+      from Array do |y,m,d|
+        #p [:from, Array, y, m, d]
+        Date.new(y, m, d)
+      end
+      from Integer do |jd|
+        #Doodle::Debug.d { [:converting_from, Integer, jd] }
+        Date.new(*Date.send(:jd_to_civil, jd))
+      end
       default { start_date }
     end
     must "have end_date >= start_date" do
@@ -52,7 +41,7 @@ shared_code = proc do
 end
 
 describe :DateRange, ' validation' do
-  temporary_constants :AttributeDate, :Base, :DateRange do
+  temporary_constants :DateRange do
 
     before :each, &shared_code
     
@@ -69,7 +58,7 @@ end
 [:DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange].each do |klass|
 
   describe klass, ' validation' do
-    temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
+    temporary_constants :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
 
       before :each, &shared_code
       before :each do
@@ -215,9 +204,9 @@ end
 
       it "should not raise an error when changing start_date and changing end_date using defer_validation" do
         proc {
-          @dr.defer_validation do |x|
-            x.start_date = x.start_date + 1
-            x.end_date = x.start_date
+          @dr.defer_validation do
+            self.start_date = self.start_date + 1
+            self.end_date = self.start_date
           end
         }.should_not raise_error
       end
