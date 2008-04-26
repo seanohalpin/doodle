@@ -261,7 +261,7 @@ class Doodle
     # (hack to fool yaml and anything else that queries instance_variables)
     meth = Object.instance_method(:instance_variables)
     define_method :instance_variables do
-      meth.bind(self).call.reject{ |x| x == '@__doodle__'}
+      meth.bind(self).call.reject{ |x| x =~ /@__doodle__/}
     end
 
     # hide @__doodle__ from inspect
@@ -590,15 +590,15 @@ class Doodle
     def define_collector(collection, name, klass = nil, &block)
       # need to use string eval because passing block
       if klass.nil?
-        sc_eval "def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__
+        sc_eval("def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__)
       else
-        sc_eval "def #{name}(*args, &block);
+        sc_eval("def #{name}(*args, &block);
                           if args.all?{|x| x.kind_of?(#{klass})}
                             #{collection}.<<(*args)
                           else
                             #{collection} << #{klass}.new(*args, &block);
                           end
-                     end", __FILE__, __LINE__
+                     end", __FILE__, __LINE__)
       end
     end
     private :define_collector
