@@ -7,6 +7,7 @@ Rakefile
 config/hoe.rb
 config/requirements.rb
 lib/doodle.rb
+lib/molic_orderedhash.rb
 lib/doodle/version.rb
 log/debug.log
 script/console
