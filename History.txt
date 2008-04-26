@@ -1,4 +1,6 @@
 == 0.1.0 / 2008-04-26
+- doodle's first beta version - the API should remain stable from now on
+- created a Google group: http://groups.google.com/group/ruby-doodle
 - major change: changed Doodle from module to class so you now use
     class Foo < Doodle
   instead of 
