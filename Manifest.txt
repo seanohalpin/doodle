@@ -2,6 +2,7 @@ History.txt
 License.txt
 Manifest.txt
 README.txt
+CREDITS
 Rakefile
 config/hoe.rb
 config/requirements.rb
