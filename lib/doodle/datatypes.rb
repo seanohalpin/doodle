@@ -40,7 +40,7 @@ end
 ### user code
 require 'date'
 require 'uri'
-require 'rfc822'
+#require 'rfc822'
 
 # note: this doesn't have to be in Doodle namespace
 class Doodle
@@ -110,7 +110,8 @@ class Doodle
     def email(name, params = { }, &block)
       string(name, { :max => 255 }.merge(params), &block).instance_eval do
         must "be valid email address" do |s|
-          s =~ RFC822::EmailAddress
+          #s =~ RFC822::EmailAddress
+          s =~ /\A.*@.*\z/
         end
       end
     end
