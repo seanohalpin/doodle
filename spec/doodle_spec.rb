@@ -263,8 +263,9 @@ describe Doodle, 'inherited singleton class attributes' do
     it 'should keep meta attributes separate' do
       @foo.special = 'foo special'
       @foo.special.should == 'foo special'
-      @foo.singleton_class.metadata = 'foo meta'
-      @foo.singleton_class.metadata.should == 'foo meta'
+#      @foo.singleton_class.methods.map{ |x| x.to_sym}.include?(:metadata).should == false
+#      @foo.singleton_class.metadata = 'foo meta'
+#      @foo.singleton_class.metadata.should == 'foo meta'
       # note: you cannot set any other values on @bar until you have set @bar.extra because it's defined as required
       @bar.extra = 'bar extra'
       @bar.extra.should == 'bar extra'
@@ -277,7 +278,7 @@ describe Doodle, 'inherited singleton class attributes' do
 
       # now make sure they haven't bumped each other off
       @foo.special.should == 'foo special'
-      @foo.singleton_class.metadata.should == 'foo meta'
+#      @foo.singleton_class.metadata.should == 'foo meta'
       @bar.extra.should == 'bar extra'
       Foo.metadata.should == 'Foo meta'
       Bar.metadata.should == 'Bar meta'
