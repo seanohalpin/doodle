@@ -1,13 +1,18 @@
-= ChangeLog for doodle
-
 == 0.1.0 / 2008-04-26
 - major change: changed Doodle from module to class so you now use
-  class Foo < Doodle instead of class Foo < Doodle::Base
+    class Foo < Doodle
+  instead of 
+    class Foo < Doodle::Base
 - Doodle::Helper renamed Doodle::Core
-- added more specs
+- added #parent method - returns outer object in initialization blocks
+  (see spec/doodle_context_spec for example usage)
 - fixed class and singleton attribute inheritance
+- rake spec now passes all specs with ruby 1.8.6, ruby 1.9.0 and JRuby 1.1.1
+- added more specs
+- added lib/doodle/utils.rb (used by examples)
 - removed (half-hearted) support for 1.8.5
-- removed redundant methods
+- removed redundant methods & excised some cruft
+- refactored project to use newgem
 
 == 0.0.11 / 2008-04-13
 - refactored attributes and conversions
