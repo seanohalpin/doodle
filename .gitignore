@@ -3,6 +3,8 @@ coverage/*
 experiments/*
 pkg/*
 doc/*
+log/*
+tmp/*
 rote/*.rake_cache
 rote/tidy.log
 gitlog

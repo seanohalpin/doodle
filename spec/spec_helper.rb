@@ -26,14 +26,14 @@ end
 
 def temporary_constants(*args, &block)
   before :each do
-    raise_if_defined *args
+    raise_if_defined(*args)
   end
   after :each do
-    undefine_const *args
+    undefine_const(*args)
   end
-  raise_if_defined *args
+  raise_if_defined(*args)
   yield
-  raise_if_defined *args
+  raise_if_defined(*args)
 end
 alias :temporary_constant :temporary_constants
 

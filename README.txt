@@ -1,6 +1,6 @@
 = doodle
 
-* http://doodle.rubyforge.org/
+* http://doodle.rubyforge.org
 
 == DESCRIPTION:
 
@@ -21,9 +21,9 @@ list":http://rubyforge.org/pipermail/doodle-talk/
 == FEATURES:
 
 * initialization
-** using positional arguments
-** with named arguments
-** by block
+  * using positional arguments
+  * with named arguments
+  * by block
 * defaults
 * initial values
 * validation at attribute and class levels
@@ -35,7 +35,7 @@ list":http://rubyforge.org/pipermail/doodle-talk/
 
 === Example 1
 
-  $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+  require 'rubygems'
   require 'date'
   require 'doodle'
 
@@ -54,7 +54,7 @@ list":http://rubyforge.org/pipermail/doodle-talk/
 
 === Example 2
 
-  $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+  require 'rubygems'
   require 'date'
   require 'doodle'
   require 'doodle/utils' # for try
