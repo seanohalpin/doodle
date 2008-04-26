@@ -11,7 +11,7 @@ shared_code = proc do
       #    else
       #      name = :date
       #    end
-      td = has(name, :kind => Date, *a) do
+      td = has(name, { :kind => Date }, *a) do
         # it is a bit clumsy to define these conversions &
         # conditions for every attribute/typedef could define a
         # subclass of Attribute which does this by default (so

@@ -65,7 +65,8 @@ describe Doodle::Attribute, 'basics' do
     end
 
     it "should have parents in correct order" do
-      Bar.parents.should == [Foo, Object]
+      expected_parents = RUBY_VERSION <= "1.8.6" ? [Foo, Object] : [Foo, Object, BasicObject]
+      Bar.parents.should == expected_parents
     end
     
     it "should have Bar's singleton parents in reverse order of definition" do
@@ -128,7 +129,8 @@ describe Doodle::Attribute, 'attribute order' do
     end
   
     it 'should keep order of inherited attributes' do
-      C.parents.should == [B, A, Doodle, Object]
+      expected_parents = RUBY_VERSION <= "1.8.6" ? [B, A, Doodle, Object] : [B, A, Doodle, Object, BasicObject]
+      C.parents.should == expected_parents
     end
 
     it 'should keep order of inherited attributes' do

@@ -11,7 +11,7 @@ describe :DateRange, 'validation & conversions' do
   #        else
   #          name = :date
   #        end
-          td = has(name, :kind => Date, *a) do
+          td = has(name, { :kind => Date }, *a) do
             # it is a bit clumsy to define these conversions &
             # conditions for every attribute/typedef - could define a
             # subclass of Typedef which does this by default (so we
@@ -122,7 +122,7 @@ describe Doodle, 'class validations' do
     before :each do
       class Foo < Doodle
         class << self
-          has :meta, :default => "data", :kind => String do
+          has :meta, { :default => "data", :kind => String } do
             must "be >= 3 chars long" do |s|
               s.size >= 3
             end

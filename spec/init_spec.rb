@@ -38,7 +38,7 @@ describe Doodle, 'init' do
       @foo.moniker.should == 'D1'
     end
     it 'should have an instance_variable for attribute :moniker' do
-      @foo.instance_variables.include?('@moniker').should == true
+      @foo.instance_variables.map{ |x| x.to_sym }.include?(:@moniker).should == true
     end
     it 'should have an initialized class attribute :metadata' do
       #pending 'deciding how this should work' do

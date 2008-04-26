@@ -166,7 +166,8 @@ describe 'Doodle', 'hiding @__doodle__' do
     end
     it 'should not include @__doodle__ in instance_variables' do
       foo = Foo 2
-      foo.instance_variables.should == ['@var1']
+      foo.instance_variables.size.should == 1
+      foo.instance_variables.first.should =~ /^@var1$/
     end
     it 'should not reveal @__doodle__ in inspect string' do
       foo = Bar 2
@@ -174,7 +175,8 @@ describe 'Doodle', 'hiding @__doodle__' do
     end
     it 'should not include @__doodle__ in instance_variables' do
       foo = Bar 2
-      foo.instance_variables.should == ['@var2']
+      foo.instance_variables.size.should == 1
+      foo.instance_variables.first.should =~ /^@var2$/
     end
     it 'should correctly inspect when using included module' do
       foo = Bar 2

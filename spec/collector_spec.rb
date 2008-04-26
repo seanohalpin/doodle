@@ -16,7 +16,7 @@ describe Doodle, "Simple collector" do
     end
     
     it "should define a collector method :item" do
-      @foo.methods.include?('item').should == true
+      @foo.methods.map{ |x| x.to_sym }.include?(:item).should == true
     end
     
     it "should collect items into attribute :list" do
@@ -45,7 +45,7 @@ describe Doodle, "Typed collector with default collector name" do
     end
     
     it "should define a collector method :location" do
-      @event.methods.include?('location').should == true
+      @event.methods.map{ |x| x.to_sym }.include?(:location).should == true
     end
     
     it "should collect items into attribute :list" do
@@ -66,7 +66,7 @@ describe Doodle, "Typed collector with specified collector name" do
       end
     end
     it "should define a collector method :place" do
-      Event.instance_methods.include?('place').should == true
+      Event.instance_methods.map{ |x| x.to_sym}.include?(:place).should == true
     end
   end
 end

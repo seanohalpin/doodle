@@ -16,7 +16,7 @@ describe Doodle, 'conversions' do
         end
         from Integer do |jd|
           Doodle::Debug.d { [:converting_from, Integer, jd] }
-          Date.new(*Date.jd_to_civil(jd))
+          Date.new(*Date.send(:jd_to_civil, jd))
         end
       end
       from String do |s|
