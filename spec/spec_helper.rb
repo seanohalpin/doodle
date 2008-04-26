@@ -1,10 +1,13 @@
-if !Object.const_defined?(:DEVLIB)
-  DEVLIB = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-  $:.unshift DEVLIB
+begin
+  require 'spec'
+rescue LoadError
+  require 'rubygems'
+  gem 'rspec'
+  require 'spec'
 end
-# make sure we get the development versions
-require "#{DEVLIB}/molic_orderedhash"
-require "#{DEVLIB}/doodle.rb"
+
+$:.unshift(File.dirname(__FILE__) + '/../lib')
+require 'doodle'
 require 'date'
 
 # functions to help clean up namespace after defining classes
