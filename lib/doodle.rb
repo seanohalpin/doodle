@@ -921,12 +921,12 @@ class Doodle
       }
     end
   end
-  # deprecated: temporary
+  # deprecated
   Helper = Core
 
-  # deprecated: derive from Base if you want all the Doodle goodness
+  # deprecated
   class Base
-    include Helper
+    include Core
   end
   include Core
 end
