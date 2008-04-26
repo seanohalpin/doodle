@@ -9,7 +9,8 @@ by making attributes and their properties more declarative.
 Doodle is eco-friendly - it does not globally modify Object, Class or Module,
 nor does it pollute instances with its own instance variables (i.e. it plays nice with yaml).
 
-Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It does not yet work with Ruby 1.9 or Rubinius.
+Doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.1. It
+has not yet been tested with Rubinius (but will be soon :)
 
 Please feel free to post bug reports, feature requests, and any comments or
 discussion topics to 
