@@ -7,7 +7,7 @@
 Doodle is a Ruby library for simplifying the definition of Ruby
 classes by making attributes and their properties more declarative.
 
-Doodle is eco-friendly - it does not globally modify Object, Class or
+Doodle is eco-friendly: it does not globally modify Object, Class or
 Module, nor does it pollute instances with its own instance variables
 (i.e. it plays nice with yaml).
 
@@ -15,8 +15,8 @@ Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It does not yet
 work with Ruby 1.9 or Rubinius.
 
 Please feel free to post bug reports, feature requests, and any
-comments or discussion topics to the "doodle mailing
-list":http://rubyforge.org/pipermail/doodle-talk/
+comments or discussion topics to the doodle Google group: 
+http://groups.google.com/group/ruby-doodle
 
 == FEATURES:
 
@@ -144,7 +144,7 @@ list":http://rubyforge.org/pipermail/doodle-talk/
 
 (The MIT License)
 
-Copyright (c) 2008 FIX
+Copyright (c) 2008 Sean O'Halpin
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

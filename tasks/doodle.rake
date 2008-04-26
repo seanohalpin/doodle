@@ -49,7 +49,7 @@ namespace :mm do
     end
 
     desc "Copy docs to rubyforge"
-    task :copy_rote_docs_to_rubyforge => [:rote, :rdoc] do
+    task :copy_rote_docs_to_rubyforge => [:rote] do
       system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
     end
   end

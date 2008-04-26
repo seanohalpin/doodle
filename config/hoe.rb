@@ -4,7 +4,7 @@ AUTHOR = "Sean O'Halpin"  # can also be an array of Authors
 EMAIL = "sean.ohalpin@gmail.com"
 DESCRIPTION = "Doodle is a gem for simplifying the definition of Ruby classes by
 making attributes and their properties more declarative. Doodle is
-eco-friendly – it does not globally modify Object, Class or Module."
+eco-friendly: it does not globally modify Object, Class or Module."
 
 GEM_NAME = 'doodle' # what ppl will type to install your gem
 RUBYFORGE_PROJECT = 'doodle' # The unix name for your project

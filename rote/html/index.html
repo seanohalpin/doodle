@@ -41,9 +41,14 @@
     Class or Module, nor does it pollute instances with its own
     instance variables (i.e. it plays nice with yaml).</p>
 
-    <p>Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It
-    does not yet work with Ruby 1.9 or Rubinius.</p><a name=
-    'features' id="features"></a>
+    <p>Doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby
+    1.1.1. It has not yet been tested with Rubinius (but will be
+    soon :)</p>
+
+    <p>Please feel free to post bug reports, feature requests, and
+    any comments or discussion topics to the <a href=
+    "http://groups.google.com/group/ruby-doodle">doodle Google
+    group</a></p><a name='features' id="features"></a>
 
     <h3>features</h3>
 
@@ -993,20 +998,7 @@
 
     <p>or singleton instances:</p>
     <pre class='ruby'>
-<code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Foo</span> <span class=
-"punct">&lt;</span> <span class="constant">Doodle</span>
-    <span class="keyword">class </span><span class=
-"punct">&lt;&lt;</span> <span class="constant">self</span>
-      <span class="ident">has</span> <span class=
-"symbol">:doc</span><span class="punct">,</span> <span class=
-"symbol">:default</span> <span class=
-"punct">=&gt;</span> <span class="punct">"</span><span class=
-"string">This is the Foo class</span><span class="punct">"</span>
-    <span class="keyword">end</span>
-  <span class="keyword">end</span>
-  
-  <span class="ident">foo</span> <span class=
+<code class='ruby'>  <span class="ident">foo</span> <span class=
 "punct">=</span> <span class="constant">Foo</span><span class=
 "punct">.</span><span class="ident">new</span>
   <span class="keyword">class </span><span class=
@@ -1030,12 +1022,9 @@
       <li><a href="http://rubyforge.org/projects/doodle">Rubyforge
       project</a></li>
 
-      <li><a href=
-      "http://rubyforge.org/forum/?group_id=5159">Forum</a></li>
-
-      <li><a href=
-      "http://rubyforge.org/tracker/?atid=19938&amp;group_id=5159&amp;func=browse">
-      Bug reports</a></li>
+      <li>Post bug reports, questions, answers to the <a href=
+      "http://groups.google.com/group/ruby-doodle">doodle Google
+      group</a></li>
     </ul>
 
     <p align='right'><span style=

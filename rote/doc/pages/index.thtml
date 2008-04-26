@@ -13,8 +13,7 @@ Doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.1. It
 has not yet been tested with Rubinius (but will be soon :)
 
 Please feel free to post bug reports, feature requests, and any comments or
-discussion topics to 
-the "doodle mailing list":http://rubyforge.org/pipermail/doodle-talk/
+discussion topics to the "doodle Google group":http://groups.google.com/group/ruby-doodle
 
 h3. features
 
@@ -532,4 +531,4 @@ or singleton instances:
 h2. links
 
 * "Rubyforge project":http://rubyforge.org/projects/doodle
-* Post bug reports, questions, answers to "the doodle mailing list":http://rubyforge.org/pipermail/doodle-talk/
+* Post bug reports, questions, answers to the "doodle Google group":http://groups.google.com/group/ruby-doodle
