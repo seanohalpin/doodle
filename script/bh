@@ -1,0 +1,2 @@
+#!/bin/sh
+BLEAK_HOUSE=1 ruby-bleak-house -I/usr/lib/ruby/gems/1.8/gems/bleak_house-4.0/lib/ -rbleak_house $*
