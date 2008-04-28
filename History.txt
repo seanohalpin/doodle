@@ -2,6 +2,7 @@
 - changed name of #parent to #doodle_parent to avoid clash with
   ActiveSupport (thanks to Ryan Garver for reporting this)
 
+
 == 0.1.0 / 2008-04-26
 - doodle's first beta version - the API should remain stable from now on
 - created a Google group: http://groups.google.com/group/ruby-doodle
@@ -19,6 +20,7 @@
 - removed (half-hearted) support for 1.8.5
 - removed redundant methods & excised some cruft
 - refactored project to use newgem
+
 
 == 0.0.11 / 2008-04-13
 - refactored attributes and conversions
