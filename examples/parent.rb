@@ -15,13 +15,8 @@ class Child < Doodle
     #   - can only be done in init block
     #   - somewhat subtle difference (from programmer's point of
     #   - view) between a proc and a block
-    
-    # Also note re: Doodle.parent - its value is only valid
-    # during initialization - this is a way to capture that
-    # value for ues later
-    
     init do
-      parent
+      doodle_parent
     end
   end
 end

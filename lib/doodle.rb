@@ -235,7 +235,7 @@ class Doodle
     attr_accessor :validation_on
     attr_accessor :arg_order
     attr_accessor :errors
-    attr_accessor :parent
+    attr_accessor :doodle_parent
 
     def initialize(object)
       @local_attributes = OrderedHash.new
@@ -244,7 +244,7 @@ class Doodle
       @local_conversions = {}
       @arg_order = []
       @errors = []
-      @parent = nil
+      @doodle_parent = nil
     end
     real_inspect = Object.instance_method(:inspect)
     define_method :real_inspect do
@@ -831,8 +831,9 @@ class Doodle
     #private :initialize_from_hash
 
     # return containing object (set during initialization)
-    def parent
-      __doodle__.parent
+    # (named doodle_parent to avoid clash with ActiveSupport)
+    def doodle_parent
+      __doodle__.doodle_parent
     end
 
     # object can be initialized from a mixture of positional arguments,
@@ -843,7 +844,7 @@ class Doodle
         super
       end
       __doodle__.validation_on = true
-      __doodle__.parent = Doodle.context[-1]
+      __doodle__.doodle_parent = Doodle.context[-1]
       Doodle.context.push(self)
       defer_validation do
         initialize_from_hash(*args)

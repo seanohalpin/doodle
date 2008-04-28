@@ -1,3 +1,7 @@
+== 0.1.1 / 2008-04-28
+- changed name of #parent to #doodle_parent to avoid clash with
+  ActiveSupport (thanks to Ryan Garver for reporting this)
+
 == 0.1.0 / 2008-04-26
 - doodle's first beta version - the API should remain stable from now on
 - created a Google group: http://groups.google.com/group/ruby-doodle
