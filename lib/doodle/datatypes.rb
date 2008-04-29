@@ -40,7 +40,7 @@ end
 ### user code
 require 'date'
 require 'uri'
-#require 'rfc822'
+require 'rfc822'
 
 # note: this doesn't have to be in Doodle namespace
 class Doodle
@@ -51,7 +51,7 @@ class Doodle
           n.to_i
         end
         from String do |n|
-          n =~ /[0-9]+(.[0-9]+)?/ or raise "#{name} must be numeric"
+          n =~ /[0-9]+(.[0-9]+)?/ or raise ArgumentError, "#{name} must be numeric"
           n.to_i
         end
       end
@@ -74,7 +74,7 @@ class Doodle
       if params.key?(:size)
         size = params.delete(:size)
         # size should be a Range
-        size.kind_of?(Range) or raise ArgumentError, ":size should be a Range", caller[-1]
+        size.kind_of?(Range) or raise ArgumentError, "#{name}: size should be a Range", [caller[-1]]
       end
       define name, params, block, { :kind => String } do
         from String do |s|
@@ -108,10 +108,16 @@ class Doodle
     end
 
     def email(name, params = { }, &block)
-      string(name, { :max => 255 }.merge(params), &block).instance_eval do
+      # for max length, see http://www.imc.org/ietf-fax/archive2/msg01578.html
+      # 384 = 128+1+255
+      string(name, { :max => 384 }.merge(params), &block).instance_eval do
         must "be valid email address" do |s|
-          #s =~ RFC822::EmailAddress
-          s =~ /\A.*@.*\z/
+          if RUBY_VERSION >= '1.9.0'
+            # the regex fails in 1.9 with illegal utf byte sequence error
+            s =~ /\A.*@.*\z/
+          else
+            s =~ RFC822::EmailAddress
+          end
         end
       end
     end
@@ -136,6 +142,7 @@ class Doodle
           str =~ /\d+\.\d+.\d+/
         end
         from Array do |a|
+          a.size == 3 or raise ArgumentError, "#{name}: version array argument must contain exactly 3 elements", [caller[-1]]
           a.join('.')
         end
       end
