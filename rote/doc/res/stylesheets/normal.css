@@ -11,6 +11,7 @@ body {
 	color: #000000;
 
 	font-family: verdana, arial, helvetica, sans-serif;
+	font-family: helvetica, sans-serif;
 	font-size: 10pt;
 	padding: 0px;
 	margin: 0px 0px 0px 0px;
@@ -301,4 +302,29 @@ pre code {
 
 h1, h2, h3, h4, h5, h6 {
   color: #d00d1e;
+  font-weight: bold;
 }
+/*
+h1 {
+    font-size: 3em;
+    line-height: 3em;
+    letter-spacing: 0.4em;
+    border-bottom: solid 3px black;
+    border-top: solid 3px black;
+}
+h2 {
+    font-size: 2em;
+    line-height: 2em;
+    letter-spacing: 0.3em;
+    border-bottom: solid 1px black;
+    border-top: solid 1px black;
+    background-color: #F0F0F0;
+    margin-left: -1em;
+    padding-left: 1em;
+}
+h3 {
+    font-size: 1.5em;
+    line-height: 2em;
+    letter-spacing: 0.1em;
+}
+*/
