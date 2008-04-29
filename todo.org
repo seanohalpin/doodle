@@ -5,11 +5,17 @@
 - [ ] Want specs for both flavours of use (e.g. class C < Doodle
       and include Doodle::Core)
   - so I probably want to generate the specs from templates
+- [ ] reorganize specs around features
+- [ ] make sure singleton inheritance working
+- [ ] review specs for 1.9 - seems like Object is getting updated somehow
+- [ ] also check discarding inherited method
 == TODO Fixes
-=== TODO fix messy code [0/3]
-- [ ] parents
+=== TODO fix messy code [1/4]
+- [X] parents
 - [ ] collect_inherited
+  - this is pretty slow too
 - [ ] embrace - maybe replace?
+  - perhaps use Ara Howard's Mixin? Or similar
 === DONE simplify usage
 class Foo < Doodle
 end
@@ -21,10 +27,11 @@ i.e. have a top-level class rather than mod
 == TODO Documentation [0/2]
 - [ ] provide full example of before vs after 
       - i.e. write out in full what you'd have to do to get same
-        functionality perhaps also using traits and fattr
+        functionality 
+      - perhaps also using traits and fattr
 - [ ] example of using doodle to generate classes 
-- (e.g. write out optimised Ruby code rather than use framework)
-i.e. I could use the information gathered to generate a source file
+  - (e.g. write out optimised Ruby code rather than use framework)
+    i.e. I could use the information gathered to generate a source file
 - could also be in other language (e.g. Java, SQL DDL, etc.)
   (see SQL tables definition example)
 == TODO Fix errors collection
@@ -44,21 +51,23 @@ i.e. I could use the information gathered to generate a source file
 === DONE Fixes
 - compatibility with AR? do I need/want that?
 - [X] make raise exception on invalid values optional
-== TODO Profile performance against plain old attributes [0/4]]
+== DONE Profile performance against plain old attributes [4/4]]
 and compare with:
-- [ ] attr_accessor
-- [ ] attributes
-- [ ] traits
-- [ ] fattr
-== TODO Reorganize library layout to follow newgem
+- [X] attr_accessor
+- [X] attributes
+- [X] traits
+- [X] fattr
+No surprise - doodle is ~much~ slower
+== DONE Reorganize library layout to follow newgem
 - only because this seems to be emerging standard (but ~don't~ use web
   page generation)
 == Compatibility
 === TODO check compatibility with ActiveRecord
 - may need to rename :attributes to :doodles or something similar to
   avoid name clash
+  - changed #parent to #doodle_parent to avoid clash with ActiveSupport
 - or to access through __doodle__ method
-- also, validate! method, etc.
+- also, validate! method, e
 === TODO Sequel
 - doesn't work with sequel_model at moment - conflict over initialization
 === TODO compare with moose
