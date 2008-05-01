@@ -18,7 +18,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF8">
     <%# Use our custom vars for the title %>
-    <title><%= @site_title + ' - ' + @page_title %></title>
+    <title><%= @site_title.to_s + ' - ' + @page_title.to_s %></title>
 	  <link rel="stylesheet" href="<%= link_rel '/stylesheets/normal.css' %>" media="screen" type="text/css" />
 	<!-- <meta http-equiv="refresh" content="1" /> -->
   </head>
