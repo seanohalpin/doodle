@@ -59,20 +59,15 @@ class Doodle
       end
       # what kind of object are we dealing with?
       def doodle_category(obj)
-        # note[this uses regex match on object's inspect string - kludgy
-        # - is there a better way?]
         return :nil if obj.class == NilClass
-        case obj.inspect
-        when /#<Class:#<.*0x[a-z0-9]+>+$/
-          :instance_singleton_class
-        when /#<Class:[A-Z]/
-            :class_singleton_class
-        else
-          if obj.kind_of?(Module)
+        if obj.kind_of?(Module)
+          if obj.ancestors.include?(obj)
             :class
           else
-            :instance
+            :singleton_class
           end
+        else
+          :instance
         end
       end
     end
@@ -135,11 +130,9 @@ class Doodle
       case Doodle::Utils.doodle_category(self)
       when :instance
         klass = self.class
-      when :instance_singleton_class
-        klass = nil
       when :class
         klass = superclass
-      when :class_singleton_class
+      when :singleton_class
         klass = nil
       end
       klasses = []
@@ -246,10 +239,6 @@ class Doodle
       @errors = []
       @doodle_parent = nil
     end
-    #real_inspect = Object.instance_method(:inspect)
-    #define_method :real_inspect do
-    #  real_inspect.bind(self).call
-    #end
     def inspect
       ''
     end
@@ -452,16 +441,17 @@ class Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
-      Doodle::Debug.d { [:_setter, name, args] }
+      #Doodle::Debug.d { [:_setter, name, args] }
       ivar = "@#{name}"
       if block_given?
         args.unshift(DeferredBlock.new(block))
       end
       if att = lookup_attribute(name)
-        Doodle::Debug.d { [:_setter, name, args] }
+        #Doodle::Debug.d { [:_setter, name, args] }
         v = instance_variable_set(ivar, att.validate(self, *args))
+        #v = instance_variable_set(ivar, *args)
       else
-        Doodle::Debug.d { [:_setter, "no attribute"] }
+        #Doodle::Debug.d { [:_setter, "no attribute"] }
         v = instance_variable_set(ivar, *args)
       end
       validate!(false)
@@ -524,10 +514,14 @@ class Doodle
 
     # validate that args meet rules defined with +must+
     def validate(owner, *args)
-      Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
+      #Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
+      # if I bypass convert here, the AR inspect wierdness stops
+      # so what is going on?
+      #return args.first
       value = convert(owner, *args)
+      #return args.first
       validations.each do |v|
-        Doodle::Debug.d { [:validate, self, v, args, value] }
+        #Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
           owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
@@ -694,22 +688,22 @@ class Doodle
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
-      Doodle::Debug.d { [:validate!, all, caller] }
+      #Doodle::Debug.d { [:validate!, all, caller] }
       if all
         clear_errors
       end
       if __doodle__.validation_on
         if self.class == Class
           attribs = class_attributes
-          Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
+          #Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
         else
           attribs = attributes
-          Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
+          #Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
         end
         attribs.each do |name, att|
           # treat default as special case
           if att.default_defined?
-            Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
+            #Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
             break
           end
           ivar_name = "@#{att.name}"
@@ -718,8 +712,8 @@ class Doodle
             # validations are applied to raw instance variables
             # e.g. when loaded from YAML
             if all
-              Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
-              __send__(att.name, instance_variable_get(ivar_name))
+              #Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
+              __send__("#{att.name}=", instance_variable_get(ivar_name))
             end
           elsif self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
@@ -727,9 +721,9 @@ class Doodle
         end
         # now apply instance level validations
         
-        Doodle::Debug.d { [:validate!, "validations", validations ]}
+        #Doodle::Debug.d { [:validate!, "validations", validations ]}
         validations.each do |v|
-          Doodle::Debug.d { [:validate!, self, v ] }
+          #Doodle::Debug.d { [:validate!, self, v ] }
           begin
             if !instance_eval(&v.block)
               handle_error self, ValidationError, "#{ self.class } must #{ v.message }", [caller[-1]]
