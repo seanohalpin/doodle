@@ -62,7 +62,7 @@ class Doodle
         # note[this uses regex match on object's inspect string - kludgy
         # - is there a better way?]
         return :nil if obj.class == NilClass
-        case obj.real_inspect
+        case obj.inspect
         when /#<Class:#<.*0x[a-z0-9]+>+$/
           :instance_singleton_class
         when /#<Class:[A-Z]/
@@ -246,10 +246,10 @@ class Doodle
       @errors = []
       @doodle_parent = nil
     end
-    real_inspect = Object.instance_method(:inspect)
-    define_method :real_inspect do
-      real_inspect.bind(self).call
-    end
+    #real_inspect = Object.instance_method(:inspect)
+    #define_method :real_inspect do
+    #  real_inspect.bind(self).call
+    #end
     def inspect
       ''
     end
@@ -261,45 +261,13 @@ class Doodle
     # (hack to fool yaml and anything else that queries instance_variables)
     meth = Object.instance_method(:instance_variables)
     define_method :instance_variables do
-      meth.bind(self).call.reject{ |x| x =~ /@__doodle__/}
+      meth.bind(self).call.reject{ |x| x.to_s =~ /@__doodle__/}
     end
 
     # hide @__doodle__ from inspect
-    # variants:
-    # #<Foo:0xb7de0064>
-    # #<Foo:0xb7c52d28 @name="Arthur Dent", @age=42>
-    # #<Class:#<Foo:0xb7de0064>>
-    # #<Class:Class>
-    # #<Class:#<Class:#<Foo:0xb7de0064>>>
-
-    # strip off all trailing > (count them = nesting)
-    # take leading chars up to first space (or EOS)
-    # rebuild rest
-
-    real_inspect = Object.instance_method(:inspect)
-    define_method :real_inspect do
-      real_inspect.bind(self).call
+    def inspect
+      super.gsub(/\s*@__doodle__=,/,'').gsub(/,?\s*@__doodle__=/,'')
     end
-    define_method :inspect do
-      # have to handle some built-ins as special case
-      built_in = Doodle::BuiltIns::BUILTINS.select{ |x| self.kind_of?(x) }.first
-      if built_in
-        built_in.instance_method(:inspect).bind(self).call
-      else
-        istr = real_inspect.bind(self).call
-        str = istr.gsub(/(>+$)/, '')
-        trailing = $1
-        klass = str.split(/\s/, 2).first
-        ivars = self.kind_of?(Module) ? [] : instance_variables
-        separator = ivars.size > 0 ? ' ' : ''
-        
-        #pp [:istr, istr, :str, str, :trailing, trailing, :klass, klass]
-        # note to self: changing klass to <self.class will highlight cases that need the hack in parents
-        #%[<#{self.class}#{separator}#{instance_variables.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
-        %[#{klass}#{separator}#{ivars.map{|x| "#{x}=#{instance_variable_get(x).inspect}"}.join(' ')}#{trailing}]
-      end
-    end
-    
   end
 
   # the core module of Doodle - to get most facilities provided by Doodle
