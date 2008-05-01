@@ -1,3 +1,7 @@
+== 0.1.2 / 2008-05-01
+- avoid wierd interaction with ActiveRecord (where calling inspect on a
+  class hits the database). Thanks again to Ryan Garver.
+
 == 0.1.1 / 2008-04-28
 - changed name of #parent to #doodle_parent to avoid clash with
   ActiveSupport (thanks to Ryan Garver for reporting this)
