@@ -268,6 +268,8 @@ class Doodle
       end
     end
 
+    #### ERRORS COLLECTION
+
     # where should I put this?
     def errors
       __doodle__.errors
@@ -290,6 +292,8 @@ class Doodle
       end
     end
 
+    #### ERRORS COLLECTION
+    
     def _handle_inherited_hash(tf, method)
       if tf
         collect_inherited(method).inject(OrderedHash.new){ |hash, item|
@@ -312,6 +316,7 @@ class Doodle
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
       results = _handle_inherited_hash(tf, :local_attributes)
+      # if an instance, include the singleton_class attributes
       if !kind_of?(Class) && singleton_class.respond_to?(:attributes)
         results = results.merge(singleton_class.attributes)
       end
@@ -427,20 +432,20 @@ class Doodle
 
     # set an attribute by name - apply validation if defined
     def _setter(name, *args, &block)
-      #Doodle::Debug.d { [:_setter, name, args] }
+      ##DBG: Doodle::Debug.d { [:_setter, name, args] }
       ivar = "@#{name}"
       if block_given?
         args.unshift(DeferredBlock.new(block))
       end
       if att = lookup_attribute(name)
-        #Doodle::Debug.d { [:_setter, name, args] }
+        ##DBG: Doodle::Debug.d { [:_setter, name, args] }
         #!p [:_setter, :got_att, name, *args]
         v = instance_variable_set(ivar, att.validate(self, *args))
         #!p [:_setter, :got_att, name, :value, v]
         #v = instance_variable_set(ivar, *args)
       else
         #!p [:_setter, :no_att, name, *args]
-        #Doodle::Debug.d { [:_setter, "no attribute"] }
+        ##DBG: Doodle::Debug.d { [:_setter, "no attribute"] }
         v = instance_variable_set(ivar, *args)
       end
       validate!(false)
@@ -511,16 +516,12 @@ class Doodle
 
     # validate that args meet rules defined with +must+
     def validate(owner, *args)
-      #Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
-      # if I bypass convert here, the AR inspect wierdness stops
-      # so what is going on?
-      #return args.first
+      ##DBG: Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
       #!p [:validate, :before_conversion, args]
       value = convert(owner, *args)
       #!p [:validate, :after_conversion, args, :becomes, value]
-      #return args.first
       validations.each do |v|
-        #Doodle::Debug.d { [:validate, self, v, args, value] }
+        ##DBG: Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
           owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
@@ -567,27 +568,22 @@ class Doodle
     # define a collector for keyed collections
     # - collection should provide a :[] method
     def define_keyed_collector(collection, name, key_method, klass = nil, &block)
-      Doodle::Debug.d { [:define_keyed_collector, collection, name, key_method, klass]}
+      #DBG: Doodle::Debug.d { [:define_keyed_collector, collection, name, key_method, klass]}
       # need to use string eval because passing block
       if klass.nil?
         sc_eval("def #{name}(*args, &block)
-#!p [:COLLECTOR1, :#{name}, #{collection}.class]
                    args.each do |arg|
                      #{collection}[arg.send(:#{key_method})] = arg
                    end
                  end", __FILE__, __LINE__)
       else
-#!p [:define_COLLECTOR2, name, collection, key_method, klass]
         sc_eval("def #{name}(*args, &block)
-#!p [:COLLECTOR2, :#{name}, #{collection}.class]
                           if args.size > 0 and args.all?{|x| x.kind_of?(#{klass})}
                             args.each do |arg|
                               #{collection}[arg.send(:#{key_method})] = arg
                             end
                           else
-#!p [:COLLECTOR3, :#{name}, #{collection}.class, :#{klass}, 1]
                             obj = #{klass}.new(*args, &block)
-#!p [:COLLECTOR4, :#{name}, #{collection}.class, :#{klass}, 2]
                             #{collection}[obj.send(:#{key_method})] = obj
                           end
                      end", __FILE__, __LINE__)
@@ -618,7 +614,7 @@ class Doodle
     #  end
     #    
     def has(*args, &block)
-      Doodle::Debug.d { [:has, self, self.class, args] }
+      #DBG: Doodle::Debug.d { [:has, self, self.class, args] }
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
       if positional_args.size > 0
@@ -628,7 +624,7 @@ class Doodle
         params = { }
       end
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
-      Doodle::Debug.d { [:has, self, self.class, params] }
+      #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
       if !params.key?(:name)
         handle_error name, ArgumentError, "Must have a name"
       else
@@ -638,6 +634,8 @@ class Doodle
 
       # don't pass collector params through to Attribute
       collector_klass = nil
+      # fixme: this should be in specialized attribute class
+      # (and also distinction between appendable and keyed collections
       if collector = params.delete(:collect)
         if !params.key?(:init)
           if params.key?(:key)
@@ -673,8 +671,10 @@ class Doodle
       # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
       local_attributes[name] = attribute = attribute_class.new(params, &block)
+      
       # if a collector has been defined and has a specific class, then you can pass in an array of hashes
       if collector_klass
+        # fixme: this should be in specialized attribute class
         #!p [:collector_klass2, collector_klass, params[:init]]
         attribute.instance_eval {
           # applying map to hashes returns an array, so avoid that by simply passing it through
@@ -699,6 +699,8 @@ class Doodle
               end
             }
             #!p [:enumerating, :results, results]
+            # fixme: this is all getting a bit too specific to arrays and hashes
+            # figure out a way to do this with specialized Doodle::Attribute?
             if !key.nil?
               results = results.inject({ }) do |hash, result|
                 hash[result.send(key)] = result
@@ -716,7 +718,7 @@ class Doodle
     def arg_order(*args)
       if args.size > 0
         begin
-          args.uniq!
+          args = args.uniq
           args.each do |x|
             handle_error :arg_order, ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
             handle_error :arg_order, NameError, "#{x} not an attribute name" if !attributes.keys.include?(x)
@@ -745,7 +747,8 @@ class Doodle
                   rescue Exception => e
                     a.init
                   end
-        ; hash }
+        hash
+      }
     end
     private :get_init_values
 
@@ -758,22 +761,22 @@ class Doodle
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
-      #Doodle::Debug.d { [:validate!, all, caller] }
+      ##DBG: Doodle::Debug.d { [:validate!, all, caller] }
       if all
         clear_errors
       end
       if __doodle__.validation_on
         if self.class == Class
           attribs = class_attributes
-          #Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
+          ##DBG: Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
         else
           attribs = attributes
-          #Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
+          ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
         end
         attribs.each do |name, att|
           # treat default as special case
           if att.default_defined?
-            #Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
+            ##DBG: Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
             break
           end
           ivar_name = "@#{att.name}"
@@ -782,7 +785,7 @@ class Doodle
             # validations are applied to raw instance variables
             # e.g. when loaded from YAML
             if all
-              #Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
+              ##DBG: Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
               __send__("#{att.name}=", instance_variable_get(ivar_name))
             end
           elsif self.class != Class
@@ -791,9 +794,9 @@ class Doodle
         end
         # now apply instance level validations
         
-        #Doodle::Debug.d { [:validate!, "validations", validations ]}
+        ##DBG: Doodle::Debug.d { [:validate!, "validations", validations ]}
         validations.each do |v|
-          #Doodle::Debug.d { [:validate!, self, v ] }
+          ##DBG: Doodle::Debug.d { [:validate!, self, v ] }
           begin
             if !instance_eval(&v.block)
               handle_error self, ValidationError, "#{ self.class } must #{ v.message }", [caller[-1]]
@@ -831,12 +834,11 @@ class Doodle
         # hash initializer
         # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values, key_values, :args, args] }
+        #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values, key_values, :args, args] }
         #!p [self.class, :initialize_from_hash, :key_values, key_values, :args, args]
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
         init_values = get_init_values
-
         #p [:init_values, init_values]
         
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
@@ -844,7 +846,6 @@ class Doodle
         #p [self.class, :initialize_from_hash, :arg_keywords, arg_keywords]
 
         # merge all hash args into one
-        # this loses some values
         key_values = key_values.inject(arg_keywords) { |hash, item|
           #p [self.class, :initialize_from_hash, :merge, hash, item]
           hash.merge(item)
@@ -853,12 +854,12 @@ class Doodle
 
         # convert key names to symbols
         key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
-        Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values2, key_values, :args2, args] }
+        #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values2, key_values, :args2, args] }
         #p [self.class, :initialize_from_hash, :key_values3, key_values]
         
         # create attributes
         key_values.keys.each do |key|
-          Doodle::Debug.d { [self.class, :initialize_from_hash, :setting, key, key_values[key]] }
+          #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :setting, key, key_values[key]] }
           #p [self.class, :initialize_from_hash, :setting, key, key_values[key]]
           if respond_to?(key)
             __send__(key, key_values[key])
