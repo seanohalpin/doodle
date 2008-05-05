@@ -37,7 +37,11 @@ describe Doodle, "Typed collector with default collector name" do
       end
       @event = Event do
         location "Stage 1"
-        location "Stage 2"
+        # todo: move this into spec
+        # should handle collected arguments with block only
+        location do
+          name "Stage 2"
+        end
       end
     end
     after :each do
