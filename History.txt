@@ -1,4 +1,9 @@
-== 0.1.4 / 2008-05-04 05:52:07
+== 0.1.4 / 2008-05-04
+- Features:
+  - keyed collections - see docs for example
+  - specialized Attribute classes in #has - see
+    spec/specialized_attribute_class_spec.rb for example
+
 - Bug fixes:
   - fixed bug when using a collect generated method with a type but no arguments
 
