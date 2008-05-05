@@ -57,6 +57,24 @@ class Doodle
       end
     end
 
+    def boolean(name, params = { }, &block)
+      define name, params, block, { } do
+        must "be true or false" do |v|
+          [true, false].include?(v)
+        end
+        from String, Symbol do |v|
+          case v.to_s
+          when /^(yes|true|on)$/
+            true
+          when /^(no|false|off)$/
+            false
+          else
+            v
+          end
+        end
+      end
+    end
+    
     def symbol(name, params = { }, &block)
       define name, params, block, { :kind => Symbol } do
         from String do |s|
