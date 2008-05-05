@@ -529,9 +529,9 @@ class Doodle
     end
     private :define_getter_setter
 
-    # define a collector
+    # define a collector for appendable collections
     # - collection should provide a :<< method
-    def define_collector(collection, name, klass = nil, &block)
+    def define_appendable_collector(collection, name, klass = nil, &block)
       # need to use string eval because passing block
       if klass.nil?
         sc_eval("def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__)
@@ -545,7 +545,7 @@ class Doodle
                      end", __FILE__, __LINE__)
       end
     end
-    private :define_collector
+    private :define_appendable_collector
 
     # +has+ is an extended +attr_accessor+
     #
@@ -571,12 +571,22 @@ class Doodle
     #    
     def has(*args, &block)
       Doodle::Debug.d { [:has, self, self.class, args] }
-      name = args.shift.to_sym
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
-      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
-      params = { :name => name }
+      if positional_args.size > 0
+        name = positional_args.shift.to_sym
+        params = { :name => name }
+      else
+        params = { }
+      end
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
+      Doodle::Debug.d { [:has, self, self.class, params] }
+      if !params.key?(:name)
+        handle_error name, ArgumentError, "Must have a name"
+      else
+        name = params[:name].to_sym
+      end
+      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
 
       # don't pass collector params through to Attribute
       collector_klass = nil
@@ -595,12 +605,15 @@ class Doodle
             collector_klass = nil
           end
         end
-        define_collector name, collector_name, collector_klass
+        define_appendable_collector name, collector_name, collector_klass
       end
+
+      # get specialized attribute class or use default
+      attribute_class = params.delete(:using) || Attribute
       
       # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
-      local_attributes[name] = attribute = Attribute.new(params, &block)
+      local_attributes[name] = attribute = attribute_class.new(params, &block)
       # if a collector has been defined and has a specific class, then you can pass in an array of hashes
       if collector_klass
         attribute.instance_eval {

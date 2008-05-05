@@ -63,26 +63,26 @@ describe :DateRange, 'validation & conversions' do
 
     it 'should have two validations' do
       d = DateRange.new
-      d.attributes[:start_date].validations.size.should == 2    
-      d.attributes[:start_date].validations(false).size.should == 2
+      d.attributes[:start_date].validations.size.should_be 2    
+      d.attributes[:start_date].validations(false).size.should_be 2
     end
 
     it 'should have two conversions' do
       d = DateRange.new
-      d.attributes[:start_date].conversions.size.should == 3    
-      d.attributes[:start_date].conversions(false).size.should == 3
+      d.attributes[:start_date].conversions.size.should_be 3    
+      d.attributes[:start_date].conversions(false).size.should_be 3
     end
 
     it 'should convert from Array' do
       d = DateRange.new [2007,01,01], [2007,01,02]
-      d.start_date.should == Date.new(2007,01,01)
-      d.end_date.should == Date.new(2007,01,02)
+      d.start_date.should_be Date.new(2007,01,01)
+      d.end_date.should_be Date.new(2007,01,02)
     end
   
     it 'should convert Integer representing Julian date to Date' do
       d = DateRange.new 2454428, 2454429
-      d.start_date.should == Date.new(2007,11,23)
-      d.end_date.should == Date.new(2007,11,24)
+      d.start_date.should_be Date.new(2007,11,23)
+      d.end_date.should_be Date.new(2007,11,24)
     end
   end
 end

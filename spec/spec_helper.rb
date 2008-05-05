@@ -10,6 +10,16 @@ $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'doodle'
 require 'date'
 
+class Object
+  # try to get rid of those annoying warnings about useless ==
+  def should_be(other)
+    should == other
+  end
+  def should_not_be(other)
+    should_not == other
+  end
+end
+
 # functions to help clean up namespace after defining classes
 def undefine_const(*consts)
   consts.each do |const|

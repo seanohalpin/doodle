@@ -17,44 +17,44 @@ describe Doodle, 'attributes with defaults' do
     end
   
     it 'should have instance attribute default via class' do
-      Foo.attributes[:name].default.should == 'D1'
+      Foo.attributes[:name].default.should_be 'D1'
     end
     it 'should have instance attribute default via instance' do
-      @foo.attributes[:name].default.should == 'D1'
+      @foo.attributes[:name].default.should_be 'D1'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.singleton_class.attributes(false)[:metadata].default.should == 'D2'
+      Foo.singleton_class.attributes(false)[:metadata].default.should_be 'D2'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.singleton_class.attributes[:metadata].default.should == 'D2'
+      Foo.singleton_class.attributes[:metadata].default.should_be 'D2'
     end
     it 'should have singleton attribute default via instance.singleton_class.attributes(false)' do
-      @foo.singleton_class.attributes(false)[:special].default.should == 'D3'
+      @foo.singleton_class.attributes(false)[:special].default.should_be 'D3'
     end
     it 'should have singleton attribute default via instance.singleton_class.attributes' do
-      @foo.singleton_class.attributes[:special].default.should == 'D3'
+      @foo.singleton_class.attributes[:special].default.should_be 'D3'
     end
     it 'should have singleton attribute name by default' do
-      @foo.name.should == 'D1'
+      @foo.name.should_be 'D1'
     end
     it 'should have singleton attribute name by default' do
-      Foo.metadata.should == 'D2'
+      Foo.metadata.should_be 'D2'
     end
     it 'should have singleton attribute special by default' do
-      @foo.special.should == 'D3'
+      @foo.special.should_be 'D3'
     end
 
     it 'should not have a @name instance variable' do
-      @foo.instance_variables.include?("@name").should == false
-      @foo.instance_variables.sort.should == []
+      @foo.instance_variables.include?("@name").should_be false
+      @foo.instance_variables.sort.should_be []
     end
     it 'should not have a @metadata class instance variable' do
-      Foo.instance_variables.include?("@metadata").should == false
-      Foo.instance_variables.sort.should == []
+      Foo.instance_variables.include?("@metadata").should_be false
+      Foo.instance_variables.sort.should_be []
     end
     it 'should not have @special singleton instance variable' do
-      @foo.singleton_class.instance_variables.include?("@special").should == false
-      @foo.singleton_class.instance_variables.sort.should == []
+      @foo.singleton_class.instance_variables.include?("@special").should_be false
+      @foo.singleton_class.instance_variables.sort.should_be []
     end
   end
 end
@@ -90,11 +90,11 @@ describe Doodle, 'defaults which have been set' do
     end
 
     it 'should have default value set from hash arg' do
-      @foo.baz.should == 'Hi!'
+      @foo.baz.should_be 'Hi!'
     end
 
     it 'should have default value set from block' do
-      @foo.start.should == Date.today
+      @foo.start.should_be Date.today
     end
   end
 end
@@ -120,8 +120,8 @@ describe Doodle, "overriding inherited defaults" do
   
     it 'should allow initialization using defaults' do
       text = Text.new(:value => 'any')
-      text.name.should == 'text'
-      text.value.should == 'any'
+      text.name.should_be 'text'
+      text.value.should_be 'any'
     end
   
     it 'should raise Doodle::ValidationError if initialized without all required values' do
@@ -130,8 +130,8 @@ describe Doodle, "overriding inherited defaults" do
   
     it 'should allow initialization using inherited defaults' do
       text = Text2.new
-      text.name.should == 'text'
-      text.value.should == 'any2'
+      text.name.should_be 'text'
+      text.value.should_be 'any2'
     end
   end
 end

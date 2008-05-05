@@ -16,11 +16,11 @@ describe Doodle, "Simple collector" do
     end
     
     it "should define a collector method :item" do
-      @foo.methods.map{ |x| x.to_sym }.include?(:item).should == true
+      @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
     end
     
     it "should collect items into attribute :list" do
-      @foo.list.should == ["Hello", "World"]
+      @foo.list.should_be ["Hello", "World"]
     end
 
   end
@@ -49,11 +49,11 @@ describe Doodle, "Typed collector with default collector name" do
     end
     
     it "should define a collector method :location" do
-      @event.methods.map{ |x| x.to_sym }.include?(:location).should == true
+      @event.methods.map{ |x| x.to_sym }.include?(:location).should_be true
     end
     
     it "should collect items into attribute :list" do
-      @event.locations.map{|loc| loc.name}.should == ["Stage 1", "Stage 2"]
+      @event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
     end
 
   end
@@ -70,7 +70,7 @@ describe Doodle, "Typed collector with specified collector name" do
       end
     end
     it "should define a collector method :place" do
-      Event.instance_methods.map{ |x| x.to_sym}.include?(:place).should == true
+      Event.instance_methods.map{ |x| x.to_sym}.include?(:place).should_be true
     end
   end
 end
@@ -93,8 +93,8 @@ describe Doodle, "typed collector with specified collector name" do
           place "Stage 2"
         end
       }.should_not raise_error
-      event.locations.map{|loc| loc.name}.should == ["Stage 1", "Stage 2"]
-      event.locations.map{|loc| loc.class}.should == [Location, Location]
+      event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
+      event.locations.map{|loc| loc.class}.should_be [Location, Location]
     end
   end
 end
@@ -126,9 +126,9 @@ describe Doodle, "typed collector with specified collector name initialized from
       proc {
         event = Event(data)
       }.should_not raise_error
-      event.locations.map{|loc| loc.name}.should == ["Stage 1", "Stage 2"]
-      event.locations.map{|loc| loc.class}.should == [Location, Location]
-      event.locations[0].events[0].kind_of?(Event).should == true
+      event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
+      event.locations.map{|loc| loc.class}.should_be [Location, Location]
+      event.locations[0].events[0].kind_of?(Event).should_be true
     end
   end
 end

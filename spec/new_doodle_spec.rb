@@ -11,9 +11,9 @@ describe Doodle, 'simple' do
     end
     it 'should be allow instantiation' do
       foo = Foo.new 1, 2, 3
-      foo.var1.should == 1
-      foo.var2.should == 2
-      foo.var3.should == 3
+      foo.var1.should_be 1
+      foo.var2.should_be 2
+      foo.var3.should_be 3
     end
   end
 end

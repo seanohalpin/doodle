@@ -14,15 +14,15 @@ describe Doodle::Factory, " as part of Doodle" do
     it 'should provide factory function' do
       proc {
         foo = Foo("abcd") 
-        foo.var1.should == "abcd"
+        foo.var1.should_be "abcd"
         }.should_not raise_error
     end
 
     it 'should inherit factory function' do
       proc {
         bar = Bar("abcd", 1234) 
-        bar.var1.should == "abcd"
-        bar.var2.should == 1234
+        bar.var1.should_be "abcd"
+        bar.var2.should_be 1234
         }.should_not raise_error
     end
   end
@@ -48,22 +48,22 @@ describe Doodle::Factory, " included as module" do
     it 'should provide factory function' do
       proc {
         foo = Baz("abcd") 
-        foo.var1.should == "abcd"
+        foo.var1.should_be "abcd"
         }.should_not raise_error
     end
 
     it 'should inherit factory function' do
       proc {
         qux = Qux("abcd", 1234) 
-        qux.var1.should == "abcd"
-        qux.var2.should == 1234
+        qux.var1.should_be "abcd"
+        qux.var2.should_be 1234
         }.should_not raise_error
     end
 
     it 'should be includeable in non-doodle classes' do
       proc {
         qux = MyDate(2008, 01, 01) 
-        qux.to_s.should == "2008-01-01" 
+        qux.to_s.should_be "2008-01-01" 
         }.should_not raise_error
     end
 
@@ -71,7 +71,7 @@ describe Doodle::Factory, " included as module" do
     # it 'should be inheritable by non-doodle classes' do
     #   proc {
     #     qux = AnotherDate(2008, 01, 01) 
-    #     qux.to_s.should == "2008-01-01" 
+    #     qux.to_s.should_be "2008-01-01" 
     #     }.should_not raise_error
     # end
 
