@@ -571,12 +571,22 @@ class Doodle
     #    
     def has(*args, &block)
       Doodle::Debug.d { [:has, self, self.class, args] }
-      name = args.shift.to_sym
       # d { [:has2, name, args] }
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
-      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
-      params = { :name => name }
+      if positional_args.size > 0
+        name = positional_args.shift.to_sym
+        params = { :name => name }
+      else
+        params = { }
+      end
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
+      Doodle::Debug.d { [:has, self, self.class, params] }
+      if !params.key?(:name)
+        handle_error name, ArgumentError, "Must have a name"
+      else
+        name = params[:name].to_sym
+      end
+      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
 
       # don't pass collector params through to Attribute
       collector_klass = nil
