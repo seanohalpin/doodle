@@ -130,12 +130,7 @@ class Doodle
       # 384 = 128+1+255
       string(name, { :max => 384 }.merge(params), &block).instance_eval do
         must "be valid email address" do |s|
-          if RUBY_VERSION >= '1.9.0'
-            # the regex fails in 1.9 with illegal utf byte sequence error
-            s =~ /\A.*@.*\z/
-          else
-            s =~ RFC822::EmailAddress
-          end
+          s =~ RFC822::EmailAddress
         end
       end
     end
