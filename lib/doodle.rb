@@ -121,7 +121,7 @@ class Doodle
             else
               self.class.ancestors
             end
-      anc #.select{|x| x.kind_of?(Class)}
+      anc.select{|x| x.kind_of?(Class)}
     end
     
     # need concepts of
@@ -536,11 +536,11 @@ class Doodle
       if klass.nil?
         sc_eval("def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__)
       else
-        sc_eval("def #{name}(*args, &block);
-                          if args.all?{|x| x.kind_of?(#{klass})}
+        sc_eval("def #{name}(*args, &block)
+                          if args.size > 0 and args.all?{|x| x.kind_of?(#{klass})}
                             #{collection}.<<(*args)
                           else
-                            #{collection} << #{klass}.new(*args, &block);
+                            #{collection} << #{klass}.new(*args, &block)
                           end
                      end", __FILE__, __LINE__)
       end
