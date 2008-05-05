@@ -16,10 +16,10 @@ describe 'Doodle', 'parents' do
       @sc.parents.should == []
     end
 
-    it "should have singleton class's singleton class parents == []" do
-      expected_parents = RUBY_VERSION <= "1.8.6" ? [] : [Module, Object, BasicObject]
-      @scc.parents.should == expected_parents
-    end
+#     it "should have singleton class's singleton class parents == []" do
+#       expected_parents = RUBY_VERSION <= "1.8.6" ? [] : [Module, Object, BasicObject]
+#       @scc.parents.should == expected_parents
+#     end
   end
 end
 

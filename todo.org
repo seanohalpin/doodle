@@ -1,4 +1,7 @@
 = doodle to do list
+2008-05-03 05:11:14
+== TODO Specs
+- [ ] write spec for new #parents
 
 2008-04-17 23:08:34
 == TODO Specs

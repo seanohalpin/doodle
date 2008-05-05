@@ -263,9 +263,9 @@ describe Doodle, 'inherited singleton class attributes' do
     it 'should keep meta attributes separate' do
       @foo.special = 'foo special'
       @foo.special.should == 'foo special'
-#      @foo.singleton_class.methods.map{ |x| x.to_sym}.include?(:metadata).should == false
-#      @foo.singleton_class.metadata = 'foo meta'
-#      @foo.singleton_class.metadata.should == 'foo meta'
+
+      # CHECK
+      
       # note: you cannot set any other values on @bar until you have set @bar.extra because it's defined as required
       @bar.extra = 'bar extra'
       @bar.extra.should == 'bar extra'
@@ -278,23 +278,39 @@ describe Doodle, 'inherited singleton class attributes' do
 
       # now make sure they haven't bumped each other off
       @foo.special.should == 'foo special'
-#      @foo.singleton_class.metadata.should == 'foo meta'
+
       @bar.extra.should == 'bar extra'
       Foo.metadata.should == 'Foo meta'
       Bar.metadata.should == 'Bar meta'
       Bar.doc.should == 'Bar doc'
     end
-    
+
+    it 'should inherit singleton methods from class' do
+      @foo.singleton_class.respond_to?(:metadata).should == true
+      @foo.singleton_class.attributes[:metadata].should == nil
+      @foo.singleton_class.metadata = 'foo meta'
+      @foo.singleton_class.instance_eval { @metadata }.should == 'foo meta'
+      if RUBY_VERSION < '1.9.0'
+        @foo.singleton_class.metadata.should == 'foo meta'
+      else
+        pending 'figuring out why this fails in 1.9' do
+          @foo.singleton_class.metadata.should == 'foo meta'
+        end
+      end
+    end
+   
     it 'should behave predictably when setting singleton attributes' do
       @bar.extra = 'bar extra'
       @bar.extra.should == 'bar extra'
-      # pending 'working out how to make this work' do
-      #   @bar.singleton_class.metadata = 'bar meta metadata'
-      #   @bar.singleton_class.metadata.should == 'bar meta metadata'
-      #   @bar.singleton_class.doc = 'bar doc'
-      #   @bar.singleton_class.doc.should == 'bar doc'
-      #   proc { @foo.singleton_class.doc = 1 }.should raise_error(NoMethodError)
-      # end
+      @bar.singleton_class.metadata = 'bar meta metadata'
+      if RUBY_VERSION < '1.9.0'
+        @bar.singleton_class.metadata.should == 'bar meta metadata'
+        @bar.singleton_class.doc = 'bar doc'
+        @bar.singleton_class.doc.should == 'bar doc'
+      else
+        pending 'figuring out why this fails in 1.9'
+      end
+      proc { @foo.singleton_class.doc = 1 }.should raise_error(NoMethodError)
     end
   end
 end

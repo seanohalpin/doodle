@@ -6,7 +6,6 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
-#require 'bleak_house' if ENV['BLEAK_HOUSE']
 
 # require Ruby 1.8.6 or higher
 if RUBY_VERSION < '1.8.6'
@@ -59,8 +58,9 @@ class Doodle
       end
       # what kind of object are we dealing with?
       def doodle_category(obj)
-        return :nil if obj.class == NilClass
-        if obj.kind_of?(Module)
+        if obj.nil?
+          :nil
+        elsif obj.kind_of?(Module)
           if obj.ancestors.include?(obj)
             :class
           else
@@ -125,22 +125,17 @@ class Doodle
 
     # parents returns the set of parent classes of an object
     def parents
-      # if singleton class (e.g. class << [Ff]oo; self; end) then it has
-      # no parents
-      case Doodle::Utils.doodle_category(self)
-      when :instance
-        klass = self.class
-      when :class
-        klass = superclass
-      when :singleton_class
-        klass = nil
-      end
-      klasses = []
-      until klass.nil? || klass == klass.superclass
-        klasses << klass
-        klass = klass.superclass
-      end
-      klasses
+      anc = if respond_to?(:ancestors)
+              if ancestors.include?(self)
+                ancestors[1..-1]
+              else
+                # singletons have no parents (they're orphans)
+                []
+              end
+            else
+              self.class.ancestors
+            end
+      anc #.select{|x| x.kind_of?(Class)}
     end
     
     # need concepts of
