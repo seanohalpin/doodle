@@ -133,3 +133,75 @@ describe Doodle, "typed collector with specified collector name initialized from
   end
 end
 
+describe Doodle, "Simple keyed collector" do
+  temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle
+        has :list, :collect => :item, :key => :size
+      end
+      @foo = Foo do
+        item "Hello"
+        item "World"
+      end
+    end
+    after :each do
+      remove_ivars :foo
+    end
+    
+    it "should define a collector method :item" do
+      @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
+    end
+    
+    it "should collect items into attribute :list" do
+      @foo.list.should_be( { 5 => "World" } )
+    end
+
+  end
+end
+
+describe Doodle, "Simple keyed collector #2" do
+  temporary_constant :Foo, :Item do
+    before :each do
+      class Item < Doodle
+        has :name
+      end
+      class Foo < Doodle
+        has :list, :collect => Item, :key => :name
+      end
+    end
+    
+    it "should define a collector method :item" do
+      foo = Foo.new
+      foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
+      foo.respond_to?(:item).should_be true
+    end
+    
+    it "should collect items into attribute :list #1" do
+      foo = Foo do
+        item "Hello"
+        item "World"
+      end
+      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+    end
+
+    it "should collect keyword argument enumerable into attribute :list" do
+      foo = Foo(:list =>
+                [
+                 { :name => "Hello" },
+                 { :name => "World" }
+                ]
+                )
+      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+    end
+    
+    it "should collect positional argument enumerable into attribute :list" do
+      foo = Foo([
+                { :name => "Hello" },
+                { :name => "World" }
+                ]
+                )
+      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+    end
+    
+  end
+end
