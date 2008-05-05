@@ -224,7 +224,15 @@
     <h2>initialization</h2>
     <pre class='ruby'>
 <code class='ruby'>  <span class=
-"keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Doodle</span>
+"ident">require</span> <span class="punct">'</span><span class=
+"string">rubygems</span><span class="punct">'</span>
+  <span class="ident">require</span> <span class=
+"punct">'</span><span class="string">doodle</span><span class=
+"punct">'</span>
+
+  <span class="keyword">class </span><span class=
+"class">Event</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span>
     <span class="ident">has</span> <span class=
 "symbol">:date</span>
   <span class="keyword">end</span></code>
@@ -978,8 +986,61 @@
       <span class="ident">place</span> <span class=
 "number">42</span>
     <span class="keyword">end</span></code>
-</pre><a name='classes_and_singletons' id=
-"classes_and_singletons"></a>
+</pre><a name='keyed_collections' id="keyed_collections"></a>
+
+    <h3>keyed collections</h3>
+
+    <p>You can also build keyed collections using
+    <code>:collect</code>. Use</p>
+    <pre class='ruby'>
+<code class='ruby'>    <span class=
+"symbol">:key</span> <span class="punct">=&gt;</span> <span class=
+"symbol">:method_name</span></code>
+</pre>
+
+    <p>to tell doodle which method to call on the collected object.
+    If you don’t specify an <code>:init</code> value, doodle will
+    create a hash to hold the collected items. For example:</p>
+    <pre class='ruby'>
+<code class='ruby'>    <span class=
+"keyword">class </span><span class="class">Item</span> <span class=
+"punct">&lt;</span> <span class="constant">Doodle</span>
+      <span class="ident">has</span> <span class=
+"symbol">:name</span>
+      <span class="ident">has</span> <span class=
+"symbol">:value</span>
+    <span class="keyword">end</span>
+    <span class="keyword">class </span><span class=
+"class">Foo</span> <span class="punct">&lt;</span> <span class=
+"constant">Doodle</span>
+      <span class="ident">has</span> <span class=
+"symbol">:list</span><span class="punct">,</span> <span class=
+"symbol">:collect</span> <span class=
+"punct">=&gt;</span> <span class="constant">Item</span><span class=
+"punct">,</span> <span class="symbol">:key</span> <span class=
+"punct">=&gt;</span> <span class="symbol">:name</span>
+    <span class="keyword">end</span>
+    <span class="ident">foo</span> <span class=
+"punct">=</span> <span class="constant">Foo</span> <span class=
+"keyword">do</span>
+      <span class="ident">item</span> <span class=
+"punct">'</span><span class="string">A</span><span class=
+"punct">',</span> <span class="number">1</span>
+      <span class="ident">item</span> <span class=
+"punct">'</span><span class="string">B</span><span class=
+"punct">',</span> <span class="number">2</span>
+    <span class="keyword">end</span>
+    <span class="ident">foo</span><span class=
+"punct">.</span><span class="ident">list</span><span class=
+"punct">['</span><span class="string">A</span><span class=
+"punct">']</span> <span class=
+"comment"># =&gt; #&lt;Item:0xb7cf76ac @value=1, @name="A"&gt;</span></code>
+</pre>
+
+    <p>If you <em>do</em> specify an <code>:init</code> value, it
+    should provide a <code>#[]</code> method that accepts the type
+    of the <code>:key</code> specified.</p><a name=
+    'classes_and_singletons' id="classes_and_singletons"></a>
 
     <h2>classes and singletons</h2>
 

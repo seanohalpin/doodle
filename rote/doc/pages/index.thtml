@@ -99,6 +99,9 @@ On Windows:
 h2. initialization
 
 #:code#ruby#
+  require 'rubygems'
+  require 'doodle'
+
   class Event < Doodle
     has :date
   end
@@ -504,6 +507,36 @@ class, you can just specify a method name:
       place 42
     end
 #:code#
+
+h3. keyed collections
+
+You can also build keyed collections using @:collect@. Use
+
+#:code#ruby#
+    :key => :method_name
+#:code#ruby#
+
+to tell doodle which method to call on the collected object. If you
+don't specify an @:init@ value, doodle will create a hash to hold the
+collected items. For example:
+
+#:code#ruby#
+    class Item < Doodle
+      has :name
+      has :value
+    end
+    class Foo < Doodle
+      has :list, :collect => Item, :key => :name
+    end
+    foo = Foo do
+      item 'A', 1
+      item 'B', 2
+    end
+    foo.list['A'] # => #<Item:0xb7cf76ac @value=1, @name="A">
+#:code#ruby#
+
+If you _do_ specify an @:init@ value, it should provide a @#[]@ method
+that accepts the type of the @:key@ specified.
 
 h2. classes and singletons
 
