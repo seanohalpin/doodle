@@ -56,20 +56,6 @@ class Doodle
       def snake_case(camel_cased_word)
         camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
-      # what kind of object are we dealing with?
-      def doodle_category(obj)
-        if obj.nil?
-          :nil
-        elsif obj.kind_of?(Module)
-          if obj.ancestors.include?(obj)
-            :class
-          else
-            :singleton_class
-          end
-        else
-          :instance
-        end
-      end
     end
   end
 
