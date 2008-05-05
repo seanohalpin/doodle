@@ -3,25 +3,16 @@
  *
  * rosco at roscopeco dot co dot uk
  */
+
 body {
 	background: #ffffff;
-  /* background-image: url(../images/notebook-bg-blue.png); */
-  background-image: url(../images/doodle2.png);
-  background-repeat: no-repeat;
 	color: #000000;
 
-	font-family: verdana, arial, helvetica, sans-serif;
-	font-family: helvetica, sans-serif;
-	font-size: 10pt;
+	font-family: verdana, sans-serif;
 	padding: 0px;
 	margin: 0px 0px 0px 0px;
 	margin: 40px 40px 40px 40px;
 
-  font-family: 'LucidaGrande', 'Lucida Grande', 'Lucida Sans Unicode', 'sans-serif'; 
-  font-size: 12px; 
-  font-size: 9pt;
-  font-size: 0.8em;
-  font-size: 0.9em;
   font-style: normal; 
   font-variant: normal;
   font-weight: normal; 
@@ -303,28 +294,30 @@ pre code {
 h1, h2, h3, h4, h5, h6 {
   color: #d00d1e;
   font-weight: bold;
+  font-family: sans-serif;
 }
-/*
+
 h1 {
-    font-size: 3em;
-    line-height: 3em;
-    letter-spacing: 0.4em;
-    border-bottom: solid 3px black;
-    border-top: solid 3px black;
-}
-h2 {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    padding-left: 0.1em;
     font-size: 2em;
     line-height: 2em;
     letter-spacing: 0.3em;
-    border-bottom: solid 1px black;
-    border-top: solid 1px black;
-    background-color: #F0F0F0;
-    margin-left: -1em;
-    padding-left: 1em;
 }
-h3 {
+h2 {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    padding-left: 0.1em;
     font-size: 1.5em;
     line-height: 2em;
+    letter-spacing: 0.2em;
+}
+h3 {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    padding-left: 0.1em;
+    font-size: 1em;
+    line-height: 1em;
     letter-spacing: 0.1em;
 }
-*/

@@ -3,6 +3,23 @@
 == TODO Specs
 - [ ] write spec for new #parents
 
+== TODO Collect
+- [ ] Hash version
+
+  has :list, :collect => Item, :key => :name
+
+== TODO has + Attribute
+
+- [ ] redefine has as a protocol so you can pass in other classes to
+  use other than Doodle::Attribute
+
+  has :thing, :use => MyClassAttribute
+
+- document how to call factory functions defined in modules
+  i.e. MyModule.Thing(:param => 'abc') rather than MyModule::Thing()
+
+
+
 2008-04-17 23:08:34
 == TODO Specs
 - [ ] Want specs for both flavours of use (e.g. class C < Doodle
