@@ -15,8 +15,8 @@ describe 'Doodle', 'parents' do
     
     it 'should not duplicate validations when accessing them!' do
       foo = Foo 2
-      foo.validations.size.should == 1
-      foo.validations.size.should == 1
+      foo.validations.size.should_be 1
+      foo.validations.size.should_be 1
     end
   end
 end
@@ -48,8 +48,8 @@ describe 'Doodle', ' loading good data from yaml' do
     
     it 'should apply conversions' do
       foo = YAML::load(@str).validate!
-      foo.date.should == Date.new(2000, 7, 1)
-      foo.date.class.should == Date
+      foo.date.should_be Date.new(2000, 7, 1)
+      foo.date.class.should_be Date
     end
   end
 end
@@ -124,7 +124,7 @@ describe Doodle, 'initializing from hashes and yaml' do
       yaml = person.to_yaml
       # be careful here - Ruby yaml is finicky (spaces after class names)
       yaml = yaml.gsub(/\s*\n/m, "\n")
-      yaml.should == %[--- !ruby/object:Person
+      yaml.should_be %[--- !ruby/object:Person
 address:
 - !ruby/object:AddressLine
   text: Henry Wood House
@@ -134,7 +134,7 @@ name: Sean
 ]
       person = YAML.load(yaml)
       proc { person.validate! }.should_not raise_error
-      person.address.all?{ |x| x.kind_of? AddressLine }.should == true
+      person.address.all?{ |x| x.kind_of? AddressLine }.should_be true
 
     end
   end
@@ -167,7 +167,7 @@ describe 'Doodle', 'hiding @__doodle__' do
     end
     it 'should not include @__doodle__ in instance_variables' do
       foo = Foo 2
-      foo.instance_variables.size.should == 1
+      foo.instance_variables.size.should_be 1
       foo.instance_variables.first.should =~ /^@var1$/
     end
     it 'should not reveal @__doodle__ in inspect string' do
@@ -176,7 +176,7 @@ describe 'Doodle', 'hiding @__doodle__' do
     end
     it 'should not include @__doodle__ in instance_variables' do
       foo = Bar 2
-      foo.instance_variables.size.should == 1
+      foo.instance_variables.size.should_be 1
       foo.instance_variables.first.should =~ /^@var2$/
     end
     it 'should correctly inspect when using included module' do
@@ -185,17 +185,17 @@ describe 'Doodle', 'hiding @__doodle__' do
     end
     it 'should correctly inspect string' do
       foo = DString("Hello")
-      foo.inspect.should == '"Hello"'
+      foo.inspect.should_be '"Hello"'
     end
     it 'should correctly inspect hash' do
       foo = DHash.new(2)
       foo[:a] = 1
-      foo.inspect.should == '{:a=>1}'
-      foo[:b].should == 2
+      foo.inspect.should_be '{:a=>1}'
+      foo[:b].should_be 2
     end
     it 'should correctly inspect array' do
       foo = DArray(3, 2)
-      foo.inspect.should == '[2, 2, 2]'
+      foo.inspect.should_be '[2, 2, 2]'
     end
   end
 end

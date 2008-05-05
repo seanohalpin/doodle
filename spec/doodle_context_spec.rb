@@ -37,8 +37,8 @@ describe Doodle, "doodle_context" do
       end
 
       sean = dad.children[0]
-      sean.dad.name.should == 'Conn'
-      sean.doodle_parent.name.should == 'Conn'
+      sean.dad.name.should_be 'Conn'
+      sean.doodle_parent.name.should_be 'Conn'
     end
   end
 end

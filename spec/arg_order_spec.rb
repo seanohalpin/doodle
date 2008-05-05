@@ -12,9 +12,9 @@ describe 'arg_order' do
     end
     it 'should specify order of positional arguments' do
       foo = Foo.new 1, 2, 3
-      foo.value.should == 1
-      foo.name.should == 2
-      foo.extra.should == 3
+      foo.value.should_be 1
+      foo.name.should_be 2
+      foo.extra.should_be 3
     end
 
     it 'should allow only symbols as arguments to arg_order' do
@@ -42,8 +42,8 @@ describe 'arg_order' do
     end
     it 'should specify order of positional arguments' do
       f = Bar.new 1, 2
-      f.name.should == 1
-      f.value.should == 2
+      f.name.should_be 1
+      f.value.should_be 2
     end
   end
 end
@@ -61,8 +61,8 @@ describe 'arg_order' do
     end
     it 'should specify order of positional arguments' do
       f = Bar.new 1, 2
-      f.value.should == 1
-      f.name.should == 2
+      f.value.should_be 1
+      f.name.should_be 2
     end  
   end
 end
@@ -81,8 +81,8 @@ describe 'arg_order' do
   
     it 'should specify order of positional arguments' do
       f = Bar.new 1
-      f.value.should == 1
-      f.name.should == "bar"
+      f.value.should_be 1
+      f.name.should_be "bar"
     end  
   end
 end
@@ -101,8 +101,8 @@ describe 'arg_order' do
   
     it 'should specify order of positional arguments' do
       f = Bar.new 1, "bar"
-      f.value.should == 1
-      f.name.should == "bar"
+      f.value.should_be 1
+      f.name.should_be "bar"
     end  
   end
 end
