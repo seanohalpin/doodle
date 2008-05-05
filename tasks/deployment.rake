@@ -1,5 +1,5 @@
-desc 'Release the website and new gem version'
-task :deploy => [:check_version, :website, :release] do
+desc 'Release the new gem version'
+task :deploy => [:check_version, :release] do
   puts "Remember to create SVN tag:"
   puts "svn copy svn+ssh://#{rubyforge_username}@rubyforge.org/var/svn/#{PATH}/trunk " +
     "svn+ssh://#{rubyforge_username}@rubyforge.org/var/svn/#{PATH}/tags/REL-#{VERS} "
@@ -7,8 +7,8 @@ task :deploy => [:check_version, :website, :release] do
   puts "Tagging release #{CHANGES}"
 end
 
-desc 'Runs tasks website_generate and install_gem as a local deployment of the gem'
-task :local_deploy => [:website_generate, :install_gem]
+desc 'Runs task install_gem as a local deployment of the gem'
+task :local_deploy => [:install_gem]
 
 task :check_version do
   unless ENV['VERSION']
