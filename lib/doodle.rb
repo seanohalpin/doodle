@@ -145,6 +145,7 @@ class Doodle
     private :collect_inherited
   end
 
+  # = embrace
   # the intent of embrace is to provide a way to create directives
   # that affect all members of a class 'family' without having to
   # modify Module, Class or Object - in some ways, it's similar to Ara
