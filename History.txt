@@ -1,6 +1,6 @@
-== 0.1.4 / 2008-05-04
+== 0.1.4 / 2008-05-06
 - Features:
-  - keyed collections - see docs for example
+  - keyed collections - see http://doodle.rubyforge.org/#keyed_collections for details
   - specialized Attribute classes in #has - see
     spec/specialized_attribute_class_spec.rb for example
 
