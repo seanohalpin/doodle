@@ -12,6 +12,6 @@ class DateRange < Doodle
 end
 
 dr = DateRange.new
-dr.start_date                   # => #<Date: 4908855/2,0,2299161>
-dr.end_date                     # => #<Date: 4908855/2,0,2299161>
+dr.start_date                   # => #<Date: 4909185/2,0,2299161>
+dr.end_date                     # => #<Date: 4909185/2,0,2299161>
 
