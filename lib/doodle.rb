@@ -774,11 +774,6 @@ class Doodle
           ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
         end
         attribs.each do |name, att|
-          # treat default as special case
-          if att.default_defined?
-            ##DBG: Doodle::Debug.d { [:validate!, "default_defined - breaking" ]}
-            break
-          end
           ivar_name = "@#{att.name}"
           if instance_variable_defined?(ivar_name)
             # if all == true, reset values so conversions and
@@ -788,10 +783,14 @@ class Doodle
               ##DBG: Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
               __send__("#{att.name}=", instance_variable_get(ivar_name))
             end
+          elsif att.optional?   # treat default/init as special case
+            ##DBG: Doodle::Debug.d { [:validate!, :optional, name ]}
+            break
           elsif self.class != Class
             handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
           end
         end
+        
         # now apply instance level validations
         
         ##DBG: Doodle::Debug.d { [:validate!, "validations", validations ]}
