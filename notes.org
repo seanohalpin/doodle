@@ -465,3 +465,11 @@ now make consistent throughout:
 and same with conversions and validations
 
 = 2008-05-06 03:24:41
+- 0.1.4 release
+  - keyed collections
+  - specialized attributes
+
+Of course, as soon as I release a version, I spot a bug - YAML loading
+data not working where attribute has a default - fixed now, but what a
+pain
+
