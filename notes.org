@@ -12,9 +12,7 @@
 === rationale
 === other?
 = Notes on doodle
-
 See also [[file:~/doodle-bugs.mm]]
-
 == Initialization
 
 === Notes
@@ -465,3 +463,5 @@ now make consistent throughout:
 - singleton_attributes
 
 and same with conversions and validations
+
+= 2008-05-06 03:24:41
