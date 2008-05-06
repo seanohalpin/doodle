@@ -4,13 +4,11 @@
 - pp doesn't seem to like Doodle anymore
 
 == TODO collect
-- [ ] Hash version
+- [X] Hash version
       has :list, :collect => Item, :key => :name
-
-- create spec for bug in validate! with loading YAML when default
+- [X] create spec for bug in validate! with loading YAML when default
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
-
 == TODO has + Attribute
 - [ ] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
