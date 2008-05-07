@@ -202,6 +202,15 @@ describe Doodle, "Simple keyed collector #2" do
                 )
       foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
+
+    it "should collect named argument hash into attribute :list" do
+      foo = Foo(:list => {
+                  "Hello" => { :name => "Hello" },
+                  "World" => { :name => "World" }
+                }
+                )
+      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+    end
     
   end
 end

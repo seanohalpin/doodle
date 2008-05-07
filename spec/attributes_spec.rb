@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe Doodle::Attribute, 'basics' do
+describe Doodle::DoodleAttribute, 'basics' do
   temporary_constants :Foo, :Bar do
     before(:each) do
       class Foo
@@ -33,7 +33,7 @@ describe Doodle::Attribute, 'basics' do
     end
     
     it 'should have attribute :ivar1 with default defined' do
-      @foo.attributes[:ivar1].default.should == 'Hello'
+      @foo.doodle_attributes[:ivar1].default.should == 'Hello'
     end
 
     it 'should have default name' do
@@ -45,36 +45,36 @@ describe Doodle::Attribute, 'basics' do
     end
 
     it 'should have name required == false (because has default)' do
-      @foo.attributes[:ivar1].required?.should == false
+      @foo.doodle_attributes[:ivar1].required?.should == false
     end
 
     it 'should have ivar2 required == true' do
-      @bar.attributes[:ivar2].required?.should == true
+      @bar.doodle_attributes[:ivar2].required?.should == true
     end
 
     it 'should have name.optional? == true (because has default)' do
-      @foo.attributes[:ivar1].optional?.should == true
+      @foo.doodle_attributes[:ivar1].optional?.should == true
     end
 
     it 'should inherit attribute from parent' do
-      @bar.attributes[:ivar1].should == @foo.attributes[:ivar1]
+      @bar.doodle_attributes[:ivar1].should == @foo.doodle_attributes[:ivar1]
     end
 
     it 'should have ivar2.optional? == false' do
-      @bar.attributes[:ivar2].optional?.should == false
+      @bar.doodle_attributes[:ivar2].optional?.should == false
     end
 
-#     it "should have parents in correct order" do
-#       expected_parents = RUBY_VERSION <= "1.8.6" ? [Foo, Object] : [Foo, Object, BasicObject]
-#       Bar.parents.should == expected_parents
+#     it "should have doodle_parents in correct order" do
+#       expected_doodle_parents = RUBY_VERSION <= "1.8.6" ? [Foo, Object] : [Foo, Object, BasicObject]
+#       Bar.doodle_parents.should == expected_doodle_parents
 #     end
     
-    it "should have Bar's singleton parents in reverse order of definition" do
-      @bar.singleton_class.parents.should == []
+    it "should have Bar's singleton doodle_parents in reverse order of definition" do
+      @bar.singleton_class.doodle_parents.should == []
     end
 
     it 'should have singleton_class attributes in order of definition' do
-      Bar.singleton_class.attributes.keys.should == [:cvar2]
+      Bar.singleton_class.doodle_attributes.keys.should == [:cvar2]
     end
 
     it 'should have inherited class_attributes in order of definition' do
@@ -86,33 +86,33 @@ describe Doodle::Attribute, 'basics' do
     end
     
     it 'should have local class attributes in order of definition' do
-      Bar.singleton_class.attributes(false).keys.should == [:cvar2]
+      Bar.singleton_class.doodle_attributes(false).keys.should == [:cvar2]
     end
 
-    it 'should not inherit singleton local_attributes' do
-      @bar.singleton_class.class_eval { collect_inherited(:local_attributes).map { |x| x[0]} }.should == []
+    it 'should not inherit singleton doodle_local_attributes' do
+      @bar.singleton_class.class_eval { doodle_collect_inherited(:doodle_local_attributes).map { |x| x[0]} }.should == []
     end
 
     it 'should not inherit singleton attributes#1' do
-      @bar.singleton_class.attributes.map { |x| x[0]} .should == [:svar2]
+      @bar.singleton_class.doodle_attributes.map { |x| x[0]} .should == [:svar2]
     end
     
     it 'should not inherit singleton attributes#2' do
-      @bar.singleton_class.attributes.keys.should == [:svar2]
+      @bar.singleton_class.doodle_attributes.keys.should == [:svar2]
     end
 
     it 'should not inherit singleton attributes#3' do
-      @bar.singleton_class.attributes(false).keys.should == [:svar2]
+      @bar.singleton_class.doodle_attributes(false).keys.should == [:svar2]
     end
 
     it 'should show singleton attributes in attributes' do
-      @bar.attributes.keys.should == [:ivar1, :ivar2, :svar2]
+      @bar.doodle_attributes.keys.should == [:ivar1, :ivar2, :svar2]
     end
 
   end
 end
 
-describe Doodle::Attribute, 'attribute order' do
+describe Doodle::DoodleAttribute, 'attribute order' do
   temporary_constants :A, :B, :C do
     before :each do
       class A < Doodle
@@ -129,12 +129,12 @@ describe Doodle::Attribute, 'attribute order' do
     end
   
 #     it 'should keep order of inherited attributes' do
-#       expected_parents = RUBY_VERSION <= "1.8.6" ? [B, A, Doodle, Object] : [B, A, Doodle, Object, BasicObject]
-#       C.parents.should == expected_parents
+#       expected_doodle_parents = RUBY_VERSION <= "1.8.6" ? [B, A, Doodle, Object] : [B, A, Doodle, Object, BasicObject]
+#       C.doodle_parents.should == expected_doodle_parents
 #     end
 
     it 'should keep order of inherited attributes' do
-      C.attributes.keys.should == [:a, :b, :c]
+      C.doodle_attributes.keys.should == [:a, :b, :c]
     end
   end
 end
