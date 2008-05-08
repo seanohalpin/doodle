@@ -29,14 +29,14 @@ See Facets compare_on
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
 == TODO has + Attribute
-- [ ] redefine has as a protocol so you can pass in other classes to
+- [X] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
 
-      has :thing, :use => MyClassAttribute
+      has :thing, :using => MyClassAttribute
 
       I could then use this to define other specialised directives
       which use subclasses of Doodle::Attribute, e.g. Doodle::CommandLineOption
-
+- [X] refactor has to use specialized attribute classes for collections
 == TODO Documentation [0/10]
 - [ ] better examples (and better running example)
 - [ ] more in tutorial fashion (cf. presentation) - from simple to
