@@ -13,8 +13,8 @@ describe Doodle, ' unspecified attributes' do
   end
 end
 
-describe Doodle::Attribute, ' unspecified attributes' do  
+describe Doodle::DoodleAttribute, ' unspecified attributes' do  
   it 'should raise Doodle::UnknownAttributeError for unspecified attributes' do
-    proc { foo = Doodle::Attribute(:name => 'foo', :extra => 'unwanted') }.should raise_error(Doodle::UnknownAttributeError)
+    proc { foo = Doodle::DoodleAttribute(:name => 'foo', :extra => 'unwanted') }.should raise_error(Doodle::UnknownAttributeError)
   end
 end

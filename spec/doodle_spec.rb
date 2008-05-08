@@ -24,15 +24,15 @@ describe Doodle, 'instance attributes' do
     end
 
     it 'should list instance attributes(false)' do
-      @foo.attributes(false).keys.should_be []
+      @foo.doodle_attributes(false).keys.should_be []
     end
 
     it 'should list instance attributes' do
-      @foo.attributes.keys.should_be [:name]
+      @foo.doodle_attributes.keys.should_be [:name]
     end
   
     it 'should list all instance attributes(false) at class level' do
-      Foo.attributes(false).keys.should_be [:name]
+      Foo.doodle_attributes(false).keys.should_be [:name]
     end
   end
 end
@@ -68,11 +68,11 @@ describe Doodle, 'class attributes(false)' do
     end
 
     it "should list all class's own attributes" do
-      Foo.singleton_class.attributes(false).keys.should_be [:metadata]
+      Foo.singleton_class.doodle_attributes(false).keys.should_be [:metadata]
     end
   
     it "should list all class's own attributes" do
-      Foo.singleton_class.attributes.keys.should_be [:metadata]
+      Foo.singleton_class.doodle_attributes.keys.should_be [:metadata]
     end
   end
 end
@@ -137,19 +137,19 @@ describe Doodle, 'inherited class attributes(false)' do
     end
   
     it "should list class's own attributes" do
-      Foo.singleton_class.attributes(false).keys.should_be [:metadata]
+      Foo.singleton_class.doodle_attributes(false).keys.should_be [:metadata]
     end
   
     it "should list all class's own attributes" do
-      Foo.singleton_class.attributes.keys.should_be [:metadata]
+      Foo.singleton_class.doodle_attributes.keys.should_be [:metadata]
     end
 
     it "should list class's own attributes(false)" do
-      Bar.singleton_class.attributes(false).keys.should_be [:doc]
+      Bar.singleton_class.doodle_attributes(false).keys.should_be [:doc]
     end
 
     it "should list all singleton class attributes" do
-      Bar.singleton_class.attributes.keys.should_be [:doc]
+      Bar.singleton_class.doodle_attributes.keys.should_be [:doc]
     end
 
     it "should list all inherited meta class attributes" do
@@ -157,7 +157,7 @@ describe Doodle, 'inherited class attributes(false)' do
     end
     
     it "should list all inherited class's attributes" do
-      Bar.attributes.keys.should_be [:name, :location]
+      Bar.doodle_attributes.keys.should_be [:name, :location]
     end
   end
 end
@@ -188,15 +188,15 @@ describe Doodle, 'singleton class attributes' do
     end
 
     it 'should list singleton instance attributes(false)' do
-      @foo.singleton_class.attributes(false).keys.should_be [:special]
+      @foo.singleton_class.doodle_attributes(false).keys.should_be [:special]
     end
 
     it 'should list singleton instance attributes' do
-      @foo.singleton_class.attributes.keys.should_be [:special]
+      @foo.singleton_class.doodle_attributes.keys.should_be [:special]
     end
 
     it 'should list instance attributes' do
-      @foo.attributes.keys.should_be [:name, :special]
+      @foo.doodle_attributes.keys.should_be [:name, :special]
     end
 
   end
@@ -245,19 +245,19 @@ describe Doodle, 'inherited singleton class attributes' do
     end
 
     it 'should list instance attributes' do
-      @foo.class.attributes(false).keys.should_be [:name]
-      @bar.class.attributes(false).keys.should_be [:info]
-      @bar2.class.attributes(false).keys.should_be [:info]
+      @foo.class.doodle_attributes(false).keys.should_be [:name]
+      @bar.class.doodle_attributes(false).keys.should_be [:info]
+      @bar2.class.doodle_attributes(false).keys.should_be [:info]
     end
 
     it 'should list instance meta attributes' do
-      @foo.singleton_class.attributes(false).keys.should_be [:special]
-      @bar.singleton_class.attributes(false).keys.should_be [:extra]
+      @foo.singleton_class.doodle_attributes(false).keys.should_be [:special]
+      @bar.singleton_class.doodle_attributes(false).keys.should_be [:extra]
     end
 
     it 'should list singleton attributes only' do
-      @foo.singleton_class.attributes.keys.should_be [:special]
-      @bar.singleton_class.attributes.keys.should_be [:extra]
+      @foo.singleton_class.doodle_attributes.keys.should_be [:special]
+      @bar.singleton_class.doodle_attributes.keys.should_be [:extra]
     end
   
     it 'should keep meta attributes separate' do
@@ -287,7 +287,7 @@ describe Doodle, 'inherited singleton class attributes' do
 
     it 'should inherit singleton methods from class' do
       @foo.singleton_class.respond_to?(:metadata).should_be true
-      @foo.singleton_class.attributes[:metadata].should_be nil
+      @foo.singleton_class.doodle_attributes[:metadata].should_be nil
       @foo.singleton_class.metadata = 'foo meta'
       @foo.singleton_class.instance_eval { @metadata }.should_be 'foo meta'
       if RUBY_VERSION < '1.9.0'

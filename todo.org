@@ -1,5 +1,22 @@
 = doodle to do list
 
+== TODO equivalence
+- sorting
+- comparison
+- equality
+
+See Facets compare_on
+- could compare attributes in arg_order by default
+
+166:   def symbolize_keys!
+167:     each do |k,v| 
+168:       sym = k.respond_to?(:to_sym) ? k.to_sym : k 
+169:       self[sym] = Hash === v ? v.symbolize_keys! : v 
+170:       delete(k) unless k == sym
+171:     end
+172:     self
+173:   end
+
 == TODO pretty_print
 - pp doesn't seem to like Doodle anymore
 

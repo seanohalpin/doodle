@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'yaml'
 
-describe 'Doodle', 'parents' do
+describe 'Doodle', 'inheriting validations' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle
@@ -15,8 +15,8 @@ describe 'Doodle', 'parents' do
     
     it 'should not duplicate validations when accessing them!' do
       foo = Foo 2
-      foo.validations.size.should_be 1
-      foo.validations.size.should_be 1
+      foo.doodle_validations.size.should_be 1
+      foo.doodle_validations.size.should_be 1
     end
   end
 end
