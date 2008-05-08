@@ -1,4 +1,5 @@
-require 'lib/doodle'
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'doodle'
 
 module CommandLine
   class Base < Doodle::Base
