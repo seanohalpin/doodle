@@ -2,6 +2,7 @@
 # Copyright (C) 2007-2008 by Sean O'Halpin
 # 2007-11-24 first version
 # 2008-04-18 latest release 0.0.12
+# 2008-05-07 0.1.6
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
@@ -56,35 +57,9 @@ class Doodle
       def snake_case(camel_cased_word)
         camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
-      # derived from http://merb.rubyforge.org/classes/Hash.html
-      def symbolize_keys(hash)
-        h = hash.class.new
-        hash.each do |k,v| 
-          sym = k.respond_to?(:to_sym) ? k.to_sym : k 
-          h[sym] = Hash === v ? symbolize_keys(v) : v 
-        end
-        h
-      end
       def const_resolve(start, constant)
-        #start_const = DoodleAttribute
         begin
-          #p [:resolving, start, start.class.inspect, constant]
-          ary = constant.to_s.split(/::/)
-          ary = ary.reject{|x| x.empty?}
-          #p [:resolving, :ary, ary]
-          #p [:resolving, :start_class, start.class]
-          start_const = start.class
-          #p [:resolving, :start_const, start_const]
-
-          result = ary.inject(start_const) { |prev, this|
-            #p [:resolving, :prev, prev, :this, this]
-            nx = prev.const_get(this)
-            #p [:resolving, :prev, prev, :this, this, :next, nx]
-            nx
-          }
-          #p [:resolving, :result, result]
-          result
-          #                    for test_top_level
+          constant.to_s.split(/::/).reject{|x| x.empty?}.inject(start) { |prev, this| prev.const_get(this) }
         rescue NameError => e
           raise e, caller
         end
@@ -274,8 +249,9 @@ class Doodle
     end
   end
 
-  # the core module of Doodle - to get most facilities provided by Doodle
-  # without inheriting from Doodle, include Doodle::Core, not this module
+  # the core module of Doodle - however, to get most facilities
+  # provided by Doodle without inheriting from Doodle, include
+  # Doodle::Core, not this module
   module BaseMethods
     include SelfClass
     include Inherited
@@ -524,29 +500,20 @@ class Doodle
     def convert(owner, *args)
       begin
         args = args.map do |value|
-          #p [:convert, value.class]
           if (converter = doodle_conversions[value.class])
-            #p [:convert, :using, value.class]
             value = converter[*args]
           else
-            #p [:convert, :finding, value.class, owner, *args]
             # try to find nearest ancestor
             ancestors = value.class.ancestors
             matches = ancestors & doodle_conversions.keys
             indexed_matches = matches.map{ |x| ancestors.index(x)}
-            #p [:convert, :matches, indexed_matches]
             if indexed_matches.size > 0
-              #p [:convert, :ancestors, indexed_matches.min]
               converter_class = ancestors[indexed_matches.min]
-              #p [:convert, :convertor, converter_class]
               if converter = doodle_conversions[converter_class]
-                #p [:convert, :using, converter_class]
                 value = converter[*args]
               end
             end
-            #p [:convert, :matches, :end]
           end
-          #p [:convert, :value, value]
           value
         end
       rescue Exception => e
@@ -674,7 +641,7 @@ class Doodle
       #DBG: Doodle::Debug.d { [:has, self, self.class, args] }
       # d { [:has2, name, args] }
       
-      # this in generic Attribute - perhaps class method
+      # fixme: this should be in generic Attribute - perhaps class method
       # how much of this can be handled by initialize_from_hash?
       
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
@@ -765,7 +732,7 @@ class Doodle
           from Hash do |hash|
             #!p [:enumerating_from_hash, name, hash]
             if !collector_klass.kind_of?(Class)
-              tmp_klass = Doodle::Utils.const_resolve(self, collector_klass)
+              tmp_klass = Doodle::Utils.const_resolve(self.class, collector_klass)
               #tmp_klass = eval(collector_klass.to_s)
             else
               tmp_klass = collector_klass
@@ -786,7 +753,7 @@ class Doodle
             if !collector_klass.kind_of?(Class)
               #p [:enum_convertor, 1, collector_klass]
               #tmp_klass = eval(collector_klass.to_s)
-              tmp_klass = Doodle::Utils.const_resolve(self, collector_klass)
+              tmp_klass = Doodle::Utils.const_resolve(self.class, collector_klass)
               #p [:enum_convertor, 1, tmp_klass]
             else
               #p [:enum_convertor, 2]

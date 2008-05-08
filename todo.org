@@ -1,5 +1,16 @@
 = doodle to do list
 
+== TODO less intrusiveness
+- move more things into __doodle__
+  - e.g. all methods which could be functions can be class methods
+    - ones which don't rely on instance variables
+- perhaps have a single doodle method
+  e.g. doodle.validations, doodle.convert, etc.
+- doodle, has, must, from, arg_order
+- could use arg checking trick for doodle
+  - if no args, return DoodleInfo
+  - if block, enter doodle context
+
 == TODO equivalence
 - sorting
 - comparison
@@ -7,15 +18,6 @@
 
 See Facets compare_on
 - could compare attributes in arg_order by default
-
-166:   def symbolize_keys!
-167:     each do |k,v| 
-168:       sym = k.respond_to?(:to_sym) ? k.to_sym : k 
-169:       self[sym] = Hash === v ? v.symbolize_keys! : v 
-170:       delete(k) unless k == sym
-171:     end
-172:     self
-173:   end
 
 == TODO pretty_print
 - pp doesn't seem to like Doodle anymore
