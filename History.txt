@@ -1,16 +1,20 @@
-== 0.1.6 / 2008-05-07
+== 0.1.6 / 2008-05-08
 - Features:
   - short cut syntax for #must - can now specify constraints like
     this:
-      must "=~ /[A-Z]"
+      must "size > 0"
+      must "self =~ /[A-Z]"
     which will be evaluated as if you had written this:
-      must "=~ /[A-Z]" do |v|
-        v.instance_eval("self " + "=~ /[A-Z]")
+      must "self =~ /[A-Z]" do |v|
+        v.instance_eval("self =~ /[A-Z]")
       end
   - prefixed more public but undocumented methods with 'doodle_' to avoid clashing with
     common names (e.g. parents, attributes, validations, etc.)
   - renamed Doodle::Attribute Doodle::DoodleAttribute for same reason
   - updated specs to reflect name changes
+  - attribute level validation messages now denote containing class
+  - major refactoring of #has method - collections now handled by
+    specialized attribute collector classes
 
 - Bug fixes:
   - can now load keyed collection from hash

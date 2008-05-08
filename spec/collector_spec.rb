@@ -1,5 +1,31 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
+describe Doodle, "Default collector" do
+  temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle
+        has :list, :collect => :item
+      end
+      @foo = Foo do
+        item "Hello"
+        item "World"
+      end
+    end
+    after :each do
+      remove_ivars :foo
+    end
+    
+    it "should define a collector method :item" do
+      @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
+    end
+    
+    it "should collect items into attribute :list" do
+      @foo.list.should_be ["Hello", "World"]
+    end
+
+  end
+end
+
 describe Doodle, "Simple collector" do
   temporary_constant :Foo do
     before :each do
@@ -100,6 +126,7 @@ describe Doodle, "typed collector with specified collector name" do
 end
 
 describe Doodle, "typed collector with specified collector name initialized from hash (with default :init param)" do
+  # note: this spec also checks for resolving collector class
   temporary_constant :Location, :Event do
     before :each do
       class Location < Doodle
