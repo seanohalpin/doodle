@@ -2,6 +2,7 @@
 # Copyright (C) 2007-2008 by Sean O'Halpin
 # 2007-11-24 first version
 # 2008-04-18 latest release 0.0.12
+# 2008-05-07 0.1.6
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
@@ -56,9 +57,12 @@ class Doodle
       def snake_case(camel_cased_word)
         camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
+      def const_resolve(constant)
+        constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
+      end
     end
   end
-
+  
   # error handling
   @@raise_exception_on_error = true
   def self.raise_exception_on_error
@@ -109,13 +113,13 @@ class Doodle
   # classes as well as modules, classes and instances
   module Inherited
 
-    # parents returns the set of parent classes of an object
-    def parents
+    # doodle_parents returns the set of parent classes of an object
+    def doodle_parents
       anc = if respond_to?(:ancestors)
               if ancestors.include?(self)
                 ancestors[1..-1]
               else
-                # singletons have no parents (they're orphans)
+                # singletons have no doodle_parents (they're orphans)
                 []
               end
             else
@@ -129,11 +133,11 @@ class Doodle
     # - instance_attributes
     # - singleton_attributes
     # - class_attributes
-   
-    # send message to all parents and collect results 
-    def collect_inherited(message)
+    
+    # send message to all doodle_parents and collect results 
+    def doodle_collect_inherited(message)
       result = []
-      parents.each do |klass|
+      doodle_parents.each do |klass|
         if klass.respond_to?(message)
           result.unshift(*klass.__send__(message))
         else
@@ -142,7 +146,7 @@ class Doodle
       end
       result
     end
-    private :collect_inherited
+    private :doodle_collect_inherited
   end
 
   # = embrace
@@ -204,19 +208,19 @@ class Doodle
 
   # place to stash bookkeeping info
   class DoodleInfo
-    attr_accessor :local_attributes
-    attr_accessor :local_validations
-    attr_accessor :local_conversions
+    attr_accessor :doodle_local_attributes
+    attr_accessor :doodle_local_validations
+    attr_accessor :doodle_local_conversions
     attr_accessor :validation_on
     attr_accessor :arg_order
     attr_accessor :errors
     attr_accessor :doodle_parent
 
     def initialize(object)
-      @local_attributes = OrderedHash.new
-      @local_validations = []
+      @doodle_local_attributes = OrderedHash.new
+      @doodle_local_validations = []
       @validation_on = true
-      @local_conversions = {}
+      @doodle_local_conversions = {}
       @arg_order = []
       @errors = []
       @doodle_parent = nil
@@ -241,8 +245,9 @@ class Doodle
     end
   end
 
-  # the core module of Doodle - to get most facilities provided by Doodle
-  # without inheriting from Doodle, include Doodle::Core, not this module
+  # the core module of Doodle - however, to get most facilities
+  # provided by Doodle without inheriting from Doodle, include
+  # Doodle::Core, not this module
   module BaseMethods
     include SelfClass
     include Inherited
@@ -296,7 +301,7 @@ class Doodle
     
     def _handle_inherited_hash(tf, method)
       if tf
-        collect_inherited(method).inject(OrderedHash.new){ |hash, item|
+        doodle_collect_inherited(method).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
         }.merge(__send__(method))
       else
@@ -306,19 +311,19 @@ class Doodle
     private :_handle_inherited_hash
     
     # return attributes defined in instance
-    def local_attributes
-      __doodle__.local_attributes
+    def doodle_local_attributes
+      __doodle__.doodle_local_attributes
     end
-    protected :local_attributes
+    protected :doodle_local_attributes
 
     # returns array of Attributes
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
-    def attributes(tf = true)
-      results = _handle_inherited_hash(tf, :local_attributes)
+    def doodle_attributes(tf = true)
+      results = _handle_inherited_hash(tf, :doodle_local_attributes)
       # if an instance, include the singleton_class attributes
-      if !kind_of?(Class) && singleton_class.respond_to?(:attributes)
-        results = results.merge(singleton_class.attributes)
+      if !kind_of?(Class) && singleton_class.respond_to?(:doodle_attributes)
+        results = results.merge(singleton_class.doodle_attributes)
       end
       results
     end
@@ -327,9 +332,9 @@ class Doodle
     def class_attributes(tf = true)
       attrs = OrderedHash.new
       if self.kind_of?(Class)
-        attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
+        attrs = doodle_collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
-        }.merge(singleton_class.respond_to?(:attributes) ? singleton_class.attributes : { })
+        }.merge(singleton_class.respond_to?(:doodle_attributes) ? singleton_class.doodle_attributes : { })
         attrs
       else
         self.class.class_attributes
@@ -337,28 +342,28 @@ class Doodle
     end
 
     # the set of conversions defined in the current class (i.e. without inheritance)
-    def local_conversions
-      __doodle__.local_conversions
+    def doodle_local_conversions
+      __doodle__.doodle_local_conversions
     end
-    protected :local_conversions
+    protected :doodle_local_conversions
 
     # returns hash of conversions
     # - if tf == true, returns all inherited conversions
     # - if tf == false, returns only those conversions defined in the current object/class
-    def conversions(tf = true)
-      _handle_inherited_hash(tf, :local_conversions)
+    def doodle_conversions(tf = true)
+      _handle_inherited_hash(tf, :doodle_local_conversions)
     end
 
     # the set of validations defined in the current class (i.e. without inheritance)
-    def local_validations
-      __doodle__.local_validations
+    def doodle_local_validations
+      __doodle__.doodle_local_validations
     end
-    protected :local_validations
+    protected :doodle_local_validations
 
     # returns array of Validations
     # - if tf == true, returns all inherited validations
     # - if tf == false, returns only those validations defined in the current object/class
-    def validations(tf = true)
+    def doodle_validations(tf = true)
       if tf
         # note: validations are handled differently to attributes and
         # conversions because ~all~ validations apply (so are stored
@@ -366,9 +371,9 @@ class Doodle
         # by name and kind respectively, so only the most recent
         # applies
         
-        local_validations + collect_inherited(:local_validations)
+        doodle_local_validations + doodle_collect_inherited(:doodle_local_validations)
       else
-        local_validations
+        doodle_local_validations
       end
     end
 
@@ -379,7 +384,7 @@ class Doodle
       if self.class == Class
         class_attributes[name]
       else
-        attributes[name]
+        doodle_attributes[name]
       end
     end
     private :lookup_attribute
@@ -424,7 +429,7 @@ class Doodle
           end
         else
           # This is an internal error (i.e. shouldn't happen)
-          handle_error name, NoDefaultError, "Error - '#{name}' has no default defined", [caller[-1]]
+          handle_error name, NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
         end
       end
     end
@@ -459,7 +464,7 @@ class Doodle
       if block_given?
         # set the rule for each arg given
         args.each do |arg|
-          local_conversions[arg] = block
+          doodle_local_conversions[arg] = block
         end
       else
         convert(self, *args)
@@ -467,8 +472,13 @@ class Doodle
     end
 
     # add a validation
-    def must(message = 'be valid', &block)
-      local_validations << Validation.new(message, &block)
+    def must(constraint = 'be valid', &block)
+      if block.nil?
+        # is this really useful? do I really want it?
+        doodle_local_validations << Validation.new(constraint, &proc { |v| v.instance_eval(constraint) })
+      else
+        doodle_local_validations << Validation.new(constraint, &block)
+      end
     end
 
     # add a validation that attribute must be of class <= kind
@@ -476,7 +486,7 @@ class Doodle
       if args.size > 0
         # todo[figure out how to handle kind being specified twice?]
         @kind = args.first
-        local_validations << (Validation.new("be #{@kind}") { |x| x.class <= @kind })
+        doodle_local_validations << (Validation.new("be #{@kind}") { |x| x.class <= @kind })
       else
         @kind
       end
@@ -484,28 +494,38 @@ class Doodle
 
     # convert a value according to conversion rules
     def convert(owner, *args)
+      #!p [:convert, 1, owner, args]
       begin
         args = args.map do |value|
-          if (converter = conversions[value.class])
-            #p [:convert, :using, value.class]
+          #!p [:convert, 2, value]
+          if (converter = doodle_conversions[value.class])
+            #!p [:convert, 3, value]
             value = converter[*args]
+            #!p [:convert, 4, value]
           else
+            #!p [:convert, 5, value]
             # try to find nearest ancestor
             ancestors = value.class.ancestors
-            matches = ancestors & conversions.keys
+            #!p [:convert, 6, ancestors]
+            matches = ancestors & doodle_conversions.keys
+            #!p [:convert, 7, matches]
             indexed_matches = matches.map{ |x| ancestors.index(x)}
+            #!p [:convert, 8, indexed_matches]
             if indexed_matches.size > 0
+              #!p [:convert, 9]
               converter_class = ancestors[indexed_matches.min]
-              if converter = conversions[converter_class]
-                #p [:convert, :using, converter_class]
+              #!p [:convert, 10, converter_class]
+              if converter = doodle_conversions[converter_class]
+                #!p [:convert, 11, converter]
                 value = converter[*args]
+                #!p [:convert, 12, value]
               end
             end
           end
           value
         end
       rescue Exception => e
-        owner.handle_error name, ConversionError, e.to_s, [caller[-1]]
+        owner.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class} - #{e.to_s}", [caller[-1]]
       end
       if args.size > 1
         args
@@ -520,10 +540,10 @@ class Doodle
       #!p [:validate, :before_conversion, args]
       value = convert(owner, *args)
       #!p [:validate, :after_conversion, args, :becomes, value]
-      validations.each do |v|
+      doodle_validations.each do |v|
         ##DBG: Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
-          owner.handle_error name, ValidationError, "#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
+          owner.handle_error name, ValidationError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
       value
@@ -547,50 +567,6 @@ class Doodle
     end
     private :define_getter_setter
 
-    # define a collector for appendable collections
-    # - collection should provide a :<< method
-    def define_appendable_collector(collection, name, klass = nil, &block)
-      # need to use string eval because passing block
-      if klass.nil?
-        sc_eval("def #{name}(*args, &block); args.unshift(block) if block_given?; #{collection}.<<(*args); end", __FILE__, __LINE__)
-      else
-        sc_eval("def #{name}(*args, &block)
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{klass})}
-                            #{collection}.<<(*args)
-                          else
-                            #{collection} << #{klass}.new(*args, &block)
-                          end
-                     end", __FILE__, __LINE__)
-      end
-    end
-    private :define_appendable_collector
-
-    # define a collector for keyed collections
-    # - collection should provide a :[] method
-    def define_keyed_collector(collection, name, key_method, klass = nil, &block)
-      #DBG: Doodle::Debug.d { [:define_keyed_collector, collection, name, key_method, klass]}
-      # need to use string eval because passing block
-      if klass.nil?
-        sc_eval("def #{name}(*args, &block)
-                   args.each do |arg|
-                     #{collection}[arg.send(:#{key_method})] = arg
-                   end
-                 end", __FILE__, __LINE__)
-      else
-        sc_eval("def #{name}(*args, &block)
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{klass})}
-                            args.each do |arg|
-                              #{collection}[arg.send(:#{key_method})] = arg
-                            end
-                          else
-                            obj = #{klass}.new(*args, &block)
-                            #{collection}[obj.send(:#{key_method})] = obj
-                          end
-                     end", __FILE__, __LINE__)
-      end
-    end
-    private :define_keyed_collector
-    
     # +has+ is an extended +attr_accessor+
     #
     # simple usage - just like +attr_accessor+:
@@ -616,6 +592,11 @@ class Doodle
     def has(*args, &block)
       #DBG: Doodle::Debug.d { [:has, self, self.class, args] }
       # d { [:has2, name, args] }
+      
+      # fixme: this should be in generic Attribute - perhaps class method
+      # how much of this can be handled by initialize_from_hash?
+      # or at least in DoodleAttribute.from(params)
+      
       key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
       if positional_args.size > 0
         name = positional_args.shift.to_sym
@@ -626,94 +607,55 @@ class Doodle
       params = key_values.inject(params){ |acc, item| acc.merge(item)}
       #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
       if !params.key?(:name)
-        handle_error name, ArgumentError, "Must have a name"
+        handle_error name, ArgumentError, "#{self.class} must have a name"
       else
         name = params[:name].to_sym
       end
-      handle_error name, ArgumentError, "Too many arguments" if positional_args.size > 0
-
-      # don't pass collector params through to Attribute
-      collector_klass = nil
-      # fixme: this should be in specialized attribute class
-      # (and also distinction between appendable and keyed collections
-      if collector = params.delete(:collect)
-        if !params.key?(:init)
-          if params.key?(:key)
-            #!p [:defining, :hash, name]
-            params[:init] = { }
-          else
-            #!p [:defining, :array, name]
-            params[:init] = []
-          end
+      handle_error name, ArgumentError, "#{self.class} has too many arguments" if positional_args.size > 0
+      
+      if params.key?(:collect) && !params.key?(:using)
+        if params.key?(:key)
+          params[:using] = KeyedAttribute
+        else
+          params[:using] = AppendableAttribute
         end
+      end
+      
+      if collector = params.delete(:collect)
+        # this in generic CollectorAttribute class
+        # collector from(Hash)
         if collector.kind_of?(Hash)
-          collector_name, collector_klass = collector.to_a[0]
+          collector_name, collector_class = collector.to_a[0]
         else
           # if Capitalized word given, treat as classname
           # and create collector for specific class
-          collector_klass = collector.to_s
-          collector_name = Utils.snake_case(collector_klass)
-          if collector_klass !~ /^[A-Z]/
-            collector_klass = nil
+          collector_class = collector.to_s
+          #p [:collector_klass, collector_klass]
+          collector_name = Utils.snake_case(collector_class.split(/::/).last)
+          #p [:collector_name, collector_name]
+          if collector_class !~ /^[A-Z]/
+            collector_class = nil
           end
           #!p [:collector_klass, collector_klass, params[:init]]
         end
-        if key = params.delete(:key)
-          define_keyed_collector name, collector_name, key, collector_klass
-        else
-          define_appendable_collector name, collector_name, collector_klass
-        end
+        params[:collector_class] = collector_class
+        params[:collector_name] = collector_name
       end
 
       # get specialized attribute class or use default
-      attribute_class = params.delete(:using) || Attribute
-      
+      attribute_class = params.delete(:using) || DoodleAttribute
+
+      # could this be handled in DoodleAttribute?
       # define getter setter before setting up attribute
       define_getter_setter name, *args, &block
-      local_attributes[name] = attribute = attribute_class.new(params, &block)
-      
-      # if a collector has been defined and has a specific class, then you can pass in an array of hashes
-      if collector_klass
-        # fixme: this should be in specialized attribute class
-        #!p [:collector_klass2, collector_klass, params[:init]]
-        attribute.instance_eval {
-          # applying map to hashes returns an array, so avoid that by simply passing it through
-          from Hash do |hash|
-            hash
-          end
-          from Enumerable do |enum|
-            if !collector_klass.kind_of?(Class)
-              tmp_klass = self.class.const_get(collector_klass)
-            else
-              tmp_klass = collector_klass
-            end
-            #!p [:enumerating, name, enum]
-            results = enum.map{|x|
-              #!p [:enumerating, x]
-              if x.kind_of?(tmp_klass)
-                x
-              elsif tmp_klass.conversions.key?(x.class)
-                tmp_klass.from(x)
-              else
-                tmp_klass.new(x)
-              end
-            }
-            #!p [:enumerating, :results, results]
-            # fixme: this is all getting a bit too specific to arrays and hashes
-            # figure out a way to do this with specialized Doodle::Attribute?
-            if !key.nil?
-              results = results.inject({ }) do |hash, result|
-                hash[result.send(key)] = result
-                hash
-              end
-            end
-            results
-          end
-        }
-      end
+      params[:doodle_owner] = self
+      #p [:attribute, attribute_class, params]
+      doodle_local_attributes[name] = attribute = attribute_class.new(params, &block)
+
       attribute
     end
 
+    
     # define order for positional arguments
     def arg_order(*args)
       if args.size > 0
@@ -721,19 +663,19 @@ class Doodle
           args = args.uniq
           args.each do |x|
             handle_error :arg_order, ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
-            handle_error :arg_order, NameError, "#{x} not an attribute name" if !attributes.keys.include?(x)
+            handle_error :arg_order, NameError, "#{x} not an attribute name" if !doodle_attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
           handle_error :arg_order, InvalidOrderError, e.to_s, [caller[-1]]
         end
       else
-        __doodle__.arg_order + (attributes.keys - __doodle__.arg_order)
+        __doodle__.arg_order + (doodle_attributes.keys - __doodle__.arg_order)
       end
     end
 
     def get_init_values(tf = true)
-      attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
+      doodle_attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
         #!p [:get_init_values, a.init]
         hash[n] = begin
                     case a.init
@@ -770,8 +712,8 @@ class Doodle
           attribs = class_attributes
           ##DBG: Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
         else
-          attribs = attributes
-          ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", attributes] }
+          attribs = doodle_attributes
+          ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", doodle_attributes] }
         end
         attribs.each do |name, att|
           ivar_name = "@#{att.name}"
@@ -793,8 +735,8 @@ class Doodle
         
         # now apply instance level validations
         
-        ##DBG: Doodle::Debug.d { [:validate!, "validations", validations ]}
-        validations.each do |v|
+        ##DBG: Doodle::Debug.d { [:validate!, "validations", doodle_validations ]}
+        doodle_validations.each do |v|
           ##DBG: Doodle::Debug.d { [:validate!, self, v ] }
           begin
             if !instance_eval(&v.block)
@@ -827,49 +769,53 @@ class Doodle
     # helper function to initialize from hash - this is safe to use
     # after initialization (validate! is called if this method is
     # called after initialization)
-    def initialize_from_hash(*args)
-      #!p [:initialize_from_hash, :args, *args]
+    def doodle_initialize_from_hash(*args)
+      #!p [:doodle_initialize_from_hash, :args, *args]
       defer_validation do
         # hash initializer
         # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values, key_values, :args, args] }
-        #!p [self.class, :initialize_from_hash, :key_values, key_values, :args, args]
+        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args] }
+        #!p [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args]
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
         init_values = get_init_values
-        #p [:init_values, init_values]
+        #!p [:init_values, init_values]
         
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
         arg_keywords = init_values.merge(Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))])
-        #p [self.class, :initialize_from_hash, :arg_keywords, arg_keywords]
+        #!p [self.class, :doodle_initialize_from_hash, :arg_keywords, arg_keywords]
 
         # merge all hash args into one
         key_values = key_values.inject(arg_keywords) { |hash, item|
-          #p [self.class, :initialize_from_hash, :merge, hash, item]
+          #!p [self.class, :doodle_initialize_from_hash, :merge, hash, item]
           hash.merge(item)
         }
-        #p [self.class, :initialize_from_hash, :key_values2, key_values]
+        #!p [self.class, :doodle_initialize_from_hash, :key_values2, key_values]
 
-        # convert key names to symbols
-        key_values = key_values.inject({}) {|h, (k, v)| h[k.to_sym] = v; h}
-        #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :key_values2, key_values, :args2, args] }
-        #p [self.class, :initialize_from_hash, :key_values3, key_values]
+        # convert keys to symbols (note not recursively - only first level == doodle keywords)
+        key_values.keys.each do |k|
+          sym_key = k.respond_to?(:to_sym) ? k.to_sym : k
+          key_values[sym_key] = key_values.delete(k)
+        end
+
+        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
+        #!p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
         
         # create attributes
         key_values.keys.each do |key|
-          #DBG: Doodle::Debug.d { [self.class, :initialize_from_hash, :setting, key, key_values[key]] }
-          #p [self.class, :initialize_from_hash, :setting, key, key_values[key]]
+          #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
+          #!p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
           if respond_to?(key)
             __send__(key, key_values[key])
           else
             # raise error if not defined
-            handle_error key, Doodle::UnknownAttributeError, "Unknown attribute '#{key}' #{key_values[key].inspect}"
+            handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}"
           end
         end
       end
     end
-    #private :initialize_from_hash
+    #private :doodle_initialize_from_hash
 
     # return containing object (set during initialization)
     # (named doodle_parent to avoid clash with ActiveSupport)
@@ -888,7 +834,7 @@ class Doodle
       __doodle__.doodle_parent = Doodle.context[-1]
       Doodle.context.push(self)
       defer_validation do
-        initialize_from_hash(*args)
+        doodle_initialize_from_hash(*args)
         instance_eval(&block) if block_given?
       end
       Doodle.context.pop
@@ -929,13 +875,13 @@ class Doodle
                              false
                            end
 
-          if !method_defined && !klass.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING) && name =~ Factory::RX_IDENTIFIER
+          if name =~ Factory::RX_IDENTIFIER && !method_defined && !klass.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING) 
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
           klass = names.inject(self) {|c, n| c.const_get(n)}
           # todo[check how many times this is being called]
-          if !klass.respond_to?(name) && name =~ Factory::RX_IDENTIFIER
+          if name =~ Factory::RX_IDENTIFIER && !klass.respond_to?(name)
             klass.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         end
@@ -979,7 +925,7 @@ class Doodle
   #
   # It is used to provide a context for defining #must and #from rules
   #
-  class Attribute < Doodle
+  class DoodleAttribute < Doodle
     # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
     # must define these methods before using them in #has below
 
@@ -997,6 +943,16 @@ class Doodle
     def validate!(all = true)
     end
 
+    # has default been defined?
+    def default_defined?
+      ivar_defined?(:default)
+    end
+
+    # has default been defined?
+    def init_defined?
+      ivar_defined?(:init)
+    end
+
     # is this attribute optional? true if it has a default defined for it
     def optional?
       default_defined? or init_defined?
@@ -1008,14 +964,8 @@ class Doodle
       !optional?
     end
 
-    # has default been defined?
-    def default_defined?
-      ivar_defined?(:default)
-    end
-    # has default been defined?
-    def init_defined?
-      ivar_defined?(:init)
-    end
+    # special case - not an attribute
+    define_getter_setter :doodle_owner
 
     # name of attribute
     has :name, :kind => Symbol do
@@ -1030,6 +980,107 @@ class Doodle
     # initial value
     has :init, :default => nil
 
+  end
+
+  # base class for attribute collector classes
+  class AttributeCollector < DoodleAttribute
+    has :collector_class
+    has :collector_name
+    
+    def resolve_collector_class
+      if !collector_class.kind_of?(Class)
+        self.collector_class = Doodle::Utils.const_resolve(collector_class)
+      end
+    end
+    def resolve_value(value)
+      if value.kind_of?(collector_class)
+        value
+      elsif collector_class.doodle_conversions.key?(value.class)
+        collector_class.from(value)
+      else
+        collector_class.new(value)
+      end
+    end
+    def initialize(*args, &block)
+      super
+      define_collection
+      from Hash do |hash|
+        resolve_collector_class
+        hash.inject({ }) do |h, (key, value)|
+          h[key] = resolve_value(value)
+          h
+        end
+      end
+      from Enumerable do |enum|
+        resolve_collector_class
+        post_process( enum.map{ |value| resolve_value(value) } )
+      end
+    end
+    def post_process(results)
+      results
+    end
+  end
+
+  # define collector methods for array-like attribute collectors
+  class AppendableAttribute < AttributeCollector
+    has :init, :init => []
+
+    # define a collector for appendable collections
+    # - collection should provide a :<< method
+    def define_collection
+      if collector_class.nil?
+        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                   args.unshift(block) if block_given?
+                   #{name}.<<(*args);
+                 end", __FILE__, __LINE__)
+      else
+        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
+                            #{name}.<<(*args)
+                          else
+                            #{name} << #{collector_class}.new(*args, &block)
+                          end
+                        end", __FILE__, __LINE__)
+      end
+    end
+    
+  end
+
+  # define collector methods for hash-like attribute collectors
+  class KeyedAttribute < AttributeCollector
+    has :init, :init => { }
+    has :key
+
+    def post_process(results)
+      results.inject({ }) do |h, result|
+        h[result.send(key)] = result
+        h
+      end
+    end
+
+    # define a collector for keyed collections
+    # - collection should provide a :[] method
+    def define_collection
+      # need to use string eval because passing block
+      if collector_class.nil?
+        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                   args.each do |arg|
+                     #{name}[arg.send(:#{key})] = arg
+                   end
+                 end", __FILE__, __LINE__)
+      else
+        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
+                            args.each do |arg|
+                              #{name}[arg.send(:#{key})] = arg
+                            end
+                          else
+                            obj = #{collector_class}.new(*args, &block)
+                            #{name}[obj.send(:#{key})] = obj
+                          end
+                     end", __FILE__, __LINE__)
+      end
+    end
   end
 
 end

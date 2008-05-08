@@ -1,5 +1,24 @@
 = doodle to do list
 
+== TODO less intrusiveness
+- move more things into __doodle__
+  - e.g. all methods which could be functions can be class methods
+    - ones which don't rely on instance variables
+- perhaps have a single doodle method
+  e.g. doodle.validations, doodle.convert, etc.
+- doodle, has, must, from, arg_order
+- could use arg checking trick for doodle
+  - if no args, return DoodleInfo
+  - if block, enter doodle context
+
+== TODO equivalence
+- sorting
+- comparison
+- equality
+
+See Facets compare_on
+- could compare attributes in arg_order by default
+
 == TODO pretty_print
 - pp doesn't seem to like Doodle anymore
 
@@ -10,14 +29,14 @@
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
 == TODO has + Attribute
-- [ ] redefine has as a protocol so you can pass in other classes to
+- [X] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
 
-      has :thing, :use => MyClassAttribute
+      has :thing, :using => MyClassAttribute
 
       I could then use this to define other specialised directives
       which use subclasses of Doodle::Attribute, e.g. Doodle::CommandLineOption
-
+- [X] refactor has to use specialized attribute classes for collections
 == TODO Documentation [0/10]
 - [ ] better examples (and better running example)
 - [ ] more in tutorial fashion (cf. presentation) - from simple to
