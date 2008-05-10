@@ -42,14 +42,14 @@ namespace :mm do
     puts Doodle::VERSION::STRING
   end
 
-  namespace :docs do
+  namespace :website do
     desc "Generate rote docs"
-    task :rote do
+    task :gen do
       system "cd ./rote && rake"
     end
 
     desc "Copy docs to rubyforge"
-    task :copy_rote_docs_to_rubyforge => [:rote] do
+    task :publish => [:rote] do
       system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
     end
   end
