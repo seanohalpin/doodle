@@ -243,6 +243,10 @@ class Doodle
     def inspect
       super.gsub(/\s*@__doodle__=,/,'').gsub(/,?\s*@__doodle__=/,'')
     end
+    # fix for pp
+    def pretty_print(q)
+      q.pp_object(self)
+    end
   end
 
   # the core module of Doodle - however, to get most facilities
