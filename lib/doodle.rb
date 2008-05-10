@@ -595,70 +595,17 @@ class Doodle
     #    
     def has(*args, &block)
       #DBG: Doodle::Debug.d { [:has, self, self.class, args] }
-      # d { [:has2, name, args] }
       
-      # fixme: this should be in generic Attribute - perhaps class method
-      # how much of this can be handled by initialize_from_hash?
-      # or at least in DoodleAttribute.from(params)
-      
-      key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
-      if positional_args.size > 0
-        name = positional_args.shift.to_sym
-        params = { :name => name }
-      else
-        params = { }
-      end
-      params = key_values.inject(params){ |acc, item| acc.merge(item)}
-      #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
-      if !params.key?(:name)
-        handle_error name, ArgumentError, "#{self.class} must have a name"
-      else
-        name = params[:name].to_sym
-      end
-      handle_error name, ArgumentError, "#{self.class} has too many arguments" if positional_args.size > 0
-      
-      if params.key?(:collect) && !params.key?(:using)
-        if params.key?(:key)
-          params[:using] = KeyedAttribute
-        else
-          params[:using] = AppendableAttribute
-        end
-      end
-      
-      if collector = params.delete(:collect)
-        # this in generic CollectorAttribute class
-        # collector from(Hash)
-        if collector.kind_of?(Hash)
-          collector_name, collector_class = collector.to_a[0]
-        else
-          # if Capitalized word given, treat as classname
-          # and create collector for specific class
-          collector_class = collector.to_s
-          #p [:collector_klass, collector_klass]
-          collector_name = Utils.snake_case(collector_class.split(/::/).last)
-          #p [:collector_name, collector_name]
-          if collector_class !~ /^[A-Z]/
-            collector_class = nil
-          end
-          #!p [:collector_klass, collector_klass, params[:init]]
-        end
-        params[:collector_class] = collector_class
-        params[:collector_name] = collector_name
-      end
-
+      params = DoodleAttribute.params_from_args(self, *args)
       # get specialized attribute class or use default
       attribute_class = params.delete(:using) || DoodleAttribute
 
       # could this be handled in DoodleAttribute?
       # define getter setter before setting up attribute
-      define_getter_setter name, *args, &block
-      params[:doodle_owner] = self
+      define_getter_setter params[:name], *args, &block
       #p [:attribute, attribute_class, params]
-      doodle_local_attributes[name] = attribute = attribute_class.new(params, &block)
-
-      attribute
+      doodle_local_attributes[params[:name]] = attribute_class.new(params, &block)
     end
-
     
     # define order for positional arguments
     def arg_order(*args)
@@ -930,7 +877,65 @@ class Doodle
   # It is used to provide a context for defining #must and #from rules
   #
   class DoodleAttribute < Doodle
-    # todo[want to design Attribute so it's extensible, e.g. to specific datatypes & built-in validations]
+    # note: using extend with a module causes an infinite loop in 1.9
+    # hence the inline
+    class << self
+      # rewrite rules for the argument list to #has
+      def params_from_args(owner, *args)
+        key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
+        params = { }
+        if positional_args.size > 0
+          name = positional_args.shift
+          case name
+            # has Person --> has :person, :kind => Person
+          when Class
+            params[:name] = Utils.snake_case(name.to_s.split(/::/).last)
+            params[:kind] = name
+          else
+            params[:name] = name.to_s.to_sym
+          end
+        end
+        params = key_values.inject(params){ |acc, item| acc.merge(item)}
+        #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
+        if !params.key?(:name)
+          handle_error name, ArgumentError, "#{self.class} must have a name"
+        else
+          name = params[:name].to_sym
+        end
+        handle_error name, ArgumentError, "#{self.class} has too many arguments" if positional_args.size > 0
+        
+        if collector = params.delete(:collect)
+          if !params.key?(:using)
+            if params.key?(:key)
+              params[:using] = KeyedAttribute
+            else
+              params[:using] = AppendableAttribute
+            end
+          end
+          # this in generic CollectorAttribute class
+          # collector from(Hash)
+          if collector.kind_of?(Hash)
+            collector_name, collector_class = collector.to_a[0]
+          else
+            # if Capitalized word given, treat as classname
+            # and create collector for specific class
+            collector_class = collector.to_s
+            #p [:collector_klass, collector_klass]
+            collector_name = Utils.snake_case(collector_class.split(/::/).last)
+            #p [:collector_name, collector_name]
+            if collector_class !~ /^[A-Z]/
+              collector_class = nil
+            end
+            #!p [:collector_klass, collector_klass, params[:init]]
+          end
+          params[:collector_class] = collector_class
+          params[:collector_name] = collector_name
+        end
+        params[:doodle_owner] = owner
+        params
+      end
+    end
+
     # must define these methods before using them in #has below
 
     # hack: bump off +validate!+ for Attributes - maybe better way of doing
