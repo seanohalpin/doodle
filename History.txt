@@ -1,3 +1,9 @@
+== 0.1.7 / 2008-05-10
+  - has now accepts class constant in name position and generates name
+    and kind from that, e.g.
+      has Person --> has :person, :kind => Person
+      has AudioClip --> has :audio_clip, :kind => AudioClip
+
 == 0.1.6 / 2008-05-08
 - Features:
   - short cut syntax for #must - can now specify constraints like
