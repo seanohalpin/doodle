@@ -62,7 +62,7 @@ describe 'Doodle', 'specialized attributes' do
 
     it 'should allow using datatypes in additional directives invoking specialized attribute of correct class' do
       class SpecializedAttribute
-        doodle do
+        doodle_defs do
           string :flag, :max => 1
         end
       end
@@ -86,7 +86,7 @@ describe 'Doodle', 'specialized attributes' do
 
     it 'should allow using datatypes in additional directives invoking specialized attribute of correct class and raise error if incorrect value supplied' do
       class SpecializedAttribute
-        doodle do
+        doodle_defs do
           string :flag, :max => 1
         end
       end

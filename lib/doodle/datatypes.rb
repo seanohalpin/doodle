@@ -28,7 +28,7 @@ class Doodle
 
   # enable global datatypes and provide an interface that allows you
   # to add your own datatypes to this declaration
-  def self.doodle(*mods, &block)
+  def self.doodle_defs(*mods, &block)
     dh = Doodle::DataTypeHolder.new(self)
     mods.each do |mod|
       dh.extend(mod)
