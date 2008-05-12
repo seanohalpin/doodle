@@ -22,7 +22,7 @@ describe Doodle, 'has Class' do
       att.name.should_be :baz
       att.kind.should_be Bar
     end
-    it "should convert class name to snakecase when using 'has AudioClip' form" do
+    it "should convert class name to snakecase when using CamelCase class constant" do
       class AudioClip
       end
       class Foo < Doodle
