@@ -3,40 +3,6 @@ $:.unshift(File.join(File.dirname(__FILE__), '.'))
 
 require 'doodle'
 
-class Doodle
-  class DataTypeHolder
-    attr_accessor :klass
-    def initialize(klass, &block)
-      @klass = klass
-      instance_eval(&block) if block_given?
-    end
-    def define(name, params, block, type_params, &type_block)
-      @klass.class_eval {
-        td = has(name, type_params.merge(params), &type_block)
-        td.instance_eval(&block) if block
-        td
-      }
-    end
-  end
-
-  # set up global datatypes
-  def self.datatypes(*mods)
-    mods.each do |mod|
-      DataTypeHolder.class_eval { include mod }
-    end
-  end
-
-  # enable global datatypes and provide an interface that allows you
-  # to add your own datatypes to this declaration
-  def self.doodle_defs(*mods, &block)
-    dh = Doodle::DataTypeHolder.new(self)
-    mods.each do |mod|
-      dh.extend(mod)
-    end
-    dh.instance_eval(&block)
-  end
-end
-
 ### user code
 require 'date'
 require 'uri'
