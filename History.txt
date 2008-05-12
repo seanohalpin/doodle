@@ -1,10 +1,11 @@
 == 0.1.7 / 2008-05-10
 - Features
-  - has now accepts class constant in name position and generates name
+  - #has now accepts class constant in name position and generates name
     and kind from that, e.g.
       has Person --> has :person, :kind => Person
       has AudioClip --> has :audio_clip, :kind => AudioClip
   - moved datatypes code into main doodle.rb
+  - use doodle.parent instead of doodle_parent
 
 - Bug fixes:
   - fixed handling of :init blocks so they can refer to user supplied
