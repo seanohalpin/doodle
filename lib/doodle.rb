@@ -3,6 +3,7 @@
 # 2007-11-24 first version
 # 2008-04-18 latest release 0.0.12
 # 2008-05-07 0.1.6
+# 2008-05-12 0.1.7
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
@@ -307,7 +308,6 @@ class Doodle
     define_method :instance_variables do
       meth.bind(self).call.reject{ |x| x.to_s =~ /@__doodle__/}
     end
-
     # hide @__doodle__ from inspect
     def inspect
       super.gsub(/\s*@__doodle__=,/,'').gsub(/,?\s*@__doodle__=/,'')
@@ -318,6 +318,21 @@ class Doodle
     end
   end
 
+  class DataTypeHolder
+    attr_accessor :klass
+    def initialize(klass, &block)
+      @klass = klass
+      instance_eval(&block) if block_given?
+    end
+    def define(name, params, block, type_params, &type_block)
+      @klass.class_eval {
+        td = has(name, type_params.merge(params), &type_block)
+        td.instance_eval(&block) if block
+        td
+      }
+    end
+  end
+  
   # the core module of Doodle - however, to get most facilities
   # provided by Doodle without inheriting from Doodle, include
   # Doodle::Core, not this module
@@ -333,9 +348,26 @@ class Doodle
     end
     protected :__doodle__
 
-    # vector through this method to get to doodle info
-    def doodle
-      __doodle__
+    # set up global datatypes
+    def datatypes(*mods)
+      mods.each do |mod|
+        DataTypeHolder.class_eval { include mod }
+      end
+    end
+
+    # vector through this method to get to doodle info or enable global
+    # datatypes and provide an interface that allows you to add your own
+    # datatypes to this declaration
+    def doodle(*mods, &block)
+      if mods.size == 0 && !block_given?
+        __doodle__
+      else
+        dh = Doodle::DataTypeHolder.new(self)
+        mods.each do |mod|
+          dh.extend(mod)
+        end
+        dh.instance_eval(&block)
+      end
     end
     
     # helper for Marshal.dump
@@ -422,11 +454,12 @@ class Doodle
     private :getter_setter
 
     # get an attribute by name - return default if not otherwise defined
-    # fixme: move
+    # fixme: init deferred blocks are not getting resolved in all cases
     def _getter(name, &block)
+      #p [:_getter, name]
       ivar = "@#{name}"
       if instance_variable_defined?(ivar)
-        #!p [:_getter, name, ivar, instance_variable_get(ivar)]
+        #p [:_getter, :instance_variable_defined, name, ivar, instance_variable_get(ivar)]
         instance_variable_get(ivar)
       else
         # handle default
@@ -434,18 +467,22 @@ class Doodle
         # (e.g. arrays that disappear when you go out of scope)
         att = __doodle__.lookup_attribute(name)
         # special case for class/singleton :init
-        if att.init_defined?
-          #!p [:_setter, att.init]
-          _setter(name, att.init)
-        elsif att.default_defined?
-          case att.default
+        if att.optional?
+          optional_value = att.init_defined? ? att.init : att.default
+          #p [:optional_value, optional_value]
+          case optional_value
           when DeferredBlock
-            instance_eval(&att.default.block)
+            #p [:deferred_block]
+            v = instance_eval(&optional_value.block)
           when Proc
-            instance_eval(&att.default)
+            v = instance_eval(&optional_value)
           else
-            att.default
+            v = optional_value
           end
+          if att.init_defined?
+            _setter(name, v)
+          end
+          v
         else
           # This is an internal error (i.e. shouldn't happen)
           __doodle__.handle_error name, NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
@@ -458,18 +495,19 @@ class Doodle
     # fixme: move
     def _setter(name, *args, &block)
       ##DBG: Doodle::Debug.d { [:_setter, name, args] }
+      #p [:_setter, name, *args]
       ivar = "@#{name}"
       if block_given?
         args.unshift(DeferredBlock.new(block))
       end
       if att = __doodle__.lookup_attribute(name)
         ##DBG: Doodle::Debug.d { [:_setter, name, args] }
-        #!p [:_setter, :got_att, name, *args]
+        #p [:_setter, :got_att1, name, ivar, *args]
         v = instance_variable_set(ivar, att.validate(self, *args))
-        #!p [:_setter, :got_att, name, :value, v]
+        #p [:_setter, :got_att2, name, ivar, :value, v]
         #v = instance_variable_set(ivar, *args)
       else
-        #!p [:_setter, :no_att, name, *args]
+        #p [:_setter, :no_att, name, *args]
         ##DBG: Doodle::Debug.d { [:_setter, "no attribute"] }
         v = instance_variable_set(ivar, *args)
       end
@@ -632,8 +670,8 @@ class Doodle
         begin
           args = args.uniq
           args.each do |x|
-            __doodle__.handle_error :arg_order, ArgumentError, "#{x} not a Symbol" if !(x.class <= Symbol)
-            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name" if !doodle_attributes.keys.include?(x)
+            __doodle__.handle_error :arg_order, ArgumentError, "#{x} not a Symbol", [caller[-1]] if !(x.class <= Symbol)
+            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name", [caller[-1]] if !doodle_attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
@@ -647,18 +685,29 @@ class Doodle
     # fixme: move
     def get_init_values(tf = true)
       __doodle__.attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
-        #!p [:get_init_values, a.init]
-        hash[n] = begin
-                    case a.init
-                    when NilClass, TrueClass, FalseClass, Fixnum
-                      a.init
-                    when DeferredBlock
-                      instance_eval(&a.init.block)
-                    else
-                      a.init.clone 
-                    end
-                  rescue Exception => e
+        #p [:get_init_values, a.name]
+        hash[n] = case a.init
+                  when NilClass, TrueClass, FalseClass, Fixnum, Float, Bignum
+                    # uncloneable values
+                    #p [:get_init_values, :special, a.name, a.init]
                     a.init
+                  when DeferredBlock
+                    #p [:get_init_values, self, DeferredBlock, a.name]
+                    begin
+                      instance_eval(&a.init.block)
+                    rescue Object => e
+                      #p [:exception_in_deferred_block, e]
+                      raise
+                    end
+                  else
+                    #p [:get_init_values, :clone, a.name]
+                    begin
+                      a.init.clone
+                    rescue Exception => e
+                      warn "tried to clone #{a.init.class} in :init option"
+                      #p [:get_init_values, :exception, a.name, e]
+                      a.init
+                    end
                   end
         hash
       }
@@ -753,11 +802,12 @@ class Doodle
         #!p [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args]
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
-        init_values = get_init_values
+        #init_values = get_init_values
         #!p [:init_values, init_values]
         
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
-        arg_keywords = init_values.merge(Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))])
+        #arg_keywords = init_values.merge(Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))])
+        arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
         #!p [self.class, :doodle_initialize_from_hash, :arg_keywords, arg_keywords]
 
         # merge all hash args into one
@@ -779,12 +829,20 @@ class Doodle
         # create attributes
         key_values.keys.each do |key|
           #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
-          #!p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
+          #p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
           if respond_to?(key)
             __send__(key, key_values[key])
           else
             # raise error if not defined
-            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}"
+            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}", [caller[-1]]
+          end
+        end
+        # do init_values after user supplied values so init blocks can depend on user supplied values
+        #p [:getting_init_values, instance_variables]
+        init_values = get_init_values
+        init_values.each do |key, value|
+          if !key_values.key?(key) && respond_to?(key)
+            __send__(key, value)
           end
         end
       end
@@ -846,10 +904,10 @@ class Doodle
           method_defined = begin
                              method(name)
                              true
-                           rescue
+                           rescue Object
                              false
                            end
-
+          
           if name =~ Factory::RX_IDENTIFIER && !method_defined && !klass.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING) 
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
@@ -922,11 +980,11 @@ class Doodle
         params = key_values.inject(params){ |acc, item| acc.merge(item)}
         #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
         if !params.key?(:name)
-          __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name"
+          __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name", [caller[-1]]
         else
           name = params[:name].to_sym
         end
-        __doodle__.handle_error name, ArgumentError, "#{self.class} has too many arguments" if positional_args.size > 0
+        __doodle__.handle_error name, ArgumentError, "#{self.class} has too many arguments", [caller[-1]] if positional_args.size > 0
         
         if collector = params.delete(:collect)
           if !params.key?(:using)
