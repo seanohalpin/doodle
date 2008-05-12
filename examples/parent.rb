@@ -16,7 +16,7 @@ class Child < Doodle
     #   - somewhat subtle difference (from programmer's point of
     #   - view) between a proc and a block
     init do
-      doodle_parent
+      doodle.parent
     end
   end
 end
