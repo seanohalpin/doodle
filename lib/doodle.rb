@@ -62,6 +62,18 @@ class Doodle
       def const_resolve(constant)
         constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
       end
+      # convert keys to symbols - updates target hash
+      def symbolize_keys!(hash)
+        hash.keys.each do |key|
+          sym_key = key.respond_to?(:to_sym) ? key.to_sym : key
+          hash[sym_key] = hash.delete(key)
+        end
+        hash
+      end
+      # convert keys to symbols
+      def symbolize_keys(hash)
+        symbolize_keys(hash.dup)
+      end
     end
   end
   
@@ -818,11 +830,12 @@ class Doodle
         #!p [self.class, :doodle_initialize_from_hash, :key_values2, key_values]
 
         # convert keys to symbols (note not recursively - only first level == doodle keywords)
-        key_values.keys.each do |k|
-          sym_key = k.respond_to?(:to_sym) ? k.to_sym : k
-          key_values[sym_key] = key_values.delete(k)
-        end
+#         key_values.keys.each do |k|
+#           sym_key = k.respond_to?(:to_sym) ? k.to_sym : k
+#           key_values[sym_key] = key_values.delete(k)
+#         end
 
+        Doodle::Utils.symbolize_keys!(key_values)
         #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
         #!p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
         
@@ -981,9 +994,12 @@ class Doodle
         #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
         if !params.key?(:name)
           __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name", [caller[-1]]
+          params[:name] = :__ERROR_missing_name__
         else
-          name = params[:name].to_sym
+          # ensure that :name is a symbol
+          params[:name] = params[:name].to_sym
         end
+        name = params[:name]
         __doodle__.handle_error name, ArgumentError, "#{self.class} has too many arguments", [caller[-1]] if positional_args.size > 0
         
         if collector = params.delete(:collect)
@@ -1014,6 +1030,7 @@ class Doodle
           params[:collector_name] = collector_name
         end
         params[:doodle_owner] = owner
+        #p [:params, owner, params]
         params
       end
     end
