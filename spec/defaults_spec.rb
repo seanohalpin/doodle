@@ -17,22 +17,22 @@ describe Doodle, 'attributes with defaults' do
     end
   
     it 'should have instance attribute default via class' do
-      Foo.doodle_attributes[:name].default.should_be 'D1'
+      Foo.doodle.attributes[:name].default.should_be 'D1'
     end
     it 'should have instance attribute default via instance' do
-      @foo.doodle_attributes[:name].default.should_be 'D1'
+      @foo.doodle.attributes[:name].default.should_be 'D1'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.singleton_class.doodle_attributes(false)[:metadata].default.should_be 'D2'
+      Foo.singleton_class.doodle.attributes(false)[:metadata].default.should_be 'D2'
     end
     it 'should have class attribute default via class.meta' do
-      Foo.singleton_class.doodle_attributes[:metadata].default.should_be 'D2'
+      Foo.singleton_class.doodle.attributes[:metadata].default.should_be 'D2'
     end
-    it 'should have singleton attribute default via instance.singleton_class.doodle_attributes(false)' do
-      @foo.singleton_class.doodle_attributes(false)[:special].default.should_be 'D3'
+    it 'should have singleton attribute default via instance.singleton_class.doodle.attributes(false)' do
+      @foo.singleton_class.doodle.attributes(false)[:special].default.should_be 'D3'
     end
-    it 'should have singleton attribute default via instance.singleton_class.doodle_attributes' do
-      @foo.singleton_class.doodle_attributes[:special].default.should_be 'D3'
+    it 'should have singleton attribute default via instance.singleton_class.doodle.attributes' do
+      @foo.singleton_class.doodle.attributes[:special].default.should_be 'D3'
     end
     it 'should have singleton attribute name by default' do
       @foo.name.should_be 'D1'

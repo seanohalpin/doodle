@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe 'Doodle', 'doodle_parents' do
+describe 'Doodle', 'doodle.parents' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle
@@ -12,13 +12,13 @@ describe 'Doodle', 'doodle_parents' do
       @sclass_foo = class << @foo; class << self; self; end; end
     end
   
-    it 'should have no singleton doodle_parents ' do
+    it 'should have no singleton doodle.parents ' do
       @sc.doodle.parents.should == []
     end
 
-#     it "should have singleton class's singleton class doodle_parents == []" do
-#       expected_doodle_parents = RUBY_VERSION <= "1.8.6" ? [] : [Module, Object, BasicObject]
-#       @scc.doodle_parents.should == expected_doodle_parents
+#     it "should have singleton class's singleton class doodle.parents == []" do
+#       expected_doodle.parents = RUBY_VERSION <= "1.8.6" ? [] : [Module, Object, BasicObject]
+#       @scc.doodle.parents.should == expected_doodle.parents
 #     end
   end
 end

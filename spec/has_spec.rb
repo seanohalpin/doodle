@@ -8,7 +8,7 @@ describe Doodle, 'has Class' do
       class Foo < Doodle
         has Bar
       end
-      att = Foo.doodle_attributes.values.first
+      att = Foo.doodle.attributes.values.first
       att.name.should_be :bar
       att.kind.should_be Bar
     end
@@ -18,7 +18,7 @@ describe Doodle, 'has Class' do
       class Foo < Doodle
         has Bar, :name => :baz
       end
-      att = Foo.doodle_attributes.values.first
+      att = Foo.doodle.attributes.values.first
       att.name.should_be :baz
       att.kind.should_be Bar
     end
@@ -28,7 +28,7 @@ describe Doodle, 'has Class' do
       class Foo < Doodle
         has AudioClip
       end
-      att = Foo.doodle_attributes.values.first
+      att = Foo.doodle.attributes.values.first
       att.name.should_be :audio_clip
       att.kind.should_be AudioClip
     end
