@@ -422,14 +422,6 @@ class Doodle
       __doodle__.class_attributes
     end
 
-    # returns array of Validations
-    # - if tf == true, returns all inherited validations
-    # - if tf == false, returns only those validations defined in the current object/class
-    # deprecated
-    def doodle_validations(tf = true)
-      __doodle__.validations(tf)
-    end
-
     # either get an attribute value (if no args given) or set it
     # (using args and/or block)
     # fixme: move
