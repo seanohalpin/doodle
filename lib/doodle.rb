@@ -255,11 +255,34 @@ class Doodle
       end
     end
 
+    # send message to all doodle_parents and collect results 
+    def doodle_collect_inherited(message)
+      result = []
+      parents.each do |klass|
+        if klass.respond_to?(:doodle) && klass.doodle.respond_to?(message)
+          result.unshift(*klass.doodle.__send__(message))
+        else
+          break
+        end
+      end
+      result
+    end
+
+    def doodle_handle_inherited_hash(tf, method)
+      if tf
+        doodle_collect_inherited(method).inject(OrderedHash.new){ |hash, item|
+          hash.merge(OrderedHash[*item])
+        }.merge(@this.doodle.__send__(method))
+      else
+        @this.doodle.__send__(method)
+      end
+    end
+    
     # returns array of Attributes
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
-      results = handle_inherited_hash(tf, :doodle_local_attributes)
+      results = doodle_handle_inherited_hash(tf, :local_attributes)
       # if an instance, include the singleton_class attributes
       if !@this.kind_of?(Class) && @this.singleton_class.doodle.respond_to?(:attributes)
         results = results.merge(@this.singleton_class.doodle.attributes)
@@ -270,12 +293,12 @@ class Doodle
     def class_attributes
       attrs = OrderedHash.new
       if @this.kind_of?(Class)
-        attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
+        attrs = doodle_collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
         }.merge(@this.singleton_class.doodle.respond_to?(:attributes) ? @this.singleton_class.doodle.attributes : { })
         attrs
       else
-        @this.class.class_attributes
+        @this.class.doodle.class_attributes
       end
     end
 
@@ -287,7 +310,7 @@ class Doodle
         # by name and kind respectively, so only the most recent
         # applies
         
-        local_validations + collect_inherited(:doodle_local_validations)
+        local_validations + doodle_collect_inherited(:local_validations)
       else
         local_validations
       end
