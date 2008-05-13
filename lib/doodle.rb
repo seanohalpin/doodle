@@ -417,11 +417,6 @@ class Doodle
       end
     end
 
-    # deprecated methods
-    def doodle_collect_inherited(message)
-      __doodle__.collect_inherited(message)
-    end
-    
     # return attributes for class
     def class_attributes
       __doodle__.class_attributes
