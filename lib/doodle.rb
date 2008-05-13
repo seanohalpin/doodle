@@ -103,12 +103,12 @@ class Doodle
   end
 
   # provides more direct access to the singleton class and a way to
-  # treat Modules and Classes equally in a meta context
+  # treat singletons, Modules and Classes equally in a meta context
   module SelfClass
     # return the 'singleton class' of an object, optionally executing
     # a block argument in the (module/class) context of that object
     def singleton_class(&block)
-      sc = (class << self; self; end)
+      sc = class << self; self; end
       sc.module_eval(&block) if block_given?
       sc
     end
