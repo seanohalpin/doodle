@@ -422,14 +422,6 @@ class Doodle
       __doodle__.class_attributes
     end
 
-    # returns hash of conversions
-    # - if tf == true, returns all inherited conversions
-    # - if tf == false, returns only those conversions defined in the current object/class
-    # deprecated
-    def doodle_conversions(tf = true)
-      __doodle__.conversions(tf)
-    end
-
     # returns array of Validations
     # - if tf == true, returns all inherited validations
     # - if tf == false, returns only those validations defined in the current object/class
