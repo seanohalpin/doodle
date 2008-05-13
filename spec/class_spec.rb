@@ -80,7 +80,7 @@ describe Doodle, 'class attributes' do
       Bar.singleton_class.doodle.attributes.keys.should_be [:doc]
     end
     it "should list all class's class_attributes" do
-      Bar.class_attributes.keys.should_be [:metadata, :doc]
+      Bar.doodle.class_attributes.keys.should_be [:metadata, :doc]
     end
   end
 end

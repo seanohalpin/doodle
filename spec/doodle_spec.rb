@@ -153,7 +153,7 @@ describe Doodle, 'inherited class attributes(false)' do
     end
 
     it "should list all inherited meta class attributes" do
-      Bar.class_attributes.keys.should_be [:metadata, :doc]
+      Bar.doodle.class_attributes.keys.should_be [:metadata, :doc]
     end
     
     it "should list all inherited class's attributes" do
