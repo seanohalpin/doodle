@@ -398,9 +398,6 @@ class Doodle
     def doodle_collect_inherited(message)
       __doodle__.collect_inherited(message)
     end
-    def doodle_parents
-      __doodle__.parents
-    end
     
     # return attributes defined in instance
     def doodle_local_attributes

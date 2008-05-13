@@ -70,7 +70,7 @@ describe Doodle::DoodleAttribute, 'basics' do
 #     end
     
     it "should have Bar's singleton doodle_parents in reverse order of definition" do
-      @bar.singleton_class.doodle_parents.should == []
+      @bar.singleton_class.doodle.parents.should == []
     end
 
     it 'should have singleton_class attributes in order of definition' do
