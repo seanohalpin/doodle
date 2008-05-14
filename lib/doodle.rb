@@ -744,22 +744,6 @@ class Doodle
       self
     end
 
-    # turn off validation, execute block, then set validation to same
-    # state as it was before +defer_validation+ was called - can be nested
-    # fixme: move
-    def xdefer_validation(&block)
-      old_validation = __doodle__.validation_on
-      __doodle__.validation_on = false
-      v = nil
-      begin
-        v = instance_eval(&block)
-      ensure
-        __doodle__.validation_on = old_validation
-      end
-      validate!(false)
-      v
-    end
-
     # helper function to initialize from hash - this is safe to use
     # after initialization (validate! is called if this method is
     # called after initialization)
