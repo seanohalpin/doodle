@@ -312,16 +312,16 @@ class Doodle
     end
 
     # fixme: move
-    def get_init_values(tf = true)
+    def initial_values(tf = true)
       attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
-        #p [:get_init_values, a.name]
+        #p [:initial_values, a.name]
         hash[n] = case a.init
                   when NilClass, TrueClass, FalseClass, Fixnum, Float, Bignum
                     # uncloneable values
-                    #p [:get_init_values, :special, a.name, a.init]
+                    #p [:initial_values, :special, a.name, a.init]
                     a.init
                   when DeferredBlock
-                    #p [:get_init_values, self, DeferredBlock, a.name]
+                    #p [:initial_values, self, DeferredBlock, a.name]
                     begin
                       @this.instance_eval(&a.init.block)
                     rescue Object => e
@@ -329,12 +329,12 @@ class Doodle
                       raise
                     end
                   else
-                    #p [:get_init_values, :clone, a.name]
+                    #p [:initial_values, :clone, a.name]
                     begin
                       a.init.clone
                     rescue Exception => e
                       warn "tried to clone #{a.init.class} in :init option"
-                      #p [:get_init_values, :exception, a.name, e]
+                      #p [:initial_values, :exception, a.name, e]
                       a.init
                     end
                   end
@@ -758,7 +758,7 @@ class Doodle
         #!p [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args]
 
         # set up initial values with ~clones~ of specified values (so not shared between instances)
-        #init_values = get_init_values
+        #init_values = initial_values
         #!p [:init_values, init_values]
         
         # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
@@ -796,8 +796,7 @@ class Doodle
         end
         # do init_values after user supplied values so init blocks can depend on user supplied values
         #p [:getting_init_values, instance_variables]
-        init_values = doodle.get_init_values
-        init_values.each do |key, value|
+        doodle.initial_values.each do |key, value|
           if !key_values.key?(key) && respond_to?(key)
             __send__(key, value)
           end
