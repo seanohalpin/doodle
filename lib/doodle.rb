@@ -342,6 +342,22 @@ class Doodle
       }
     end
     
+    # turn off validation, execute block, then set validation to same
+    # state as it was before +defer_validation+ was called - can be nested
+    # fixme: move
+    def defer_validation(&block)
+      old_validation = self.validation_on
+      self.validation_on = false
+      v = nil
+      begin
+        v = @this.instance_eval(&block)
+      ensure
+        self.validation_on = old_validation
+      end
+      @this.validate!(false)
+      v
+    end
+
   end
 
   # what it says on the tin :) various hacks to hide @__doodle__ variable
@@ -731,7 +747,7 @@ class Doodle
     # turn off validation, execute block, then set validation to same
     # state as it was before +defer_validation+ was called - can be nested
     # fixme: move
-    def defer_validation(&block)
+    def xdefer_validation(&block)
       old_validation = __doodle__.validation_on
       __doodle__.validation_on = false
       v = nil
@@ -750,7 +766,7 @@ class Doodle
     # fixme?
     def doodle_initialize_from_hash(*args)
       #!p [:doodle_initialize_from_hash, :args, *args]
-      defer_validation do
+      __doodle__.defer_validation do
         # hash initializer
         # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
@@ -815,7 +831,7 @@ class Doodle
       __doodle__.validation_on = true
       __doodle__.parent = Doodle.context[-1]
       Doodle.context.push(self)
-      defer_validation do
+      __doodle__.defer_validation do
         doodle_initialize_from_hash(*args)
         instance_eval(&block) if block_given?
       end

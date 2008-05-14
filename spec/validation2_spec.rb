@@ -202,17 +202,17 @@ end
         @dr.end_date.should == @dr.start_date
       end
 
-      it "should not raise an error when changing start_date and changing end_date using defer_validation" do
+      it "should not raise an error when changing start_date and changing end_date using doodle.defer_validation" do
         proc {
-          @dr.defer_validation do
+          @dr.doodle.defer_validation do
             self.start_date = self.start_date + 1
             self.end_date = self.start_date
           end
         }.should_not raise_error
       end
 
-      it "should allow changing start_date and changing end_date using defer_validation" do
-        @dr.defer_validation do
+      it "should allow changing start_date and changing end_date using doodle.defer_validation" do
+        @dr.doodle.defer_validation do
           start_date start_date + 1
           end_date start_date
         end
