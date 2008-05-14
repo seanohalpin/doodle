@@ -577,6 +577,7 @@ class Doodle
     # if block passed, define a conversion from class
     # if no args, apply conversion to arguments
     def from(*args, &block)
+      #p [:from, self, args]
       if block_given?
         # set the rule for each arg given
         args.each do |arg|
@@ -599,6 +600,7 @@ class Doodle
 
     # add a validation that attribute must be of class <= kind
     def kind(*args, &block)
+      @kind ||= nil
       if args.size > 0
         # todo[figure out how to handle kind being specified twice?]
         @kind = args.first
@@ -637,12 +639,26 @@ class Doodle
                 value = converter[*args]
                 #!p [:convert, 12, value]
               end
+            else
+              #!p [:convert, 13, :kind, kind]
+              if kind && kind <= Doodle::Core # && kind.respond_to?(:doodle)
+                #!p [:convert, 14, :kind_is_a_doodle, kind, kind.doodle.conversions]
+                if converter = kind.doodle.conversions[value.class]
+                  #!p [:convert, 15, value, kind, args]
+                  value = converter[*args]
+                else
+                  #!p [:convert, 16, :no_conversion_for, value.class]
+                end
+              else
+                #!p [:convert, 17, :kind_has_no_conversions]
+              end
             end
           end
+          #!p [:convert, 18, value]
           value
         end
       rescue Exception => e
-        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class} - #{e.to_s}", [caller[-1]]
+        owner.__doodle__.handle_error name, ConversionError, "#{e.message}", [caller[-1]]
       end
       if args.size > 1
         args
@@ -655,15 +671,20 @@ class Doodle
     # fixme: move
     def validate(owner, *args)
       ##DBG: Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
-      #!p [:validate, :before_conversion, args]
-      value = convert(owner, *args)
-      #!p [:validate, :after_conversion, args, :becomes, value]
+      #!p [:validate, 1, args]
+      begin
+        value = convert(owner, *args)
+      rescue Exception => e
+        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", [caller[-1]]
+      end
+      #!p [:validate, 2, args, :becomes, value]
       __doodle__.validations.each do |v|
         ##DBG: Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
           owner.__doodle__.handle_error name, ValidationError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
         end
       end
+      #!p [:validate, 3, value]
       value
     end
 
@@ -1119,7 +1140,6 @@ class Doodle
       end
     end
   end
-
 end
 
 ############################################################
