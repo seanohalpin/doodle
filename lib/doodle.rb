@@ -310,6 +310,37 @@ class Doodle
     def conversions(tf = true)
       handle_inherited_hash(tf, :local_conversions)
     end
+
+    # fixme: move
+    def get_init_values(tf = true)
+      attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
+        #p [:get_init_values, a.name]
+        hash[n] = case a.init
+                  when NilClass, TrueClass, FalseClass, Fixnum, Float, Bignum
+                    # uncloneable values
+                    #p [:get_init_values, :special, a.name, a.init]
+                    a.init
+                  when DeferredBlock
+                    #p [:get_init_values, self, DeferredBlock, a.name]
+                    begin
+                      @this.instance_eval(&a.init.block)
+                    rescue Object => e
+                      #p [:exception_in_deferred_block, e]
+                      raise
+                    end
+                  else
+                    #p [:get_init_values, :clone, a.name]
+                    begin
+                      a.init.clone
+                    rescue Exception => e
+                      warn "tried to clone #{a.init.class} in :init option"
+                      #p [:get_init_values, :exception, a.name, e]
+                      a.init
+                    end
+                  end
+        hash
+      }
+    end
     
   end
 
@@ -639,38 +670,6 @@ class Doodle
       end
     end
 
-    # fixme: move
-    def get_init_values(tf = true)
-      __doodle__.attributes(tf).select{|n, a| a.init_defined? }.inject({}) {|hash, (n, a)|
-        #p [:get_init_values, a.name]
-        hash[n] = case a.init
-                  when NilClass, TrueClass, FalseClass, Fixnum, Float, Bignum
-                    # uncloneable values
-                    #p [:get_init_values, :special, a.name, a.init]
-                    a.init
-                  when DeferredBlock
-                    #p [:get_init_values, self, DeferredBlock, a.name]
-                    begin
-                      instance_eval(&a.init.block)
-                    rescue Object => e
-                      #p [:exception_in_deferred_block, e]
-                      raise
-                    end
-                  else
-                    #p [:get_init_values, :clone, a.name]
-                    begin
-                      a.init.clone
-                    rescue Exception => e
-                      warn "tried to clone #{a.init.class} in :init option"
-                      #p [:get_init_values, :exception, a.name, e]
-                      a.init
-                    end
-                  end
-        hash
-      }
-    end
-    private :get_init_values
-
     # return true if instance variable +name+ defined
     # fixme: move
     def ivar_defined?(name)
@@ -797,7 +796,7 @@ class Doodle
         end
         # do init_values after user supplied values so init blocks can depend on user supplied values
         #p [:getting_init_values, instance_variables]
-        init_values = get_init_values
+        init_values = doodle.get_init_values
         init_values.each do |key, value|
           if !key_values.key?(key) && respond_to?(key)
             __send__(key, value)
