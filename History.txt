@@ -15,8 +15,15 @@
       end
 
       person = Person 'Arthur'
+      person.name.class         # => Name
 
   - better error reporting
+  - kind can now take an array of classes or modules to match against,
+  - e.g.
+
+      has :name, :kind => [String, Symbol]
+
+    - kind with no args now returns an array of kinds (possibly empty)
 
 - Bug fixes:
   - #has with class param was not enforcing :kind constraint

@@ -10,7 +10,7 @@ describe Doodle, 'has Class' do
       end
       att = Foo.doodle.attributes.values.first
       att.name.should_be :bar
-      att.kind.should_be Bar
+      att.kind.should_be [Bar]
     end
     it "should allow overriding name of attribute when using 'has Bar'" do
       class Bar
@@ -20,7 +20,7 @@ describe Doodle, 'has Class' do
       end
       att = Foo.doodle.attributes.values.first
       att.name.should_be :baz
-      att.kind.should_be Bar
+      att.kind.should_be [Bar]
     end
     it "should convert class name to snakecase when using CamelCase class constant" do
       class AudioClip
@@ -30,7 +30,7 @@ describe Doodle, 'has Class' do
       end
       att = Foo.doodle.attributes.values.first
       att.name.should_be :audio_clip
-      att.kind.should_be AudioClip
+      att.kind.should_be [AudioClip]
     end
     it "should apply validations for 'has Bar' as if 'has :bar, :kind => Bar' was used" do
       class Bar
