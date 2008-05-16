@@ -1098,6 +1098,7 @@ class Doodle
     def define_collection
       if collector_class.nil?
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                   junk = #{name} if !#{name} # force initialization for classes
                    args.unshift(block) if block_given?
                    #{name}.<<(*args);
                  end", __FILE__, __LINE__)
@@ -1133,12 +1134,14 @@ class Doodle
       # need to use string eval because passing block
       if collector_class.nil?
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                   junk = #{name} if !#{name} # force initialization for classes
                    args.each do |arg|
                      #{name}[arg.send(:#{key})] = arg
                    end
                  end", __FILE__, __LINE__)
       else
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                          junk = #{name} if !#{name} # force initialization for classes
                           if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
                             args.each do |arg|
                               #{name}[arg.send(:#{key})] = arg
