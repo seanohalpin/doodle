@@ -1103,6 +1103,7 @@ class Doodle
                  end", __FILE__, __LINE__)
       else
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                          junk = #{name} if !#{name} # force initialization for classes
                           if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
                             #{name}.<<(*args)
                           else
