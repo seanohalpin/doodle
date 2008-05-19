@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe Doodle, 'has Class' do
-  temporary_constant :Foo, :Bar do
+  temporary_constant :Foo, :Bar, :AudioClip do
     it "should convert 'has Bar' into 'has :bar, :kind => Bar'" do
       class Bar
       end
