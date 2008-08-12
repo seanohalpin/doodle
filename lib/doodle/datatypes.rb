@@ -17,7 +17,7 @@ class Doodle
           n.to_i
         end
         from String do |n|
-          n =~ /[0-9]+(.[0-9]+)?/ or raise ArgumentError, "#{name} must be numeric"
+          n =~ /[0-9]+(.[0-9]+)?/ or raise ArgumentError, "#{name} must be numeric", [caller[-1]]
           n.to_i
         end
       end
@@ -125,6 +125,15 @@ class Doodle
           a.join('.')
         end
       end
+    end
+
+    def list(name, params = { }, &block)
+      if name.kind_of?(Class)
+        params[:collect] = name
+        name = Doodle::Utils.pluralize(Doodle::Utils.snake_case(name))
+      end
+      raise ArgumentError, "#{name} must specify what to :collect", [caller[-1]] if !params.key?(:collect)
+      define name, params, block, { }
     end
   end
 end
