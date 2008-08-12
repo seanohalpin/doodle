@@ -1,3 +1,21 @@
+== 0.1.7 / 2008-05-10
+- Features
+  - #has now accepts class constant in name position and generates name
+    and kind from that, e.g.
+      has Person --> has :person, :kind => Person
+      has AudioClip --> has :audio_clip, :kind => AudioClip
+  - moved datatypes code into main doodle.rb
+  - use doodle.parent instead of doodle_parent
+
+- Bug fixes:
+  - fixed handling of :init blocks so they can refer to user supplied
+    attribute values which don't have defaults
+    - note: attributes referred to in :init blocks ~must~ be supplied as
+      keyword arguments - by the time evaluation gets to the
+      initialization block, the :init block has already been evaluated
+      so will raise an error if it cannot find the value it's looking for
+  - moved more methods into DoodleInfo from Core
+
 == 0.1.6 / 2008-05-08
 - Features:
   - short cut syntax for #must - can now specify constraints like
