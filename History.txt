@@ -1,7 +1,30 @@
 == 0.1.9 / 2008-05-18
 - doodle do .. end blocks now support #has, #from, #must and
   #arg_order
-- 
+- will now initialize a setter from a block by calling kind.new (if
+  kind specified), e.g.
+
+  class Animal
+    has :species
+  end
+
+  class Barn
+    has :animals, :collect => Animal
+  end
+
+  class Farm
+    has Barn
+  end
+
+  farm = Farm do
+    # this is new - will call Barn.new(&block)
+    barn do
+      animal 'chicken'
+      animal 'pig'
+    end
+  end
+
+- attributes now have :doc member      
 
 == 0.1.8 / 2008-05-13
 - Features:
