@@ -89,8 +89,9 @@ describe Doodle::DoodleAttribute, 'basics' do
       Bar.singleton_class.doodle.attributes(false).keys.should == [:cvar2]
     end
 
-    it 'should not inherit singleton doodle_local_attributes' do
-      @bar.singleton_class.class_eval { doodle_collect_inherited(:doodle_local_attributes).map { |x| x[0]} }.should == []
+    # bit iffy this test
+    it 'should not inherit singleton doodle.local_attributes' do
+      @bar.singleton_class.class_eval { doodle.collect_inherited(:local_attributes).map { |x| x[0]} }.should == []
     end
 
     it 'should not inherit singleton attributes#1' do
