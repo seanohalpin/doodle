@@ -13,7 +13,7 @@ describe 'Doodle', 'doodle_parents' do
     end
   
     it 'should have no singleton doodle_parents ' do
-      @sc.doodle_parents.should == []
+      @sc.doodle.parents.should == []
     end
 
 #     it "should have singleton class's singleton class doodle_parents == []" do
