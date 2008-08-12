@@ -78,18 +78,18 @@ describe Doodle::DoodleAttribute, 'basics' do
     end
 
     it 'should have inherited class_attributes in order of definition' do
-      Bar.class_attributes.keys.should == [:cvar1, :cvar2]
+      Bar.doodle.class_attributes.keys.should == [:cvar1, :cvar2]
     end
 
     it 'should have inherited class_attributes in order of definition' do
-      @bar.class_attributes.keys.should == [:cvar1, :cvar2]
+      @bar.doodle.class_attributes.keys.should == [:cvar1, :cvar2]
     end
     
     it 'should have local class attributes in order of definition' do
       Bar.singleton_class.doodle.attributes(false).keys.should == [:cvar2]
     end
 
-    # bit iffy this test
+    # bit iffy this test - testing implementation, not interface
     it 'should not inherit singleton doodle.local_attributes' do
       @bar.singleton_class.class_eval { doodle.collect_inherited(:local_attributes).map { |x| x[0]} }.should == []
     end

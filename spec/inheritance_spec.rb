@@ -62,8 +62,8 @@ describe Doodle, "inheritance" do
     end
 
     it "should inherite class attributes for class" do
-      Foo.class_attributes.map{ |key, value| key}.should_be [:cvar] 
-      Bar.class_attributes.map{ |key, value| key}.should_be [:cvar, :cvar2] 
+      Foo.doodle.class_attributes.map{ |key, value| key}.should_be [:cvar] 
+      Bar.doodle.class_attributes.map{ |key, value| key}.should_be [:cvar, :cvar2] 
     end
     
     it "should not inherit class attributes via singleton_class" do

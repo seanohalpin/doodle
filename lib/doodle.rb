@@ -236,8 +236,8 @@ class Doodle
     def collect_inherited(message)
       result = []
       parents.each do |klass|
-        if klass.respond_to?(message)
-          result.unshift(*klass.__send__(message))
+        if klass.respond_to?(:doodle) && klass.doodle.respond_to?(message)
+          result.unshift(*klass.doodle.__send__(message))
         else
           break
         end
@@ -249,29 +249,6 @@ class Doodle
       if tf
         collect_inherited(method).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
-        }.merge(@this.__send__(method))
-      else
-        @this.__send__(method)
-      end
-    end
-
-    # send message to all doodle_parents and collect results 
-    def doodle_collect_inherited(message)
-      result = []
-      parents.each do |klass|
-        if klass.respond_to?(:doodle) && klass.doodle.respond_to?(message)
-          result.unshift(*klass.doodle.__send__(message))
-        else
-          break
-        end
-      end
-      result
-    end
-
-    def doodle_handle_inherited_hash(tf, method)
-      if tf
-        doodle_collect_inherited(method).inject(OrderedHash.new){ |hash, item|
-          hash.merge(OrderedHash[*item])
         }.merge(@this.doodle.__send__(method))
       else
         @this.doodle.__send__(method)
@@ -282,7 +259,7 @@ class Doodle
     # - if tf == true, returns all inherited attributes
     # - if tf == false, returns only those attributes defined in the current object/class
     def attributes(tf = true)
-      results = doodle_handle_inherited_hash(tf, :local_attributes)
+      results = handle_inherited_hash(tf, :local_attributes)
       # if an instance, include the singleton_class attributes
       if !@this.kind_of?(Class) && @this.singleton_class.doodle.respond_to?(:attributes)
         results = results.merge(@this.singleton_class.doodle.attributes)
@@ -290,10 +267,11 @@ class Doodle
       results
     end
 
+    # return class level attributes
     def class_attributes
       attrs = OrderedHash.new
       if @this.kind_of?(Class)
-        attrs = doodle_collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
+        attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
         }.merge(@this.singleton_class.doodle.respond_to?(:attributes) ? @this.singleton_class.doodle.attributes : { })
         attrs
@@ -310,7 +288,7 @@ class Doodle
         # by name and kind respectively, so only the most recent
         # applies
         
-        local_validations + doodle_collect_inherited(:local_validations)
+        local_validations + collect_inherited(:local_validations)
       else
         local_validations
       end
@@ -330,7 +308,7 @@ class Doodle
     # - if tf == true, returns all inherited conversions
     # - if tf == false, returns only those conversions defined in the current object/class
     def conversions(tf = true)
-      doodle_handle_inherited_hash(tf, :local_conversions)
+      handle_inherited_hash(tf, :local_conversions)
     end
     
   end
@@ -415,11 +393,6 @@ class Doodle
       data.each do |name, value|
         instance_variable_set(name, value)
       end
-    end
-
-    # return attributes for class
-    def class_attributes
-      __doodle__.class_attributes
     end
 
     # either get an attribute value (if no args given) or set it
