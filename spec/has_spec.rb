@@ -32,5 +32,14 @@ describe Doodle, 'has Class' do
       att.name.should_be :audio_clip
       att.kind.should_be AudioClip
     end
+    it "should apply validations for 'has Bar' as if 'has :bar, :kind => Bar' was used" do
+      class Bar
+      end
+      class Foo < Doodle
+        has Bar
+      end
+      proc {  Foo.new(:bar => Bar.new) }.should_not raise_error
+      proc {  Foo.new(:bar => "Hello") }.should raise_error(Doodle::ValidationError)
+    end
   end
 end

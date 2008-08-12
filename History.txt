@@ -1,3 +1,8 @@
+== 0.1.8 / 2008-05-13
+
+- Bug fixes:
+  - #has with class param was not enforcing :kind constraint
+
 == 0.1.7 / 2008-05-10
 - Features
   - #has now accepts class constant in name position and generates name
