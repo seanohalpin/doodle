@@ -1,4 +1,22 @@
 == 0.1.8 / 2008-05-13
+- Features:
+  - now applies instance level conversions (class level #from) to
+    attribute values, e.g.
+
+      class Name < String
+        include Doodle::Core
+        from String do |s|
+          Name.new(s)
+        end
+      end
+
+      class Person < Doodle
+        has Name
+      end
+
+      person = Person 'Arthur'
+
+  - better error reporting
 
 - Bug fixes:
   - #has with class param was not enforcing :kind constraint
