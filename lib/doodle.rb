@@ -855,13 +855,6 @@ class Doodle
     end
     #private :doodle_initialize_from_hash
 
-    # return containing object (set during initialization)
-    # (named doodle_parent to avoid clash with ActiveSupport)
-    # fixme: move
-    def doodle_parent
-      __doodle__.parent
-    end
-
     # object can be initialized from a mixture of positional arguments,
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
