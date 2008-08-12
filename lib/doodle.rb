@@ -399,7 +399,7 @@ class Doodle
             __send__(key, key_values[key])
           else
             # raise error if not defined
-            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}", [caller[-1]]
+            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}", (caller)
           end
         end
         # do init_values after user supplied values so init blocks can depend on user supplied values
@@ -543,7 +543,7 @@ class Doodle
           v
         else
           # This is an internal error (i.e. shouldn't happen)
-          __doodle__.handle_error name, NoDefaultError, "'#{name}' has no default defined", [caller[-1]]
+          __doodle__.handle_error name, NoDefaultError, "'#{name}' has no default defined", (caller)
         end
       end
     end
@@ -600,11 +600,16 @@ class Doodle
 
     # add a validation that attribute must be of class <= kind
     def kind(*args, &block)
-      @kind ||= nil
+      @kind ||= []
       if args.size > 0
+        @kind = [args].flatten
         # todo[figure out how to handle kind being specified twice?]
-        @kind = args.first
-        __doodle__.local_validations << (Validation.new("be #{@kind}") { |x| x.class <= @kind })
+        if @kind.size > 2
+          kind_text = "a kind of #{ @kind[0..-2].map{ |x| x.to_s }.join(', ') } or #{@kind[-1].to_s}" # => 
+        else
+          kind_text = "a kind of #{@kind.to_s}"
+        end
+        __doodle__.local_validations << (Validation.new(kind_text) { |x| @kind.any? { |klass| x.kind_of?(klass) } })
       else
         @kind
       end
@@ -613,7 +618,7 @@ class Doodle
     # convert a value according to conversion rules
     # fixme: move
     def convert(owner, *args)
-      #!p [:convert, 1, owner, args]
+      #!p [:convert, 1, owner, args, __doodle__.conversions]
       begin
         args = args.map do |value|
           #!p [:convert, 2, value]
@@ -624,15 +629,15 @@ class Doodle
           else
             #!p [:convert, 5, value]
             # try to find nearest ancestor
-            ancestors = value.class.ancestors
-            #!p [:convert, 6, ancestors]
-            matches = ancestors & __doodle__.conversions.keys
+            this_ancestors = value.class.ancestors
+            #!p [:convert, 6, this_ancestors]
+            matches = this_ancestors & __doodle__.conversions.keys
             #!p [:convert, 7, matches]
-            indexed_matches = matches.map{ |x| ancestors.index(x)}
+            indexed_matches = matches.map{ |x| this_ancestors.index(x)}
             #!p [:convert, 8, indexed_matches]
             if indexed_matches.size > 0
               #!p [:convert, 9]
-              converter_class = ancestors[indexed_matches.min]
+              converter_class = this_ancestors[indexed_matches.min]
               #!p [:convert, 10, converter_class]
               if converter = __doodle__.conversions[converter_class]
                 #!p [:convert, 11, converter]
@@ -640,14 +645,19 @@ class Doodle
                 #!p [:convert, 12, value]
               end
             else
-              #!p [:convert, 13, :kind, kind]
-              if kind && kind <= Doodle::Core # && kind.respond_to?(:doodle)
-                #!p [:convert, 14, :kind_is_a_doodle, kind, kind.doodle.conversions]
-                if converter = kind.doodle.conversions[value.class]
-                  #!p [:convert, 15, value, kind, args]
-                  value = converter[*args]
-                else
-                  #!p [:convert, 16, :no_conversion_for, value.class]
+              #!p [:convert, 13, :kind, kind, name, value] 
+              mappable_kinds = kind.select{ |x| x <= Doodle::Core }
+              #!p [:convert, 13.1, :kind, kind, mappable_kinds] 
+              if mappable_kinds.size > 0
+                mappable_kinds.each do |mappable_kind|
+                  #!p [:convert, 14, :kind_is_a_doodle, value.class, mappable_kind, mappable_kind.doodle.conversions, args] 
+                  if converter = mappable_kind.doodle.conversions[value.class]
+                    #!p [:convert, 15, value, mappable_kind, args] 
+                    value = converter[*args]
+                    break
+                  else
+                    #!p [:convert, 16, :no_conversion_for, value.class] 
+                  end
                 end
               else
                 #!p [:convert, 17, :kind_has_no_conversions]
@@ -658,7 +668,7 @@ class Doodle
           value
         end
       rescue Exception => e
-        owner.__doodle__.handle_error name, ConversionError, "#{e.message}", [caller[-1]]
+        owner.__doodle__.handle_error name, ConversionError, "#{e.message}", (caller)
       end
       if args.size > 1
         args
@@ -675,13 +685,13 @@ class Doodle
       begin
         value = convert(owner, *args)
       rescue Exception => e
-        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", [caller[-1]]
+        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", (caller)
       end
       #!p [:validate, 2, args, :becomes, value]
       __doodle__.validations.each do |v|
         ##DBG: Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
-          owner.__doodle__.handle_error name, ValidationError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", [caller[-1]]
+          owner.__doodle__.handle_error name, ValidationError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } must #{ v.message } - got #{ value.class }(#{ value.inspect })", (caller)
         end
       end
       #!p [:validate, 3, value]
@@ -749,12 +759,12 @@ class Doodle
         begin
           args = args.uniq
           args.each do |x|
-            __doodle__.handle_error :arg_order, ArgumentError, "#{x} not a Symbol", [caller[-1]] if !(x.class <= Symbol)
-            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name", [caller[-1]] if !doodle.attributes.keys.include?(x)
+            __doodle__.handle_error :arg_order, ArgumentError, "#{x} not a Symbol", (caller) if !(x.class <= Symbol)
+            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name", (caller) if !doodle.attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
-          __doodle__.handle_error :arg_order, InvalidOrderError, e.to_s, [caller[-1]]
+          __doodle__.handle_error :arg_order, InvalidOrderError, e.to_s, (caller)
         end
       else
         __doodle__.arg_order + (__doodle__.attributes.keys - __doodle__.arg_order)
@@ -797,7 +807,7 @@ class Doodle
             ##DBG: Doodle::Debug.d { [:validate!, :optional, name ]}
             break
           elsif self.class != Class
-            __doodle__.handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", [caller[-1]]
+            __doodle__.handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", (caller)
           end
         end
         
@@ -808,10 +818,10 @@ class Doodle
           ##DBG: Doodle::Debug.d { [:validate!, self, v ] }
           begin
             if !instance_eval(&v.block)
-              __doodle__.handle_error self, ValidationError, "#{ self.class } must #{ v.message }", [caller[-1]]
+              __doodle__.handle_error self, ValidationError, "#{ self.class } must #{ v.message }", (caller)
             end
           rescue Exception => e
-            __doodle__.handle_error self, ValidationError, e.to_s, [caller[-1]]
+            __doodle__.handle_error self, ValidationError, e.to_s, (caller)
           end
         end
       end
@@ -943,14 +953,14 @@ class Doodle
         params = key_values.inject(params){ |acc, item| acc.merge(item)}
         #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
         if !params.key?(:name)
-          __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name", [caller[-1]]
+          __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name", (caller)
           params[:name] = :__ERROR_missing_name__
         else
           # ensure that :name is a symbol
           params[:name] = params[:name].to_sym
         end
         name = params[:name]
-        __doodle__.handle_error name, ArgumentError, "#{self.class} has too many arguments", [caller[-1]] if positional_args.size > 0
+        __doodle__.handle_error name, ArgumentError, "#{self.class} has too many arguments", (caller) if positional_args.size > 0
         
         if collector = params.delete(:collect)
           if !params.key?(:using)

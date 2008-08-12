@@ -1,6 +1,12 @@
 = doodle to do list
 
-== TODO less intrusiveness
+== TODO documentation
+- cover all features
+  - reference doc
+- tutorial
+  - more & better examples
+- redo website as multiple pages
+== DONE less intrusiveness
 - move more things into __doodle__
   - e.g. all methods which could be functions can be class methods
     - ones which don't rely on instance variables
