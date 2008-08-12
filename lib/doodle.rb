@@ -1,4 +1,5 @@
 # doodle
+# -*- mode: ruby; ruby-indent-level: 2; tab-width: 2 -*- vim: sw=2 ts=2
 # Copyright (C) 2007-2008 by Sean O'Halpin
 # 2007-11-24 first version
 # 2008-04-18 latest release 0.0.12
@@ -7,11 +8,52 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
-require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
+if RUBY_VERSION < '1.9.0'
+  require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
+else
+  # 1.9+ hashes are ordered by default
+  class Doodle
+    OrderedHash = Hash
+  end
+end
 
 # require Ruby 1.8.6 or higher
 if RUBY_VERSION < '1.8.6'
   raise Exception, "Sorry - doodle does not work with versions of Ruby below 1.8.6"
+end
+
+#
+# instance_exec for ruby 1.8 by Mauricio Fernandez
+# http://eigenclass.org/hiki.rb?bounded+space+instance_exec
+# thread-safe and handles frozen objects in bounded space
+#
+# (tag "ruby instance_exec")
+#
+if !Object.respond_to?(:instance_exec)
+  class Object
+    module InstanceExecHelper; end
+    include InstanceExecHelper
+    def instance_exec(*args, &block)
+      begin
+        old_critical, Thread.critical = Thread.critical, true
+        n = 0
+        methods = InstanceExecHelper.instance_methods
+        # this in order to make the lookup O(1), and name generation O(n) on the
+        # number of nested/concurrent instance_exec calls instead of O(n**2)
+        table = Hash[*methods.zip(methods).flatten]
+        n += 1 while table.has_key?(mname="__instance_exec#{n}")
+      ensure
+        Thread.critical = old_critical
+      end
+      InstanceExecHelper.module_eval{ define_method(mname, &block) }
+      begin
+        ret = send(mname, *args)
+      ensure
+        InstanceExecHelper.module_eval{ remove_method(mname) } rescue nil
+      end
+      ret
+    end
+  end
 end
 
 # *doodle* is my attempt at an eco-friendly metaprogramming framework that does not
@@ -56,7 +98,7 @@ class Doodle
       end
       # from facets/string/case.rb, line 80
       def snake_case(camel_cased_word)
-        camel_cased_word.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+        camel_cased_word.to_s.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
       end
       # resolve a constant of the form Some::Class::Or::Module
       def const_resolve(constant)
@@ -73,6 +115,10 @@ class Doodle
       # convert keys to symbols
       def symbolize_keys(hash)
         symbolize_keys(hash.dup)
+      end
+      # simple (!) pluralization - if you want fancier, override this method
+      def pluralize(string)
+        string.to_s + 's'
       end
     end
   end
@@ -150,7 +196,7 @@ class Doodle
           #p [:embrace, :inherited, klass]
           klass.__send__(:embrace, other)       # n.b. closure
           klass.__send__(:include, Factory)     # is there another way to do this? i.e. not in embrace
-          super(klass) if defined?(super)
+          #super(klass) if defined?(super)
         end
       }
       sc.module_eval(&block) if block_given?
@@ -192,7 +238,7 @@ class Doodle
 
     def initialize(object)
       @this = object
-      @local_attributes = OrderedHash.new
+      @local_attributes = Doodle::OrderedHash.new
       @local_validations = []
       @validation_on = true
       @local_conversions = {}
@@ -247,8 +293,8 @@ class Doodle
 
     def handle_inherited_hash(tf, method)
       if tf
-        collect_inherited(method).inject(OrderedHash.new){ |hash, item|
-          hash.merge(OrderedHash[*item])
+        collect_inherited(method).inject(Doodle::OrderedHash.new){ |hash, item|
+          hash.merge(Doodle::OrderedHash[*item])
         }.merge(@this.doodle.__send__(method))
       else
         @this.doodle.__send__(method)
@@ -269,10 +315,10 @@ class Doodle
 
     # return class level attributes
     def class_attributes
-      attrs = OrderedHash.new
+      attrs = Doodle::OrderedHash.new
       if @this.kind_of?(Class)
-        attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
-          hash.merge(OrderedHash[*item])
+        attrs = collect_inherited(:class_attributes).inject(Doodle::OrderedHash.new){ |hash, item|
+          hash.merge(Doodle::OrderedHash[*item])
         }.merge(@this.singleton_class.doodle.respond_to?(:attributes) ? @this.singleton_class.doodle.attributes : { })
         attrs
       else
@@ -445,6 +491,18 @@ class Doodle
         td
       }
     end
+    def has(*args, &block)
+      @klass.class_eval { has(*args, &block) }
+    end
+    def must(*args, &block)
+      @klass.class_eval { must(*args, &block) }
+    end
+    def from(*args, &block)
+      @klass.class_eval { from(*args, &block) }
+    end
+    def arg_order(*args, &block)
+      @klass.class_eval { arg_order(*args, &block) }
+    end
   end
   
   # the core module of Doodle - however, to get most facilities
@@ -600,31 +658,31 @@ class Doodle
 
     # add a validation that attribute must be of class <= kind
     def kind(*args, &block)
-      @kind ||= []
       if args.size > 0
         @kind = [args].flatten
         # todo[figure out how to handle kind being specified twice?]
         if @kind.size > 2
-          kind_text = "a kind of #{ @kind[0..-2].map{ |x| x.to_s }.join(', ') } or #{@kind[-1].to_s}" # => 
+          kind_text = "be a kind of #{ @kind[0..-2].map{ |x| x.to_s }.join(', ') } or #{@kind[-1].to_s}" # => 
         else
-          kind_text = "a kind of #{@kind.to_s}"
+          kind_text = "be a kind of #{@kind.to_s}"
         end
         __doodle__.local_validations << (Validation.new(kind_text) { |x| @kind.any? { |klass| x.kind_of?(klass) } })
       else
-        @kind
+        @kind ||= []
       end
     end
 
     # convert a value according to conversion rules
     # fixme: move
     def convert(owner, *args)
-      #!p [:convert, 1, owner, args, __doodle__.conversions]
+      #p [:convert, 1, owner, args, __doodle__.conversions]
       begin
         args = args.map do |value|
           #!p [:convert, 2, value]
           if (converter = __doodle__.conversions[value.class])
-            #!p [:convert, 3, value]
-            value = converter[*args]
+            #p [:convert, 3, value]
+            value = converter[value]
+            #value = instance_exec(value, &converter)
             #!p [:convert, 4, value]
           else
             #!p [:convert, 5, value]
@@ -641,7 +699,8 @@ class Doodle
               #!p [:convert, 10, converter_class]
               if converter = __doodle__.conversions[converter_class]
                 #!p [:convert, 11, converter]
-                value = converter[*args]
+                value = converter[value]
+                #value = instance_exec(value, &converter)
                 #!p [:convert, 12, value]
               end
             else
@@ -653,7 +712,8 @@ class Doodle
                   #!p [:convert, 14, :kind_is_a_doodle, value.class, mappable_kind, mappable_kind.doodle.conversions, args] 
                   if converter = mappable_kind.doodle.conversions[value.class]
                     #!p [:convert, 15, value, mappable_kind, args] 
-                    value = converter[*args]
+                    value = converter[value]
+                    #value = instance_exec(value, &converter)
                     break
                   else
                     #!p [:convert, 16, :no_conversion_for, value.class] 
@@ -856,10 +916,10 @@ class Doodle
   # As the notion of a factory function is somewhat contentious [xref
   # ruby-talk], you need to explicitly ask for them by including Factory
   # in your base class:
-  #   class Base < Doodle::Root
+  #   class Animal < Doodle
   #     include Factory
   #   end
-  #   class Dog < Base
+  #   class Dog < Animal
   #   end
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
@@ -915,11 +975,9 @@ class Doodle
       }
     end
   end
-  # deprecated
-  Helper = Core
 
-  # deprecated
-  class Base
+  # wierd 1.9 shit
+  class IAmNotUsedBut1_9GoesIntoAnInfiniteRegressInInspectIfIAmNotDefined
     include Core
   end
   include Core
