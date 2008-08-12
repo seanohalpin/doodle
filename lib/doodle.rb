@@ -613,10 +613,17 @@ class Doodle
       ##DBG: Doodle::Debug.d { [:_setter, name, args] }
       #p [:_setter, name, *args]
       ivar = "@#{name}"
+      att = __doodle__.lookup_attribute(name)
       if block_given?
+        # if a class has been defined, let's assume it can take a
+        # block initializer (maybe should test that it's a doodle)
+        if klass = att.kind.first
+          args = [klass.new(*args, &block)]
+        else
         args.unshift(DeferredBlock.new(block))
       end
-      if att = __doodle__.lookup_attribute(name)
+      end
+      if att # = __doodle__.lookup_attribute(name)
         ##DBG: Doodle::Debug.d { [:_setter, name, args] }
         #p [:_setter, :got_att1, name, ivar, *args]
         v = instance_variable_set(ivar, att.validate(self, *args))
@@ -1106,6 +1113,8 @@ class Doodle
     # initial value
     has :init, :default => nil
 
+    # documentation
+    has :doc, :default => ""
   end
 
   # base class for attribute collector classes
