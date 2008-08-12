@@ -34,6 +34,7 @@
     - obj.doodle.validations
     - obj.doodle.parent
     - obj.doodle.class_attributes
+  - collectors initializing too late when defined at class level
 
 == 0.1.7 / 2008-05-10
 - Features
