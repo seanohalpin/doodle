@@ -93,14 +93,20 @@ describe Doodle, 'init' do
   temporary_constant :Foo do
     it 'should evaluate value when block given as :init' do
       class Foo < Doodle
-        has :value do
+        has :value, :kind => Integer do
           init do
             42
+          end
+        end
+        has :name, :kind => String do
+          init do
+            "foo"
           end
         end
       end
       foo = Foo.new
       foo.value.should == 42
+      foo.name.should == "foo"
     end
   end
 end

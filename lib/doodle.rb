@@ -616,12 +616,17 @@ class Doodle
       att = __doodle__.lookup_attribute(name)
       if block_given?
         # if a class has been defined, let's assume it can take a
-        # block initializer (maybe should test that it's a doodle)
+        # block initializer (maybe should test that it's a Doodle or Proc)
         if klass = att.kind.first
-          args = [klass.new(*args, &block)]
+          if [Doodle, Proc].any?{ |c| klass <= c }
+            args = [klass.new(*args, &block)]
+          else
+            __doodle__.handle_error att.name, ArgumentError, "#{klass} #{att.name} does not take a block initializer", [caller[-1]]
+          end
         else
-        args.unshift(DeferredBlock.new(block))
-      end
+          # this is used by init do ... block
+          args.unshift(DeferredBlock.new(block))
+        end
       end
       if att # = __doodle__.lookup_attribute(name)
         ##DBG: Doodle::Debug.d { [:_setter, name, args] }
