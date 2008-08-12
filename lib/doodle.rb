@@ -262,7 +262,7 @@ class Doodle
       results = handle_inherited_hash(tf, :doodle_local_attributes)
       # if an instance, include the singleton_class attributes
       if !@this.kind_of?(Class) && @this.singleton_class.doodle.respond_to?(:attributes)
-        results = results.merge(@this.singleton_class.doodle_attributes)
+        results = results.merge(@this.singleton_class.doodle.attributes)
       end
       results
     end
@@ -272,7 +272,7 @@ class Doodle
       if @this.kind_of?(Class)
         attrs = collect_inherited(:class_attributes).inject(OrderedHash.new){ |hash, item|
           hash.merge(OrderedHash[*item])
-        }.merge(@this.singleton_class.respond_to?(:doodle_attributes) ? @this.singleton_class.doodle_attributes : { })
+        }.merge(@this.singleton_class.doodle.respond_to?(:attributes) ? @this.singleton_class.doodle.attributes : { })
         attrs
       else
         @this.class.class_attributes
@@ -404,13 +404,6 @@ class Doodle
       __doodle__.local_attributes
     end
     protected :doodle_local_attributes
-
-    # returns array of Attributes
-    # - if tf == true, returns all inherited attributes
-    # - if tf == false, returns only those attributes defined in the current object/class
-    def doodle_attributes(tf = true)
-      __doodle__.attributes(tf)
-    end
 
     # return attributes for class
     def class_attributes
@@ -680,7 +673,7 @@ class Doodle
           args = args.uniq
           args.each do |x|
             __doodle__.handle_error :arg_order, ArgumentError, "#{x} not a Symbol", [caller[-1]] if !(x.class <= Symbol)
-            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name", [caller[-1]] if !doodle_attributes.keys.include?(x)
+            __doodle__.handle_error :arg_order, NameError, "#{x} not an attribute name", [caller[-1]] if !doodle.attributes.keys.include?(x)
           end
           __doodle__.arg_order = args
         rescue Exception => e
@@ -743,7 +736,7 @@ class Doodle
           ##DBG: Doodle::Debug.d { [:validate!, "using class_attributes", class_attributes] }
         else
           attribs = __doodle__.attributes
-          ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", doodle_attributes] }
+          ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", doodle.attributes] }
         end
         attribs.each do |name, att|
           ivar_name = "@#{att.name}"

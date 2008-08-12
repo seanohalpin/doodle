@@ -58,19 +58,19 @@ describe :DateRange, 'validation & conversions' do
 
     it 'should have start_date kind == Date' do
       d = DateRange.new
-      d.doodle_attributes[:start_date].kind == Date
+      d.doodle.attributes[:start_date].kind == Date
     end
 
     it 'should have two validations' do
       d = DateRange.new
-      d.doodle_attributes[:start_date].doodle_validations.size.should_be 2    
-      d.doodle_attributes[:start_date].doodle_validations(false).size.should_be 2
+      d.doodle.attributes[:start_date].doodle_validations.size.should_be 2    
+      d.doodle.attributes[:start_date].doodle_validations(false).size.should_be 2
     end
 
     it 'should have two conversions' do
       d = DateRange.new
-      d.doodle_attributes[:start_date].doodle_conversions.size.should_be 3    
-      d.doodle_attributes[:start_date].doodle_conversions(false).size.should_be 3
+      d.doodle.attributes[:start_date].doodle_conversions.size.should_be 3    
+      d.doodle.attributes[:start_date].doodle_conversions(false).size.should_be 3
     end
 
     it 'should convert from Array' do

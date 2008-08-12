@@ -36,11 +36,11 @@ describe Doodle, 'class attributes' do
     end
 
     it "should list all class's own attributes" do
-      Foo.singleton_class.doodle_attributes(false).keys.should_be [:metadata]
+      Foo.singleton_class.doodle.attributes(false).keys.should_be [:metadata]
     end
   
     it "should list all class's own attributes" do
-      Foo.singleton_class.doodle_attributes.keys.should_be [:metadata]
+      Foo.singleton_class.doodle.attributes.keys.should_be [:metadata]
     end
 
     it 'should create Bar class attribute' do
@@ -73,11 +73,11 @@ describe Doodle, 'class attributes' do
     end
   
     it "should list all class's own attributes" do
-      Bar.singleton_class.doodle_attributes(false).keys.should_be [:doc]
+      Bar.singleton_class.doodle.attributes(false).keys.should_be [:doc]
     end
   
     it "should list all class's singleton attributes" do
-      Bar.singleton_class.doodle_attributes.keys.should_be [:doc]
+      Bar.singleton_class.doodle.attributes.keys.should_be [:doc]
     end
     it "should list all class's class_attributes" do
       Bar.class_attributes.keys.should_be [:metadata, :doc]

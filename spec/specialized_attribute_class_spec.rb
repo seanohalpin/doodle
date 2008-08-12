@@ -55,9 +55,9 @@ describe 'Doodle', 'specialized attributes' do
         rv.class.should_be SpecializedAttribute
         rv.flag.should_be 'sflag'
       end
-      Foo.doodle_attributes[:ivar1].flag.should_be "sflag"
+      Foo.doodle.attributes[:ivar1].flag.should_be "sflag"
       foo = Foo.new('hi')
-      foo.doodle_attributes[:ivar1].flag.should_be "sflag"
+      foo.doodle.attributes[:ivar1].flag.should_be "sflag"
     end
 
     it 'should allow using datatypes in additional directives invoking specialized attribute of correct class' do
@@ -79,9 +79,9 @@ describe 'Doodle', 'specialized attributes' do
         rv.class.should_be SpecializedAttribute
         rv.flag.should_be 'x'
       end
-      Foo.doodle_attributes[:ivar1].flag.should_be "x"
+      Foo.doodle.attributes[:ivar1].flag.should_be "x"
       foo = Foo.new('hi')
-      foo.doodle_attributes[:ivar1].flag.should_be "x"
+      foo.doodle.attributes[:ivar1].flag.should_be "x"
     end
 
     it 'should allow using datatypes in additional directives invoking specialized attribute of correct class and raise error if incorrect value supplied' do
