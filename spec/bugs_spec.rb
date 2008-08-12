@@ -21,7 +21,7 @@ describe 'Doodle', 'inheriting validations' do
   end
 end
 
-describe 'Doodle', ' loading good data from yaml' do
+describe 'Doodle', 'loading good data from yaml' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle
@@ -54,7 +54,7 @@ describe 'Doodle', ' loading good data from yaml' do
   end
 end
 
-describe 'Doodle', ' loading bad data from yaml' do
+describe 'Doodle', 'loading bad data from yaml' do
   temporary_constant :Foo do
     before :each do
       class Foo < Doodle
@@ -223,6 +223,73 @@ describe 'Doodle', 'hiding @__doodle__' do
     it 'should correctly inspect array' do
       foo = DArray(3, 2)
       foo.inspect.should_be '[2, 2, 2]'
+    end
+  end
+end
+
+describe 'Doodle', 'initalizing class level collectors' do
+  temporary_constant :Menu, :KeyedMenu, :Item, :SubMenu do
+    before :each do
+      class Item < Doodle
+        has :title
+      end
+      class Menu < Doodle
+        class << self
+          has :items, :collect => Item
+        end
+      end
+      class KeyedMenu < Doodle
+        class << self
+          has :items, :collect => Item, :key => :title
+        end
+      end
+    end
+
+    it 'should collect first item specified in appendable collector' do
+      class SubMenu < Menu
+        item "Item 1"
+      end
+      SubMenu.items[0].title.should_be "Item 1"
+    end
+    
+    it 'should collect all items specified in appendable collector' do
+      class SubMenu < Menu
+        item "New Item 1"
+        item "New Item 2"
+        item "New Item 3"
+      end
+      SubMenu.items[0].title.should_be "New Item 1"
+      SubMenu.items[2].title.should_be "New Item 3"
+      SubMenu.items.size.should_be 3
+    end
+
+    it 'should collect first item specified in keyed collector' do
+      class SubMenu < KeyedMenu
+        item "Item 1"
+      end
+      SubMenu.items["Item 1"].title.should_be "Item 1"
+    end
+    
+    it 'should collect all items specified in keyed collector' do
+      class SubMenu < KeyedMenu
+        item "New Item 1"
+        item "New Item 2"
+        item "New Item 3"
+      end
+      SubMenu.items["New Item 1"].title.should_be "New Item 1"
+      SubMenu.items["New Item 3"].title.should_be "New Item 3"
+      SubMenu.items.size.should_be 3
+    end
+
+    it 'should collect all items specified in keyed collector in order' do
+      class SubMenu < KeyedMenu
+        item "New Item 1"
+        item "New Item 2"
+        item "New Item 3"
+      end
+      SubMenu.items.to_a[0][0].should_be "New Item 1"
+      SubMenu.items.to_a[2][0].should_be "New Item 3"
+      SubMenu.items.size.should_be 3
     end
   end
 end
