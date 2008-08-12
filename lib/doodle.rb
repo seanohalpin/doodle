@@ -358,6 +358,60 @@ class Doodle
       v
     end
 
+    # helper function to initialize from hash - this is safe to use
+    # after initialization (validate! is called if this method is
+    # called after initialization) 
+    def initialize_from_hash(*args)
+      #!p [:doodle_initialize_from_hash, :args, *args]
+      defer_validation do
+        # hash initializer
+        # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
+        key_values, args = args.partition{ |x| x.kind_of?(Hash)}
+        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args] }
+        #!p [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args]
+
+        # set up initial values with ~clones~ of specified values (so not shared between instances)
+        #init_values = initial_values
+        #!p [:init_values, init_values]
+        
+        # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
+        #arg_keywords = init_values.merge(Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))])
+        arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
+        #!p [self.class, :doodle_initialize_from_hash, :arg_keywords, arg_keywords]
+
+        # merge all hash args into one
+        key_values = key_values.inject(arg_keywords) { |hash, item|
+          #!p [self.class, :doodle_initialize_from_hash, :merge, hash, item]
+          hash.merge(item)
+        }
+        #!p [self.class, :doodle_initialize_from_hash, :key_values2, key_values]
+
+        # convert keys to symbols (note not recursively - only first level == doodle keywords)
+        Doodle::Utils.symbolize_keys!(key_values)
+        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
+        #!p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
+        
+        # create attributes
+        key_values.keys.each do |key|
+          #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
+          #p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
+          if respond_to?(key)
+            __send__(key, key_values[key])
+          else
+            # raise error if not defined
+            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}", [caller[-1]]
+          end
+        end
+        # do init_values after user supplied values so init blocks can depend on user supplied values
+        #p [:getting_init_values, instance_variables]
+        __doodle__.initial_values.each do |key, value|
+          if !key_values.key?(key) && respond_to?(key)
+            __send__(key, value)
+          end
+        end
+      end
+    end
+    
   end
 
   # what it says on the tin :) various hacks to hide @__doodle__ variable
@@ -744,67 +798,6 @@ class Doodle
       self
     end
 
-    # helper function to initialize from hash - this is safe to use
-    # after initialization (validate! is called if this method is
-    # called after initialization)
-    # fixme?
-    def doodle_initialize_from_hash(*args)
-      #!p [:doodle_initialize_from_hash, :args, *args]
-      __doodle__.defer_validation do
-        # hash initializer
-        # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args 
-        key_values, args = args.partition{ |x| x.kind_of?(Hash)}
-        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args] }
-        #!p [self.class, :doodle_initialize_from_hash, :key_values, key_values, :args, args]
-
-        # set up initial values with ~clones~ of specified values (so not shared between instances)
-        #init_values = initial_values
-        #!p [:init_values, init_values]
-        
-        # match up positional args with attribute names (from arg_order) using idiom to create hash from array of assocs
-        #arg_keywords = init_values.merge(Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))])
-        arg_keywords = Hash[*(Utils.flatten_first_level(self.class.arg_order[0...args.size].zip(args)))]
-        #!p [self.class, :doodle_initialize_from_hash, :arg_keywords, arg_keywords]
-
-        # merge all hash args into one
-        key_values = key_values.inject(arg_keywords) { |hash, item|
-          #!p [self.class, :doodle_initialize_from_hash, :merge, hash, item]
-          hash.merge(item)
-        }
-        #!p [self.class, :doodle_initialize_from_hash, :key_values2, key_values]
-
-        # convert keys to symbols (note not recursively - only first level == doodle keywords)
-#         key_values.keys.each do |k|
-#           sym_key = k.respond_to?(:to_sym) ? k.to_sym : k
-#           key_values[sym_key] = key_values.delete(k)
-#         end
-
-        Doodle::Utils.symbolize_keys!(key_values)
-        #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
-        #!p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
-        
-        # create attributes
-        key_values.keys.each do |key|
-          #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
-          #p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
-          if respond_to?(key)
-            __send__(key, key_values[key])
-          else
-            # raise error if not defined
-            __doodle__.handle_error key, Doodle::UnknownAttributeError, "unknown attribute '#{key}' #{key_values[key].inspect}", [caller[-1]]
-          end
-        end
-        # do init_values after user supplied values so init blocks can depend on user supplied values
-        #p [:getting_init_values, instance_variables]
-        doodle.initial_values.each do |key, value|
-          if !key_values.key?(key) && respond_to?(key)
-            __send__(key, value)
-          end
-        end
-      end
-    end
-    #private :doodle_initialize_from_hash
-
     # object can be initialized from a mixture of positional arguments,
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
@@ -816,7 +809,7 @@ class Doodle
       __doodle__.parent = Doodle.context[-1]
       Doodle.context.push(self)
       __doodle__.defer_validation do
-        doodle_initialize_from_hash(*args)
+        doodle.initialize_from_hash(*args)
         instance_eval(&block) if block_given?
       end
       Doodle.context.pop
