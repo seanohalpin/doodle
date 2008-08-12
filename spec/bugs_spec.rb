@@ -15,8 +15,8 @@ describe 'Doodle', 'inheriting validations' do
     
     it 'should not duplicate validations when accessing them!' do
       foo = Foo 2
-      foo.doodle_validations.size.should_be 1
-      foo.doodle_validations.size.should_be 1
+      foo.doodle.validations.size.should_be 1
+      foo.doodle.validations.size.should_be 1
     end
   end
 end

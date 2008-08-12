@@ -63,8 +63,8 @@ describe :DateRange, 'validation & conversions' do
 
     it 'should have two validations' do
       d = DateRange.new
-      d.doodle.attributes[:start_date].doodle_validations.size.should_be 2    
-      d.doodle.attributes[:start_date].doodle_validations(false).size.should_be 2
+      d.doodle.attributes[:start_date].doodle.validations.size.should_be 2    
+      d.doodle.attributes[:start_date].doodle.validations(false).size.should_be 2
     end
 
     it 'should have two conversions' do
