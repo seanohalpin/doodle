@@ -330,7 +330,7 @@ class Doodle
     # - if tf == true, returns all inherited conversions
     # - if tf == false, returns only those conversions defined in the current object/class
     def conversions(tf = true)
-      handle_inherited_hash(tf, :doodle_local_conversions)
+      doodle_handle_inherited_hash(tf, :local_conversions)
     end
     
   end
@@ -422,23 +422,10 @@ class Doodle
       __doodle__.collect_inherited(message)
     end
     
-    # return attributes defined in instance
-    def doodle_local_attributes
-      __doodle__.local_attributes
-    end
-    protected :doodle_local_attributes
-
     # return attributes for class
     def class_attributes
       __doodle__.class_attributes
     end
-
-    # the set of conversions defined in the current class (i.e. without inheritance)
-    # deprecated
-    def doodle_local_conversions
-      __doodle__.local_conversions
-    end
-    protected :doodle_local_conversions
 
     # returns hash of conversions
     # - if tf == true, returns all inherited conversions
@@ -447,13 +434,6 @@ class Doodle
     def doodle_conversions(tf = true)
       __doodle__.conversions(tf)
     end
-
-    # the set of validations defined in the current class (i.e. without inheritance)
-    # deprecated
-    def doodle_local_validations
-      __doodle__.local_validations
-    end
-    protected :doodle_local_validations
 
     # returns array of Validations
     # - if tf == true, returns all inherited validations
