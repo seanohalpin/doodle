@@ -2,6 +2,11 @@
 
 - Bug fixes:
   - #has with class param was not enforcing :kind constraint
+  - moved more methods into DoodleInfo. You should now access metadata
+    via:
+    - obj.doodle.attributes
+    - obj.doodle.conversions
+    - obj.doodle.validations
 
 == 0.1.7 / 2008-05-10
 - Features
