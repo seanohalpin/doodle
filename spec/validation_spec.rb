@@ -69,8 +69,8 @@ describe :DateRange, 'validation & conversions' do
 
     it 'should have two conversions' do
       d = DateRange.new
-      d.doodle.attributes[:start_date].doodle_conversions.size.should_be 3    
-      d.doodle.attributes[:start_date].doodle_conversions(false).size.should_be 3
+      d.doodle.attributes[:start_date].doodle.conversions.size.should_be 3    
+      d.doodle.attributes[:start_date].doodle.conversions(false).size.should_be 3
     end
 
     it 'should convert from Array' do

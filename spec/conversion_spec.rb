@@ -47,7 +47,7 @@ describe Doodle, 'conversions' do
   end
 
   it 'should return class_conversions' do
-    Foo.doodle_conversions.keys.should == [String]
+    Foo.doodle.conversions.keys.should == [String]
   end
 
 end
