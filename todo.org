@@ -1,5 +1,8 @@
 = doodle to do list
 
+== Specs to add [/]
+- attr do ... end initialization
+
 == TODO documentation
 - cover all features
   - reference doc

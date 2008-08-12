@@ -60,6 +60,7 @@ class Mail < Doodle
   end
 end
 
+require 'rubygems'
 require 'highline/import'
 def prompt_for_password
   ask("Enter your password:  ") { |q| q.echo = '*' }
