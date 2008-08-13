@@ -1,30 +1,35 @@
-== 0.1.9 / 2008-05-18
-- doodle do .. end blocks now support #has, #from, #must and
-  #arg_order
-- will now initialize a setter from a block by calling kind.new (if
-  kind specified), e.g.
+== 0.1.9 / 2008-08-13
+- Features:
+  - doodle do .. end blocks now support #has, #from, #must and
+    #arg_order
+  - will now initialize a setter from a block by calling kind.new if
+    kind is specified and kind is a Doodle or a Proc, e.g.
 
-  class Animal
-    has :species
-  end
-
-  class Barn
-    has :animals, :collect => Animal
-  end
-
-  class Farm
-    has Barn
-  end
-
-  farm = Farm do
-    # this is new - will call Barn.new(&block)
-    barn do
-      animal 'chicken'
-      animal 'pig'
+    class Animal
+      has :species
     end
-  end
 
-- attributes now have :doc member      
+    class Barn
+      has :animals, :collect => Animal
+    end
+
+    class Farm
+      has Barn
+    end
+
+    farm = Farm do
+      # this is new - will call Barn.new(&block)
+      barn do
+        animal 'chicken'
+        animal 'pig'
+      end
+    end
+
+  - attributes now have :doc member
+
+- Bug fixes:
+  - fixed reversion in 0.1.8 which enabled full backtrace from within
+    doodle.rb
 
 == 0.1.8 / 2008-05-13
 - Features:
