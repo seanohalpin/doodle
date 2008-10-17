@@ -1,5 +1,6 @@
 == 0.1.9 / 2008-08-13
 - Features:
+  - to_hash
   - doodle do .. end blocks now support #has, #from, #must and
     #arg_order
   - will now initialize a setter from a block by calling kind.new if
@@ -24,12 +25,30 @@
         animal 'pig'
       end
     end
+    
+    Will not try this for an attribute with :abstract => true
 
-  - attributes now have :doc member
+  - attributes now have :doc option
+  - attributes now have :abstract option - will not try to
+    auto-instantiate an object from this class
+  - attributes now have a :readonly attribute - will not allow setting
+    outside initialization
+  - Doodle::Utils
+    - deep_copy(obj)
+    - normalize_keys!(hash, recursive = false, method = :to_sym),
+      optionally recurse into child hashes
+    - symbolize_keys!(hash, recursive = false)
+    - stringify_keys!(hash, recursive = false)
+
+- Experimental:
+  - Doodle::App for handlng command line application options
+  - doodle/datatypes - added more datatypes
 
 - Bug fixes:
   - fixed reversion in 0.1.8 which enabled full backtrace from within
     doodle.rb
+  - fixed bug where required attributes defined after attributes with
+    default values were not being validated (had 'break' instead of 'next')
 
 == 0.1.8 / 2008-05-13
 - Features:

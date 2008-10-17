@@ -12,7 +12,7 @@ describe 'Doodle', 'inheriting validations' do
         end
       end
     end
-    
+
     it 'should not duplicate validations when accessing them!' do
       foo = Foo 2
       foo.doodle.validations.size.should_be 1
@@ -30,12 +30,12 @@ describe 'Doodle', 'loading good data from yaml' do
             Date.parse(s)
           end
         end
-      end      
+      end
       @str = %[
       --- !ruby/object:Foo
       date: "2000-7-01"
       ]
-      
+
     end
 
     it 'should succeed without validation' do
@@ -45,7 +45,7 @@ describe 'Doodle', 'loading good data from yaml' do
     it 'should validate ok' do
       proc { foo = YAML::load(@str).validate! }.should_not raise_error
     end
-    
+
     it 'should apply conversions' do
       foo = YAML::load(@str).validate!
       foo.date.should_be Date.new(2000, 7, 1)
@@ -67,7 +67,7 @@ describe 'Doodle', 'loading bad data from yaml' do
       @str = %[
       --- !ruby/object:Foo
       date: "2000"
-      ]      
+      ]
     end
 
     it 'should succeed without validation' do
@@ -94,7 +94,7 @@ describe 'Doodle', 'loading bad data from yaml with default defined' do
       @str = %[
       --- !ruby/object:Foo
       date: "2000"
-      ]      
+      ]
     end
 
     it 'should succeed without validation' do
@@ -141,7 +141,7 @@ describe Doodle, 'initializing from hashes and yaml' do
 
       yaml = %[
 ---
-:address: 
+:address:
 - Henry Wood House
 - London
 :name: Sean
@@ -151,14 +151,16 @@ describe Doodle, 'initializing from hashes and yaml' do
       yaml = person.to_yaml
       # be careful here - Ruby yaml is finicky (spaces after class names)
       yaml = yaml.gsub(/\s*\n/m, "\n")
-      yaml.should_be %[--- !ruby/object:Person
-address:
-- !ruby/object:AddressLine
-  text: Henry Wood House
-- !ruby/object:AddressLine
-  text: London
-name: Sean
-]
+#       yaml.should_be %[--- !ruby/object:Person
+# address:
+# - !ruby/object:AddressLine
+#   text: Henry Wood House
+# - !ruby/object:AddressLine
+#   text: London
+# name: Sean
+# ]
+
+      yaml.should_be "--- !ruby/object:Person\naddress:\n- !ruby/object:AddressLine\n  text: Henry Wood House\n- !ruby/object:AddressLine\n  text: London\nname: Sean\n"
       person = YAML.load(yaml)
       proc { person.validate! }.should_not raise_error
       person.address.all?{ |x| x.kind_of? AddressLine }.should_be true
@@ -187,7 +189,7 @@ describe 'Doodle', 'hiding @__doodle__' do
         include Doodle::Core
       end
     end
-    
+
     it 'should not reveal @__doodle__ in inspect string' do
       foo = Foo 2
       foo.inspect.should_not =~ /@__doodle__/
@@ -251,7 +253,7 @@ describe 'Doodle', 'initalizing class level collectors' do
       end
       SubMenu.items[0].title.should_be "Item 1"
     end
-    
+
     it 'should collect all items specified in appendable collector' do
       class SubMenu < Menu
         item "New Item 1"
@@ -269,7 +271,7 @@ describe 'Doodle', 'initalizing class level collectors' do
       end
       SubMenu.items["Item 1"].title.should_be "Item 1"
     end
-    
+
     it 'should collect all items specified in keyed collector' do
       class SubMenu < KeyedMenu
         item "New Item 1"
@@ -290,6 +292,33 @@ describe 'Doodle', 'initalizing class level collectors' do
       SubMenu.items.to_a[0][0].should_be "New Item 1"
       SubMenu.items.to_a[2][0].should_be "New Item 3"
       SubMenu.items.size.should_be 3
+    end
+  end
+end
+
+describe 'Doodle', 'validating required attributes after default attributes' do
+  temporary_constant :Foo do
+    before :each do
+      class Foo < Doodle
+        has :v1, :default => 1
+        has :v2
+      end
+    end
+
+    it 'should validate required attribute after an attribute with default defined' do
+      proc { Foo.new }.should raise_error(Doodle::ValidationError)
+    end
+
+    it 'should validate required attribute after an attribute with default defined specified #1' do
+      proc { Foo.new(1) }.should raise_error(Doodle::ValidationError)
+    end
+
+    it 'should validate required attribute after an attribute with default defined specified #2' do
+      proc { Foo.new(:v1 => 1) }.should raise_error(Doodle::ValidationError)
+    end
+
+    it 'should validate specified required attribute after an attribute with default defined not specified' do
+      proc { Foo.new(:v2 => 2) }.should_not raise_error
     end
   end
 end
