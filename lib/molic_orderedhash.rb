@@ -3,7 +3,7 @@
 #
 # DESCRIPTION
 #    Hash with preserved order and some array-like extensions
-#    Public domain. 
+#    Public domain.
 #
 # THANKS
 #    Andrew Johnson for his suggestions and fixes of Hash[],
@@ -13,7 +13,7 @@ class Doodle
     attr_accessor :order
 
     class << self
-      def [] *args
+      def [](*args)
         hsh = OrderedHash.new
         if Hash === args[0]
           hsh.replace args[0]
@@ -29,16 +29,16 @@ class Doodle
       super
       @order = []
     end
-    def store_only a,b
+    def store_only(a,b)
       store a,b
     end
-    alias orig_store store    
-    def store a,b
+    alias orig_store store
+    def store(a,b)
       @order.push a unless has_key? a
       super a,b
     end
     alias []= store
-    def == hsh2
+    def ==(hsh2)
       return false if @order != hsh2.order
       super hsh2
     end
@@ -46,7 +46,7 @@ class Doodle
       @order = []
       super
     end
-    def delete key
+    def delete(key)
       @order.delete key
       super
     end
@@ -62,9 +62,9 @@ class Doodle
       @order.each { |k| yield k,self[k] }
       self
     end
-    alias each_pair each    
+    alias each_pair each
     def delete_if
-      @order.clone.each { |k| 
+      @order.clone.each { |k|
         delete k if yield
       }
       self
@@ -78,26 +78,26 @@ class Doodle
       @order
     end
     def invert
-      hsh2 = Hash.new    
+      hsh2 = Hash.new
       @order.each { |k| hsh2[self[k]] = k }
       hsh2
     end
-    def reject &block
+    def reject(&block)
       self.dup.delete_if(&block)
     end
-    def reject! &block
+    def reject!(&block)
       hsh2 = reject(&block)
       self == hsh2 ? nil : hsh2
     end
-    def replace hsh2
-      @order = hsh2.keys 
+    def replace(hsh2)
+      @order = hsh2.keys
       super hsh2
     end
     def shift
       key = @order.first
       key ? [key,delete(key)] : super
     end
-    def unshift k,v
+    def unshift(k,v)
       unless self.include? k
         @order.unshift k
         orig_store(k,v)
@@ -106,7 +106,7 @@ class Doodle
         false
       end
     end
-    def push k,v
+    def push(k,v)
       unless self.include? k
         @order.push k
         orig_store(k,v)
@@ -132,7 +132,7 @@ class Doodle
       each {|k,v| ary << k.inspect + "=>" + v.inspect}
       '{' + ary.join(", ") + '}'
     end
-    def update hsh2
+    def update(hsh2)
       hsh2.each { |k,v| self[k] = v }
       self
     end
@@ -150,7 +150,7 @@ class Doodle
     end
 
     attr_accessor "to_yaml_style"
-    def yaml_inline= bool
+    def yaml_inline=(bool)
       if respond_to?("to_yaml_style")
         self.to_yaml_style = :inline
       else

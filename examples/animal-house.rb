@@ -49,7 +49,7 @@ end
 data = DATA.read
 pp farm
 puts farm.to_output
-#puts farm.to_output == data
+puts farm.to_output == data
 
 __END__
 Farm contains

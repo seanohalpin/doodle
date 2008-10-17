@@ -27,7 +27,7 @@ describe 'Doodle', 'block initialization of scalar attributes' do
           animal "pig"
         end
       end
-      farm.barn.animals[0].species.should == "pig"
+      farm.barn.animals[0].species.should_be "pig"
     end
     it 'should fail trying to initialize an inappropriate attribute (not a Doodle or Proc) from a block' do
       proc { 
@@ -44,8 +44,8 @@ describe 'Doodle', 'block initialization of scalar attributes' do
           "hello"
         end
       end
-      bar.block.class.should == Proc
-      bar.block.call.should == "hello"
+      bar.block.class.should_be Proc
+      bar.block.call.should_be "hello"
     end
   end
 end

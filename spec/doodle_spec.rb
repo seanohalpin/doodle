@@ -30,7 +30,7 @@ describe Doodle, 'instance attributes' do
     it 'should list instance attributes' do
       @foo.doodle.attributes.keys.should_be [:name]
     end
-  
+
     it 'should list all instance attributes(false) at class level' do
       Foo.doodle.attributes(false).keys.should_be [:name]
     end
@@ -70,7 +70,7 @@ describe Doodle, 'class attributes(false)' do
     it "should list all class's own attributes" do
       Foo.singleton_class.doodle.attributes(false).keys.should_be [:metadata]
     end
-  
+
     it "should list all class's own attributes" do
       Foo.singleton_class.doodle.attributes.keys.should_be [:metadata]
     end
@@ -90,7 +90,7 @@ describe Doodle, 'inherited class attributes(false)' do
       class Bar < Foo
         has :location, :default => nil
         class << self
-          has :doc
+          has :notes
         end
       end
       @foo = Foo.new
@@ -135,27 +135,27 @@ describe Doodle, 'inherited class attributes(false)' do
       Foo.metadata.should_be 'Foo metadata'
       @foo.class.metadata.should_be 'Foo metadata'
     end
-  
+
     it "should list class's own attributes" do
       Foo.singleton_class.doodle.attributes(false).keys.should_be [:metadata]
     end
-  
+
     it "should list all class's own attributes" do
       Foo.singleton_class.doodle.attributes.keys.should_be [:metadata]
     end
 
     it "should list class's own attributes(false)" do
-      Bar.singleton_class.doodle.attributes(false).keys.should_be [:doc]
+      Bar.singleton_class.doodle.attributes(false).keys.should_be [:notes]
     end
 
     it "should list all singleton class attributes" do
-      Bar.singleton_class.doodle.attributes.keys.should_be [:doc]
+      Bar.singleton_class.doodle.attributes.keys.should_be [:notes]
     end
 
     it "should list all inherited meta class attributes" do
-      Bar.doodle.class_attributes.keys.should_be [:metadata, :doc]
+      Bar.doodle.class_attributes.keys.should_be [:metadata, :notes]
     end
-    
+
     it "should list all inherited class's attributes" do
       Bar.doodle.attributes.keys.should_be [:name, :location]
     end
@@ -165,7 +165,7 @@ end
 describe Doodle, 'singleton class attributes' do
   temporary_constant :Foo do
     before(:each) do
-  
+
       class Foo
         include Doodle::Core
         has :name, :default => nil
@@ -181,7 +181,7 @@ describe Doodle, 'singleton class attributes' do
     after :each do
       remove_ivars :foo
     end
-  
+
     it 'should allow creation of singleton class attributes' do
       @foo.special = 42
       @foo.special.should_be 42
@@ -215,7 +215,7 @@ describe Doodle, 'inherited singleton class attributes' do
       class Bar < Foo
         has :info, :default => nil
         class << self
-          has :doc
+          has :notes
         end
       end
 
@@ -229,11 +229,11 @@ describe Doodle, 'inherited singleton class attributes' do
         has :extra
       end
     end
-    
+
     after :each do
       remove_ivars :foo, :bar, :bar2
     end
-  
+
     it 'should allow creation of singleton class attributes' do
       @foo.special = 42
       @foo.special.should_be 42
@@ -259,13 +259,13 @@ describe Doodle, 'inherited singleton class attributes' do
       @foo.singleton_class.doodle.attributes.keys.should_be [:special]
       @bar.singleton_class.doodle.attributes.keys.should_be [:extra]
     end
-  
+
     it 'should keep meta attributes separate' do
       @foo.special = 'foo special'
       @foo.special.should_be 'foo special'
 
       # CHECK
-      
+
       # note: you cannot set any other values on @bar until you have set @bar.extra because it's defined as required
       @bar.extra = 'bar extra'
       @bar.extra.should_be 'bar extra'
@@ -273,8 +273,8 @@ describe Doodle, 'inherited singleton class attributes' do
       Foo.metadata.should_be 'Foo meta'
       Bar.metadata = 'Bar meta'
       Bar.metadata.should_be 'Bar meta'
-      Bar.doc = 'Bar doc'
-      Bar.doc.should_be 'Bar doc'
+      Bar.notes = 'Bar notes'
+      Bar.notes.should_be 'Bar notes'
 
       # now make sure they haven't bumped each other off
       @foo.special.should_be 'foo special'
@@ -282,7 +282,7 @@ describe Doodle, 'inherited singleton class attributes' do
       @bar.extra.should_be 'bar extra'
       Foo.metadata.should_be 'Foo meta'
       Bar.metadata.should_be 'Bar meta'
-      Bar.doc.should_be 'Bar doc'
+      Bar.notes.should_be 'Bar notes'
     end
 
     it 'should inherit singleton methods from class' do
@@ -298,19 +298,19 @@ describe Doodle, 'inherited singleton class attributes' do
         end
       end
     end
-   
+
     it 'should behave predictably when setting singleton attributes' do
       @bar.extra = 'bar extra'
       @bar.extra.should_be 'bar extra'
       @bar.singleton_class.metadata = 'bar meta metadata'
       if RUBY_VERSION < '1.9.0'
         @bar.singleton_class.metadata.should_be 'bar meta metadata'
-        @bar.singleton_class.doc = 'bar doc'
-        @bar.singleton_class.doc.should_be 'bar doc'
+        @bar.singleton_class.notes = 'bar notes'
+        @bar.singleton_class.notes.should_be 'bar notes'
       else
         pending 'figuring out why this fails in 1.9'
       end
-      proc { @foo.singleton_class.doc = 1 }.should raise_error(NoMethodError)
+      proc { @foo.singleton_class.notes = 1 }.should raise_error(NoMethodError)
     end
   end
 end
