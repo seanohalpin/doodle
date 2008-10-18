@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Tidy up examples
+desc: ""
+type: :task
+component: doodle
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-09-28 22:33:40.429307 Z
+references: []
+
+id: 656854c1d04b89a9ea8321bbd4b1ba2bdc817805
+log_events: 
+- - 2008-09-28 22:33:43.936644 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

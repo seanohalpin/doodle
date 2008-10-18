@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: decide how to_hash should work
+desc: Should to_hash return a hash containing only Ruby primitives or should it include instances of other classes? I'm not sure
+type: :feature
+component: doodle
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-10-18 01:28:37.784944 Z
+references: []
+
+id: 78d9d06c3d403f1228370e98654b4f330109fca0
+log_events: 
+- - 2008-10-18 01:28:41.281070 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

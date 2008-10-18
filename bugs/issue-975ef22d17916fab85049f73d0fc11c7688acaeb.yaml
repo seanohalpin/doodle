@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Review use of parent
+desc: parent not working as I hoped/expected - I find myself trying to use it and getting only nil. I need to rethink both implementation and what it is for.
+type: :task
+component: doodle
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2008-09-28 22:29:33.349371 Z
+references: []
+
+id: 975ef22d17916fab85049f73d0fc11c7688acaeb
+log_events: 
+- - 2008-09-28 22:29:42.167193 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

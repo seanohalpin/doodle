@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Has with class not respecting kind
+desc: "#has Class is not respecting :kind (i.e. not validating that attribute value is of kind)"
+type: :bugfix
+component: doodle
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2008-05-13 13:16:21.631393 Z
+references: []
+
+id: 94800a611d309618c664b13f50af4169d9d21206
+log_events: 
+- - 2008-05-13 13:17:17.039353 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - add spec to spec/has_spec to catch this
+- - 2008-05-13 13:18:11.047407 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed issue with disposition fixed
+  - turns out I was converting name to string, not a symbol which was then not being picked up - bit fragile
