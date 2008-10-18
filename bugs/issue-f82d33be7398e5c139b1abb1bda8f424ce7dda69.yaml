@@ -16,3 +16,14 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
   - ""
+- - 2008-10-18 22:47:21.619308 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - commented
+  - |-
+    Things to document:
+    - doodle/datatypes
+    - doodle/app - command line option parsing
+    changes made since 1.8
+    Organization changes:
+    - split into separate pages
+    - reference docs
