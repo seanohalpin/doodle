@@ -1,17 +1,17 @@
---- !ditz.rubyforge.org,2008-03-06/issue 
+--- !ditz.rubyforge.org,2008-03-06/issue
 title: Update docs
 desc: include new features and more examples
 type: :task
 component: doodle
-release: 
+release:
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
-disposition: 
+disposition:
 creation_time: 2008-09-28 22:34:22.847217 Z
 references: []
 
 id: f82d33be7398e5c139b1abb1bda8f424ce7dda69
-log_events: 
+log_events:
 - - 2008-09-28 22:34:23.932566 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
@@ -23,7 +23,7 @@ log_events:
     Things to document:
     - doodle/datatypes
     - doodle/app - command line option parsing
-    changes made since 1.8
+    - changes made since 1.8
     Organization changes:
     - split into separate pages
     - reference docs
