@@ -23,6 +23,7 @@ examples/test-datatypes.rb
 examples/yaml-example.rb
 examples/yaml-example2.rb
 lib/doodle.rb
+lib/doodle/app.rb
 lib/doodle/datatypes.rb
 lib/doodle/rfc822.rb
 lib/doodle/utils.rb
