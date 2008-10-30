@@ -3,7 +3,6 @@ $:.unshift(File.join(File.dirname(__FILE__), '.'))
 
 require 'doodle'
 
-### user code
 require 'date'
 require 'uri'
 require 'rfc822'
@@ -20,19 +19,13 @@ class Doodle
     def datatype(name, params, block, type_params, &type_block)
       define name, params, block, { :using => DataType }.merge(type_params) do
         #p [:self, __doodle__.__inspect__]
-#         from Object do |o|
-#           p [:changed, name, o, self]
-#           if respond_to?(:on_change)
-#             on_change(name, :changed, o)
-#           end
-#           o
-#         end
         #p [:checking_values, values, values.class]
         if respond_to?(:values)
           if values.kind_of?(Range)
             must "be in range #{values}" do |s|
               values.include?(s)
             end
+            # array of values
           elsif values.respond_to?(:size) && values.size > 0
             must "be one of #{values.join(', ')}" do |s|
               values.include?(s)
@@ -48,8 +41,14 @@ class Doodle
         instance_eval(&type_block) if type_block
       end
     end
-    
+
     def integer(name, params = { }, &block)
+      if params.key?(:max)
+        max = params.delete(:max)
+      end
+      if params.key?(:min)
+        min = params.delete(:min)
+      end
       datatype name, params, block, { :kind => Integer } do
         from Float do |n|
           n.to_i
@@ -57,6 +56,16 @@ class Doodle
         from String do |n|
           n =~ /[0-9]+(.[0-9]+)?/ or raise ArgumentError, "#{name} must be numeric", [caller[-1]]
           n.to_i
+        end
+        if max
+          must "be <= #{max}" do |s|
+            s.size <= max
+          end
+        end
+        if min
+          must "be >= #{min}" do |s|
+            s.size >= min
+          end
         end
       end
     end
@@ -84,7 +93,7 @@ class Doodle
         end
       end
     end
-    
+
     def symbol(name, params = { }, &block)
       datatype name, params, block, { :kind => Symbol } do
         from String do |s|
@@ -92,7 +101,7 @@ class Doodle
         end
       end
     end
-    
+
     def string(name, params = { }, &block)
       # must extract non-standard attributes before processing with
       # datatype otherwise causes UnknownAttribute error in Attribute definition
@@ -144,7 +153,7 @@ class Doodle
         end
       end
     end
-    
+
     def date(name, params = { }, &block)
       datatype name, params, block, { :kind => Date } do
         from String do |s|
@@ -179,7 +188,7 @@ class Doodle
         end
       end
     end
-    
+
     RX_ISODATE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
 
     def utc(name, params = { }, &block)
@@ -196,7 +205,7 @@ class Doodle
       da.instance_eval(&block) if block_given?
       da
     end
-    
+
     def version(name, params = { }, &block)
       datatype name, params, block, { :kind => String } do
         must "be of form n.n.n" do |str|
@@ -218,7 +227,7 @@ class Doodle
       datatype name, params, block, { :using => Doodle::AppendableAttribute }
     end
 
-    def contains(name, params = { }, &block)
+    def dictionary(name, params = { }, &block)
       if name.kind_of?(Class)
         params[:collect] = name
         name = Doodle::Utils.pluralize(Doodle::Utils.snake_case(name))
