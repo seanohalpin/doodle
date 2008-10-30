@@ -78,7 +78,7 @@ end
 m = Mail do
   subject subject + ': Hi!'
   if rcpt = prompt
-    to      rcpt
+    to rcpt
   end
   body "Hello, world!\n"
 end
