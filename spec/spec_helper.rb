@@ -30,7 +30,7 @@ def undefine_const(*consts)
 end
 
 def raise_if_defined(*args)
-  defined, undefined = args.partition{ |x| Object.const_defined?(x)}
+  defined = args.select{ |x| Object.const_defined?(x)}
   raise "Namespace pollution: #{defined.join(', ')}" if defined.size > 0
 end
 
