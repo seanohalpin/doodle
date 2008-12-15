@@ -778,12 +778,7 @@ class Doodle
 
     # add a validation
     def must(constraint = 'be valid', &block)
-      if block.nil?
-        # is this really useful? do I really want it?
-        __doodle__.local_validations << Validation.new(constraint, &proc { |v| v.instance_eval(constraint) })
-      else
-        __doodle__.local_validations << Validation.new(constraint, &block)
-      end
+      __doodle__.local_validations << Validation.new(constraint, &block)
     end
 
     # add a validation that attribute must be of class <= kind
@@ -1318,31 +1313,6 @@ class Doodle
     end
     def post_process(results)
       self.init.clone.replace(results)
-    end
-  end
-
-  class DoodleArray < Array
-    def after_update(params)
-      p [self.class, :after_update]
-    end
-    def <<(*a, &b)
-      p [self.class, :<<]
-      old_value = self.clone
-      rv = super
-      after_update :instance => self, :new_value => a
-      rv
-    end
-  end
-  class DoodleHash < Hash
-    def after_update(params)
-      p [self.class, :after_update]
-    end
-    def []=(*a, &b)
-      p [self.class, :[]=]
-      old_value = self.clone
-      rv = super
-      after_update :instance => self, :new_value => a
-      rv
     end
   end
 
