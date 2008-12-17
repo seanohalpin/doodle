@@ -1,0 +1,31 @@
+
+h2. footnotes
+
+<div class="tiny">
+
+fn1. This could be rewritten using a closure:
+
+<% coderay(:lang => "ruby") do -%>
+class Life < Doodle
+  answer = 42
+  has :answer, :kind => Integer, :default => answer do
+    must "be #{answer}" do |value|
+      value == answer
+    end
+  end
+end
+<% end %>
+
+or even the value of @default@:
+
+<% coderay(:lang => "ruby") do -%>
+class Life < Doodle
+  has :answer, :kind => Integer, :default => 42 do
+    must "be #{default}" do |value|
+      value == default
+    end
+  end
+end
+<% end %>
+
+</div>

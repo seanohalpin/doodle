@@ -1,0 +1,55 @@
+---
+# -*- mode: textile; -*-
+title:       doodle/app
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - textile
+  - wikilinks
+---
+h2(title). <%= @page.title %>
+
+<% coderay(:lang => "ruby") do -%>
+require 'rubygems'
+require 'doodle/app'
+
+class Filter < Doodle::App
+  filename :input, :existing => true,
+    :doc => "name of existing input file"
+  filename :output, :doc => "name of output file"
+  std_flags
+  def run
+    puts "input: #{input} => output: #{output}"
+  end
+end
+
+if  __FILE__ == $0
+  Filter.run(ARGV)
+end
+<% end %>
+
+<% coderay(:lang => "shell") do -%>
+$ ruby examples/filter.rb index.txt
+ERROR: #<Filter:0x124a60c> missing required attribute 'output'
+<% end %>
+
+<% coderay(:lang => "shell") do -%>
+$ ruby filter.rb foo.txt
+ERROR: Filter.input must exist - got String("foo.txt")
+<% end %>
+
+<% coderay(:lang => "shell") do -%>
+$ ruby filter.rb --help
+filter.rb
+
+Usage: ./filter.rb -i STRING -o STRING
+
+Required args:
+  -i, --input        STRING     name of existing input file (REQUIRED)
+  -o, --output       STRING     name of output file (REQUIRED)
+
+Options:
+  -h, --help         BOOLEAN    display this help
+  -v, --verbose      BOOLEAN    verbose output
+  -D, --debug        BOOLEAN    turn on debugging
+<% end %>

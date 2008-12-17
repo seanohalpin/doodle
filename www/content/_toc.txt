@@ -1,0 +1,38 @@
+---
+# -*- mode: textile; -*-
+title:       introduction
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - textile
+  - wikilinks
+---
+
+h6. contents
+
+* [[introduction]]
+* [[initialization]]
+* [[defaults]]
+* [[initial values]]
+* [[validations]]
+* [[conversions]]
+* [[collectors]]
+* [[classes and singletons]]
+
+h6. extras
+
+* [[doodle/datatypes]] - data definition DSL
+* [[doodle/app]] - command line option handling DSL
+
+h6. examples
+
+* [[simple]]
+* [[animal house]]
+* [[more]]
+
+h6. misc
+
+* [[design notes]]
+* "Rubyforge project":http://rubyforge.org/projects/doodle
+* [[github]]
+* [[rubydoc]]

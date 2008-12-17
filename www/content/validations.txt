@@ -1,0 +1,128 @@
+---
+# -*- mode: textile; -*-
+title:       validations
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - textile
+  - outline
+---
+<toc numbering="off"/>
+
+h2(title). <%= @page.title %>
+
+h3. by kind
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :start_date, :kind => Date
+  end
+<% end %>
+
+Doodle uses @kind_of?@ to test the value, so @kind@ can be set to any module
+(e.g. @Enumerable@), class or superclass that makes sense for your application.
+
+If you now try to initialize @Event#date@ with something that isn't a @Date@:
+
+<% coderay(:lang => "ruby") do -%>
+  event = Event.new(:date => "Hello")
+<% end %>
+
+you'll get a @Doodle::ValidationError@ exception:
+
+<% coderay(:lang => "ruby") do -%>
+  date must be Date - got String("Hello") (Doodle::ValidationError)
+<% end %>
+
+h3. attribute validations using @must@
+
+To specify a validation on an attribute, use @must@ inside the attribute's definition block:
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :start_date, :kind => Date do
+      must "be >= today" do |value|
+        value >= Date.today
+      end
+    end
+  end
+
+  event = Event :start_date => Date.today
+  event.start_date = Date.parse('2001-01-01')
+  =>  start_date must be >= today - got
+  Date(#<Date: 4903821/2,0,2299161>) (Doodle::ValidationError)
+<% end %>
+
+The @must@ block should return @true@ if the value is valid, @false@
+otherwise. A failed validation will raise a @Doodle::ValidationError@
+exception.
+
+Attribute validations happen _before_ the instance variable is changed.
+
+h3. instance level validations
+
+You can also specify validations for the object as a whole:
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :start_date, :kind => Date do
+      must "be >= today" do |value|
+        value >= Date.today
+      end
+    end
+    has :end_date, :kind => Date do
+      default { start_date }
+    end
+
+    must "have end_date >= start_date" do
+      end_date >= start_date
+    end
+  end
+
+  event = Event :start_date => Date.today
+  event.end_date = Date.parse('2001-01-01')
+  =>  #<Event:0x657ed0 @start_date=#<Date: 4909061/2,0,2299161>,
+  @end_date=#<Date: 4903821/2,0,2299161>>
+  must have end_date >= start_date (Doodle::ValidationError)
+<% end %>
+
+Note that you don't need to project the value into the block but you
+can if you like - its value is the object instance itself.
+
+Object level validations occur _after_ all instance variables have been
+set.
+
+h3. validating data loaded from a yaml source
+
+YAML::load sets an object's instance variables directly, bypassing its
+attribute accessors. In a Doodle context, this means that loading from
+a yaml source bypasses attribute validations.
+
+You can apply validations 'manually' by using the @validate!@ method
+(the exclamation mark denotes that this method can raise an
+exception). For convenience, @validate!@ returns the validated object
+on success, so you can get a validated object from a yaml source using
+the following:
+
+<% coderay(:lang => "ruby") do -%>
+  foo = YAML::load(yaml_source).validate!
+<% end %>
+
+The following will raise an exception, complaining that 'name' is missing:
+
+<% coderay(:lang => "ruby") do -%>
+  require "rubygems"
+  require "doodle"
+  require "yaml"
+  class Foo < Doodle
+    has :name
+    has :date
+  end
+  str = %[
+  --- !ruby/object:Foo
+  date: 2000-07-01
+  ]
+  # load from string
+  foo = YAML::load(str).validate!
+  # => #<Foo:0x10c4cb0> missing required attribute 'name' (ArgumentError)
+<% end %>

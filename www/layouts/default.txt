@@ -1,0 +1,59 @@
+---
+extension: html
+filter:
+- erb
+- wikilinks
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>doodle - <%= @page.title %></title>
+    <meta name="author" content="<%= @page.author %>" />
+
+    <!--- Blueprint CSS Framework -->
+    <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" />
+
+    <!-- CodeRay syntax highlighting CSS -->
+    <link rel="stylesheet" href="/css/coderay.css" type="text/css" />
+
+    <!-- Homepage CSS -->
+    <link rel="stylesheet" href="/css/site.css" type="text/css" media="screen, projection" />
+  </head>
+  <body>
+
+    <div class="container">
+
+      <div class="column span-18 prepend-2 append-2 first last" id="header">
+        <div class="logo"><img src="images/doodle-logo.png"
+        title="doodle" alt="doodle" /><span style="vertical-align: 200%;">&nbsp;&nbsp;eco-friendly metaprogramming</span></div>
+        <!-- <p class="title">doodle&nbsp;<span class="tinylogo">eco-friendly --
+          -- metaprogramming</span></p> -->
+        <hr />
+      </div>
+
+      <div class="column span-13 prepend-2 first">
+        <%= @content %>
+      </div>
+
+      <div class="column span-5 append-2 last">
+        <%= render :partial => 'toc' %>
+
+        <blockquote>
+          Post bug reports, feature requests, and any comments or
+          discussion topics to the
+          <a href="http://groups.google.com/group/ruby-doodle">doodle Google group</a>.
+        </blockquote>
+
+      </div>
+
+      <div class="column span-20 prepend-1 append-2 first last" id="footer">
+        <hr />
+        <p>&copy; 2008, Sean O'Halpin</p>
+      </div>
+    </div>
+  </body>
+</html>

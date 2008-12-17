@@ -1,0 +1,61 @@
+---
+# -*- mode: textile; -*-
+title:       introduction
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - textile
+  - outline
+---
+<toc class="toc" numbering="off"/>
+
+h2(title). <%= @page.title %>
+
+doodle is a Ruby gem for creating extended attribute accessors
+with defaults, conversions and validations.
+
+h2. example
+
+<% coderay(:lang => "ruby") do -%>
+require 'rubygems'
+require 'doodle'
+
+class Life < Doodle
+  ANSWER = 42
+  has :answer do
+    must "be #{ANSWER}" do |value|
+      value == ANSWER
+    end
+    from String do |s|
+      s.to_i
+    end
+  end
+end
+
+a = Life.new(:answer => "42")   # => #<Life:0x10aba6c @answer=42>
+b = Life(41)                    # =>
+# ~> -:16: Life.answer must be 42 - got Fixnum(41)
+(Doodle::ValidationError)
+<% end %>
+
+doodle is eco-friendly - it does not globally modify Object, Class or Module,
+nor does it pollute instances with its own instance variables (i.e. it plays nice with yaml).
+
+h2. installation
+
+<% coderay(:lang => "shell") do -%>
+$ sudo gem install doodle
+<% end %>
+
+or
+
+<% coderay(:lang => "shell") do -%>
+C:\> gem install doodle
+<% end %>
+
+depending on which way you swing ;)
+
+h2. compatibility
+
+doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.1. It
+has not yet been tested with Rubinius (but will be soon :)

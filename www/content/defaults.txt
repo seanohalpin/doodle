@@ -1,0 +1,105 @@
+---
+# -*- mode: textile; -*-
+title:       defaults
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - textile
+  - wikilinks
+  - outline
+---
+<toc numbering="off"/>
+
+h2(title). <%= @page.title %>
+
+Doodle assumes that attributes specified without defaults
+or [[initial values]] are *required*. If you try to initialize an instance without
+providing values for all required attributes, Doodle will raise an
+exception. For example:
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :date
+  end
+
+  event = Event()
+  # or
+  event = Event.new
+<% end %>
+
+will result in:
+
+<% coderay(:lang => "ruby") do -%>
+  ArgumentError: #<Event:0x72b118> missing required
+  attribute 'date'
+<% end %>
+
+To specify a default, use the @default@ option:
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :date, :default => Date.today
+  end
+<% end %>
+
+Now we can create an Event without specifying a date:
+
+<% coderay(:lang => "ruby") do -%>
+  event = Event()
+  => #<Event:0x71343c>
+  event.date
+  => #<Date: 4909061/2,0,2299161>
+<% end %>
+
+You can of course override the default on initialization or later:
+
+<% coderay(:lang => "ruby") do -%>
+  event = Event(:date => Date.new(2008, 03, 01))
+  => #<Event:0x7036e0 @date=#<Date: 4909053/2,0,2299161>>
+  event.date = Date.new(2008, 03, 05)
+  => #<Date: 4909061/2,0,2299161>
+<% end %>
+
+Note that if you do not specify a value for an attribute with a
+default, no instance variable is created.
+
+h3. dynamically calculated defaults
+
+With the default specified as above, the @date@ attribute will take on
+the value current when the class is defined.  If you want the default
+value to be recalculated every time, use a Proc object or block as the default
+value.
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :time, :default => proc { Time.now }
+  end
+  # or
+  class Event < Doodle
+    has :time do
+      default { Time.now }
+    end
+  end
+
+  event.time
+  => Wed Mar 05 14:44:01 +0000 2008
+  event.time
+  => Wed Mar 05 14:44:03 +0000 2008
+<% end %>
+
+h3. dependent attributes
+
+Dynamically calculating an attribute value can be quite useful when you have dependent attributes, as in this example:
+
+<% coderay(:lang => "ruby") do -%>
+  class Event < Doodle
+    has :start_date, :default => Date.today
+    has :end_date, :default => proc { start_date + 1 }
+  end
+
+  event.start_date.to_s
+  => "2008-03-05"
+  event.end_date.to_s
+  => "2008-03-06"
+<% end %>
+

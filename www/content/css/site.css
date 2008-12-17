@@ -1,0 +1,112 @@
+---
+extension: css
+filter:    erb
+layout:    nil   # no layout
+
+color:
+  background:  "#FFFFFF"
+  border:      "#ddd"
+#  header:      "#d00d1e"
+  header:      "#111111"
+  link:        "#125AA7"
+#  link:      "#d00d1e"
+  link-hover:  "#000"
+  blockquote:  "#666"
+  box-bg:      "#eee"
+  highlight:   "#B2CCFF"
+  quiet:       "#666"
+  alt:         "#666"
+font_size: "100%"
+code_font_size: "110%"
+---
+
+body {
+  font-family: Verdana, "Bitstream Vera Sans", sans-serif;
+  font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
+  font-size: <%= @page.font_size %>;
+}
+
+pre {
+ font-size: <%= @page.code_font_size %>;
+ }
+
+div.tiny {
+  font-size: 90%;
+}
+
+.tinylogo {
+  line-height: inherit;
+  font-size: 0.3em;
+  vertical-align: 70%;
+}
+
+.missing {
+  background-color: red;
+  color: white;
+}
+
+/* Headings
+ * --------------------------------------------------------------------- */
+h1,h2,h3,h4,h5,h6 { color: <%= @page.color['header'] %>; }
+
+/* Text Elements
+ * --------------------------------------------------------------------- */
+a                 { color: <%= @page.color['link'] %>; }
+a:hover           { color: <%= @page.color['link-hover'] %>; }
+blockquote        { color: <%= @page.color['blockquote'] %>; }
+
+pre {
+  background: <%= @page.color['box-bg'] %>;
+  border:     1px solid <%= @page.color['border'] %>;
+}
+
+hr {
+  background: <%= @page.color['highlight'] %>;
+  color:      <%= @page.color['highlight'] %>;
+}
+
+/* Tables
+ * --------------------------------------------------------------------- */
+table {
+  border-top:     1px solid <%= @page.color['border'] %>;
+  border-left:    1px solid <%= @page.color['border'] %>;
+}
+th,td {
+  border-bottom:  1px solid <%= @page.color['border'] %>;
+  border-right:   1px solid <%= @page.color['border'] %>;
+}
+
+/* Default Classes
+ * --------------------------------------------------------------------- */
+p.quiet { color: <%= @page.color['quiet'] %>; }
+.alt    { color: <%= @page.color['alt'] %>; }
+
+p.title {
+  color: #111;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
+  font-size: 2em;
+  margin-bottom: 0.75em;
+}
+
+#header p.title { font-size: 3em; line-height: 1; margin-bottom: 0.5em; }
+
+h1,h2,h3,h4,h5,h6 {
+  color: <%= @page.color['header'] %>;
+  font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
+  font-weight: 400;
+}
+
+/* overrides */
+
+em, dfn {
+font-style: italic;
+background-color: <%= @page.color['background'] %>;
+background-image: none;
+background-repeat: repeat;
+background-attachment: scroll;
+background-position: 0% 0%;
+}
+
+
+/* EOF */
