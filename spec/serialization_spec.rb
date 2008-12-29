@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'yaml'
 
+# TODO: add more complex (e.g. nested doodles) scenarios here
 describe Doodle, "Serialization" do
   temporary_constant :Foo do
     before :each do
@@ -14,9 +15,8 @@ describe Doodle, "Serialization" do
     end
     
     it "should be serializable to yaml" do
-      # is this a bug in the MRI yaml implementation? why the space after Foo?
       # (note: all on one line to pass coverage)
-      RUBY_PLATFORM == 'java' ? @foo.to_yaml.should == "--- !ruby/object:Foo\nvar: 42\n" : @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
+      @foo.to_yaml.should == "--- !ruby/object:Foo \nvar: 42\n"
     end
     
     it "should be loadable from yaml" do

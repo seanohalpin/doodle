@@ -137,9 +137,10 @@ describe Doodle, 'initializing from hashes and yaml' do
       end
     end
 
-    it 'should validate ouput from to_yaml' do
+    # TODO: this is a bit of a mess - split into separate specs and clarify what I'm expecting
+    it 'should validate output from to_yaml' do
 
-      yaml = %[
+      source_yaml = %[
 ---
 :address:
 - Henry Wood House
@@ -147,7 +148,7 @@ describe Doodle, 'initializing from hashes and yaml' do
 :name: Sean
 ]
 
-      person = Person(YAML.load(yaml))
+      person = Person(YAML.load(source_yaml))
       yaml = person.to_yaml
       # be careful here - Ruby yaml is finicky (spaces after class names)
       yaml = yaml.gsub(/\s*\n/m, "\n")
@@ -159,11 +160,14 @@ describe Doodle, 'initializing from hashes and yaml' do
 #   text: London
 # name: Sean
 # ]
-
-      yaml.should_be "--- !ruby/object:Person\naddress:\n- !ruby/object:AddressLine\n  text: Henry Wood House\n- !ruby/object:AddressLine\n  text: London\nname: Sean\n"
+      loaded = YAML::load(source_yaml)
+      loaded[:name].should_be person.name
+      loaded[:address].should_be person.address.map{|x| x.text}
+      # want to compare yaml output with this but different order for every version of ruby, jruby, etc.
+      # "--- !ruby/object:Person\naddress:\n- !ruby/object:AddressLine\n  text: Henry Wood House\n- !ruby/object:AddressLine\n  text: London\nname: Sean\n"
       person = YAML.load(yaml)
       proc { person.validate! }.should_not raise_error
-      person.address.all?{ |x| x.kind_of? AddressLine }.should_be true
+      person.address.all?{ |x| x.kind_of?(AddressLine) }.should_be true
 
     end
   end
