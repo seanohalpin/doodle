@@ -2,7 +2,7 @@
 title: decide how to_hash should work
 desc: Should to_hash return a hash containing only Ruby primitives or should it include instances of other classes? I'm not sure
 type: :feature
-component: doodle
+component: core
 release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -15,4 +15,8 @@ log_events:
 - - 2008-10-18 01:28:41.281070 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-04 00:37:16.583648 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component core from doodle
   - ""

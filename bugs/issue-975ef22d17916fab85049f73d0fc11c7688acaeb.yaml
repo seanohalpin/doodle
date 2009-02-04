@@ -2,7 +2,7 @@
 title: Review use of parent
 desc: parent not working as I hoped/expected - I find myself trying to use it and getting only nil. I need to rethink both implementation and what it is for.
 type: :task
-component: doodle
+component: core
 release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -15,4 +15,8 @@ log_events:
 - - 2008-09-28 22:29:42.167193 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-04 00:36:35.921545 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component core from doodle
   - ""

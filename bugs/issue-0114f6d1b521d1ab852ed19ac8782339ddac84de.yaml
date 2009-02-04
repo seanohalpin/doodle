@@ -2,7 +2,7 @@
 title: doodles should be comparable
 desc: by default, a doodle should be equal to another doodle with the same values
 type: :feature
-component: doodle
+component: core
 release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -15,4 +15,8 @@ log_events:
 - - 2009-02-04 00:30:46.567520 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-04 00:36:44.169260 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component core from doodle
   - ""
