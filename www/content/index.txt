@@ -39,8 +39,9 @@ b = Life(41)                    # =>
 (Doodle::ValidationError)
 <% end %>
 
-doodle is eco-friendly - it does not globally modify Object, Class or Module,
-nor does it pollute instances with its own instance variables (i.e. it plays nice with yaml).
+doodle is eco-friendly - it does not globally modify Object, Class or
+Module, nor does it pollute instances with its own instance variables[1]
+(i.e. it plays nice with yaml).
 
 h2. installation
 
@@ -58,5 +59,10 @@ depending on which way you swing ;)
 
 h2. compatibility
 
-doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.1. It
-has not yet been tested with Rubinius (but will be soon :)
+doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.6. It
+has not yet been tested with Rubinius.
+
+***
+
+fn1. Not _entirely_ true - doodle uses tricks under the hood to hide
+its footprint. However, the visible effect is the same.

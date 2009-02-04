@@ -52,7 +52,7 @@ filter:
 
       <div class="column span-20 prepend-1 append-2 first last" id="footer">
         <hr />
-        <p>&copy; 2008, Sean O'Halpin</p>
+        <p>&copy; 2008-2009, Sean O'Halpin</p>
       </div>
     </div>
   </body>
