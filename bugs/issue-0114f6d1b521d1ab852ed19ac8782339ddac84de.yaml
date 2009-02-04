@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: doodles should be comparable
+desc: by default, a doodle should be equal to another doodle with the same values
+type: :feature
+component: doodle
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-04 00:30:33.360050 Z
+references: []
+
+id: 0114f6d1b521d1ab852ed19ac8782339ddac84de
+log_events: 
+- - 2009-02-04 00:30:46.567520 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
