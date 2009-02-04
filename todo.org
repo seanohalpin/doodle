@@ -28,16 +28,16 @@
 See Facets compare_on
 - could compare attributes in arg_order by default
 
-== TODO pretty_print
-- pp doesn't seem to like Doodle anymore
+== DONE pretty_print
+- [X] pp doesn't seem to like Doodle anymore
 
-== TODO collect
+== DONE collect
 - [X] Hash version
       has :list, :collect => Item, :key => :name
 - [X] create spec for bug in validate! with loading YAML when default
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
-== TODO has + Attribute
+== DONE has + Attribute
 - [X] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
 
@@ -46,15 +46,15 @@ See Facets compare_on
       I could then use this to define other specialised directives
       which use subclasses of Doodle::Attribute, e.g. Doodle::CommandLineOption
 - [X] refactor has to use specialized attribute classes for collections
-== TODO Documentation [0/10]
+== TODO Documentation [2/10]
 - [ ] better examples (and better running example)
 - [ ] more in tutorial fashion (cf. presentation) - from simple to
       more complex
-- [ ] separate page for each feature?
+- [X] separate page for each feature?
 - [ ] tutorial?
 - [ ] use capture/xmpfilter to run code
   - [ ] and verify that output is correct
-- [ ] use webby rather than rote (not supported anymore it seems)
+- [X] use webby rather than rote (not supported anymore it seems)
 - [ ] document how to call factory functions defined in modules
       i.e. MyModule.Thing(:param => 'abc') rather than MyModule::Thing()
 - [ ] provide full example of before vs after 
