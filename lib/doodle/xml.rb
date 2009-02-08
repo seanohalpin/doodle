@@ -18,8 +18,12 @@ class Doodle
   end
 
   module Utils
+    def self.normalize_const(const)
+      const.to_s.gsub(/[-]/, '')
+    end
     # lookup a constant along the module nesting path
     def const_lookup(const, context = self)
+      const = Utils.normalize_const(const)
       result = nil
       if !context.kind_of?(Module)
         context = context.class
@@ -65,8 +69,10 @@ class Doodle
 
     def self.from_xml_elem(ctx, root)
       attributes = root.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
+      text, children = root.children.partition{ |x| x.name == "text"}
+      text = text.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
       #p attributes
-      oroot = Utils.const_lookup(root.name, ctx).new(attributes) { 
+      oroot = Utils.const_lookup(root.name, ctx).new(text, attributes) { 
         from_xml_elem(root)
       }
       oroot
@@ -75,10 +81,11 @@ class Doodle
     def from_xml_elem(parent)
       children = parent.children.reject{ |x| x.name == "text"}
       children.each do |child|
+        text = child.children.select{ |x| x.name == "text"}.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
         object = const_lookup(child.name)
-        method = Doodle::Utils.snake_case(child.name)
+        method = Doodle::Utils.snake_case(Utils.normalize_const(child.name))
         attributes = child.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
-        send(method, object.new(attributes) {
+        send(method, object.new(text, attributes) {
                from_xml_elem(child)
              })
       end
@@ -99,10 +106,19 @@ class Doodle
       end
     end
     
+    def format_tag(tag, attributes, body)
+      if body.size > 0
+        ["<#{tag}#{format_attributes(attributes)}>", body, "</#{tag}>"]
+      else
+        ["<#{tag}#{format_attributes(attributes)} />"]
+      end.to_s
+    end
+    
     def to_xml
       body = []
       attributes = []
       self.doodle.attributes.map do |k, attr|
+        next if self.default?(k)
         v = send(k)
         if v.kind_of?(Doodle)
           body << v.to_xml
@@ -112,11 +128,7 @@ class Doodle
           attributes << [k, EscapeXML.escape(v)]
         end
       end
-      if body.size > 0
-        ["<#{tag}#{format_attributes(attributes)}>", body, "</#{tag}>"]
-      else
-        ["<#{tag}#{format_attributes(attributes)} />"]
-      end.to_s
+      format_tag(tag, attributes, body)
     end
   end
 end
