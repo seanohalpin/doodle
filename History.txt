@@ -1,15 +1,17 @@
 == 0.2.0 / 2009-02-08
 - Features:
   - object.doodle.values for easy access to array of attribute values
+  - object.default?(:name) returns true if :name has default and not been assigned
   - equality
     - doodles are equal if both have the same class and values
   - comparability
     - defines <=> (so doodles are sortable by default)
-  - XML serialization
+  - XML serialization - require 'doodle/xml'
     simple XML serialization using Doodle class names as tag
     names. Works for me. YMMV :)
     - to_xml
     - from_xml
+  - reworked website using webby
 
 == 0.1.9 / 2008-08-13
 - Features:
