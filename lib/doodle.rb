@@ -124,7 +124,12 @@ class Doodle
       end
       # from facets/string/case.rb, line 80
       def snake_case(camel_cased_word)
-        camel_cased_word.to_s.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+        # if all caps, just downcase it
+        if camel_cased_word =~ /^[A-Z]+$/
+          camel_cased_word.downcase
+        else
+          camel_cased_word.to_s.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
+        end
       end
       # resolve a constant of the form Some::Class::Or::Module
       def const_resolve(constant)
@@ -1001,6 +1006,12 @@ class Doodle
     end
     private :ivar_defined?
 
+    # return true if attribute has default defined and not yet been
+    # assigned to (i.e. still has default value)
+    def default?(name)
+      doodle.attributes[name.to_sym].optional? && !ivar_defined?(name)
+    end
+    
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
