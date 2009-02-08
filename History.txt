@@ -1,3 +1,16 @@
+== 0.2.0 / 2009-02-08
+- Features:
+  - object.doodle.values for easy access to array of attribute values
+  - equality
+    - doodles are equal if both have the same class and values
+  - comparability
+    - defines <=> (so doodles are sortable by default)
+  - XML serialization
+    simple XML serialization using Doodle class names as tag
+    names. Works for me. YMMV :)
+    - to_xml
+    - from_xml
+
 == 0.1.9 / 2008-08-13
 - Features:
   - to_hash

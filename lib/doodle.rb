@@ -79,6 +79,27 @@ class Doodle
     end
   end
 
+  # two doodles of the same class with the same attribute values are
+  # considered equal
+  module Equality
+    def eql?(o)
+      self.class == o.class &&
+        doodle.attributes.all? { |k, a| send(k).eql?(o.send(k)) }
+    end
+    def ==(o)
+      eql?(o)
+    end
+  end
+  include Equality
+
+  # doodles are compared (sorted) on values
+  module Comparable
+    def <=>(o)
+      doodle.values <=> o.doodle.values
+    end
+  end
+  include Comparable
+  
   # debugging utilities
   module Debug
     class << self
@@ -389,6 +410,13 @@ class Doodle
       results
     end
 
+    # returns array of values
+    # - if tf == true, returns all inherited values (default)
+    # - if tf == false, returns only those values defined in current object
+    def values(tf = true)
+      attributes(tf).map{ |k, a| @this.send(k)}
+    end
+    
     # return class level attributes
     def class_attributes
       attrs = Doodle::OrderedHash.new
