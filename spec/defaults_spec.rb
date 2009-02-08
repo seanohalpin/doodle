@@ -96,6 +96,19 @@ describe Doodle, 'defaults which have been set' do
     it 'should have default value set from block' do
       @foo.start.should_be Date.today
     end
+
+    it 'should denote that default value is a default' do
+      @foo.default?(:start).should_be true
+      @foo.default?(:baz).should_be true
+    end
+
+    it 'should denote that default value is not a default if it has been assigned' do
+      @foo.baz = "Hi"
+      @foo.default?(:baz).should_not_be true
+      @foo.start = Date.today
+      @foo.default?(:start).should_not_be true
+    end
+
   end
 end
 

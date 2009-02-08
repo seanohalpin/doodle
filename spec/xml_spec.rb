@@ -82,3 +82,66 @@ describe Doodle, 'xml serialization at top level' do
     end
   end
 end
+
+describe Doodle, 'if default specified before required attributes, they are ignored if defined in block' do
+  temporary_constant :Address do
+    before :each do
+      class Address < Doodle
+        include Doodle::XML
+        has :where, :default => "home"
+        has :city
+      end
+    end
+
+    it 'should raise an error that required attributes have not been set' do
+      proc {
+        Address do
+          city "London"
+        end
+      }.should_not raise_error
+    end
+
+    it 'should define required attributes' do
+      a = Address do
+        city "London"
+      end
+      a.city.should_be "London"
+    end
+
+    it 'should output required attributes in XML' do
+      a = Address do
+        city "London"
+      end
+      a.to_xml.should_be '<Address city="London" />'
+    end
+  end
+end
+
+describe Doodle, 'if default specified before required attributes, they are ignored if defined in block #2' do
+  temporary_constant :Base, :City, :Address do
+    before :each do
+      class Base < Doodle
+        include Doodle::XML
+      end
+      class City < Base
+        has :value
+        def to_xml
+          format_tag(tag, { }, value)
+        end
+      end
+      class Address < Base
+        has :where, :default => "home"
+        has City
+      end
+    end
+
+    it 'should output required tags in XML' do
+      a = Address do
+        city "London"
+      end
+      a.to_xml.should_be '<Address><City>London</City></Address>'
+    end
+
+  end
+
+end

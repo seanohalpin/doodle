@@ -326,3 +326,30 @@ describe 'Doodle', 'validating required attributes after default attributes' do
     end
   end
 end
+
+describe Doodle, 'if default specified before required attributes, they are ignored if defined in block' do
+  temporary_constant :Address do
+    before :each do
+      class Address < Doodle
+        has :where, :default => "home"
+        has :city
+      end
+    end
+
+    it 'should raise an error that required attributes have not been set' do
+      proc {
+        Address do
+          city "London"
+        end
+      }.should_not raise_error
+    end
+
+    it 'should define required attributes' do
+      a = Address do
+          city "London"
+        end
+      a.city.should_be "London"
+    end
+  end
+
+end
