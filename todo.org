@@ -198,3 +198,5 @@ or get rid of them
   - list_of
   - dict, map_of
 - type-safe collections (check type when adding to list - trickier than it seems)
+== TODO reorganize todo.org list into ditz
+== TODO move speculative stuff out of todo.org
