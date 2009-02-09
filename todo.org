@@ -1,43 +1,38 @@
 = doodle to do list
-
 == Specs to add [/]
 - attr do ... end initialization
-
-== TODO documentation
-- cover all features
+== TODO documentation [0/3]
+- [ ] cover all features
   - reference doc
-- tutorial
+- [ ] tutorial
   - more & better examples
-- redo website as multiple pages
-== DONE less intrusiveness
-- move more things into __doodle__
+- [ ] redo website as multiple pages
+== DONE less intrusiveness [1/2]
+- [ ] move more things into __doodle__
   - e.g. all methods which could be functions can be class methods
     - ones which don't rely on instance variables
-- perhaps have a single doodle method
+- [X] perhaps have a single doodle method
   e.g. doodle.validations, doodle.convert, etc.
 - doodle, has, must, from, arg_order
 - could use arg checking trick for doodle
   - if no args, return DoodleInfo
   - if block, enter doodle context
-
-== TODO equivalence
-- sorting
-- comparison
-- equality
+== TODO equivalence [4/4]
+- [X] sorting
+- [X] comparison
+- [X] equality
 
 See Facets compare_on
-- could compare attributes in arg_order by default
-
-== DONE pretty_print
+- [X] could compare attributes in arg_order by default
+== DONE pretty_print [1/1]
 - [X] pp doesn't seem to like Doodle anymore
-
-== DONE collect
+== DONE collect [2/2]
 - [X] Hash version
       has :list, :collect => Item, :key => :name
 - [X] create spec for bug in validate! with loading YAML when default
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
-== DONE has + Attribute
+== DONE has + Attribute [2/2]
 - [X] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
 
@@ -57,16 +52,16 @@ See Facets compare_on
 - [X] use webby rather than rote (not supported anymore it seems)
 - [ ] document how to call factory functions defined in modules
       i.e. MyModule.Thing(:param => 'abc') rather than MyModule::Thing()
-- [ ] provide full example of before vs after 
+- [ ] provide full example of before vs after
       - i.e. write out in full what you'd have to do to get same
-        functionality 
+        functionality
       - perhaps also using traits and fattr
-- [ ] example of using doodle to generate classes 
+- [ ] example of using doodle to generate classes
   - (e.g. write out optimised Ruby code rather than use framework)
     i.e. I could use the information gathered to generate a source file
 - could also be in other language (e.g. Java, SQL DDL, etc.)
   (see SQL tables definition example)
-== TODO Specs
+== TODO Specs [0/6]
 - [ ] write spec for new #parents
 - [ ] Want specs for both flavours of use (e.g. class C < Doodle
       and include Doodle::Core)
@@ -93,7 +88,7 @@ end
 i.e. have a top-level class rather than
 == TODO Fix errors collection [0/1]
 - [ ] document it (when working properly)
-=== TODO should be simpler way of getting to errors collection
+=== TODO should be simpler way of getting to errors collection [0/0]
 - the errors collection is for collecting all errors on an instance
   rather than raising an exception on the first error
 - current way of collecting errors is not satisfactory
@@ -106,7 +101,7 @@ i.e. have a top-level class rather than
 === TODO formalize content of errors collection [1/2]
 - [X] include attribute name
 - [ ] do I want to save the call stack? probably
-=== DONE Fixes
+=== DONE Fixes [1/1]
 - compatibility with AR? do I need/want that?
 - [X] make raise exception on invalid values optional
 == DONE Profile performance against plain old attributes [4/4]]
@@ -139,7 +134,7 @@ or get rid of them
 == DONE Fix inspect [2/2]
 - [X] don't include @__doodle__ in inspect string
 - [X] don't break built-ins
-== DONE Known bugs
+== DONE Known bugs [3/3]
 - [X] loading from yaml should apply conversions 2008-03-24
 - [X] sort out duplication of errors when calling validate! after
       setting incorrect value has already generated entry 2008-03-26
@@ -151,7 +146,7 @@ or get rid of them
   parent as neither would be garbage collected (bkz of cycle -
   better check this)
 - 2008-04-06 22:12:22 use Doodle.parent (inside initialization only)
-- 2008-04-17 15:57:15 use #parent instead of Doodle.parent 
+- 2008-04-17 15:57:15 use #parent instead of Doodle.parent
   (doesn't seem to affect memory usage)
 == DONE Fix singleton & class init
 - I'm not happy using the class_init directive
@@ -175,3 +170,31 @@ or get rid of them
 - check garbage collection of attributes
 - 2008-04-06 22:12:18 - used ruby-bleak-house - doesn't look good :(
 - fixed - used @__doodle__ instead of DOODLES in DoodleInfo
+== TODO New features [0/0]
+- add :match from doodle/app to core
+  - apply before :from
+  - or include in :from, e.g
+
+    from String do |s|
+      must "contain only digits" do |s|
+        s =~ /^\d+$/
+      end
+      s.to_i
+    end
+
+    from String, :match => /^\d+$/ do |s|
+      s.to_i
+    end
+
+  - perhaps rename :pattern (after XMLSchema)
+- converge on XMLSchema (e.g. PositiveInteger)
+- 'unions' in collections, e.g.
+   has :elements, :collect => [Element, Image, Text]
+   has :elements, :collect => { :element => Element, :image => Image, :text => Text }
+- merge doodle/datatypes and doodle/app - rationalize
+- don't make it awkward to use datatypes - if included, make available
+- make it easier to define datatype helpers
+- has_many instead of has :collect?
+  - list_of
+  - dict, map_of
+- type-safe collections (check type when adding to list - trickier than it seems)

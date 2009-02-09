@@ -4,11 +4,12 @@
 
 =begin
 
-to do:
+TODO:
 - add file mode to filename (or have separate file type)
 - use PathName?
 - sort out lists of things (with types)
 - apply match ~before~ from
+  - add match to core doodle (as 'pattern' a la XMLSchema?)
 - handle config files
 
 =end
