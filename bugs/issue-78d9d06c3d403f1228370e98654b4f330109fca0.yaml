@@ -20,3 +20,7 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to component core from doodle
   - ""
+- - 2009-02-15 13:08:05.313624 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - commented
+  - should I call it to_h or to_hash?
