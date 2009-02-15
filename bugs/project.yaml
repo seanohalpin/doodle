@@ -12,5 +12,13 @@ components:
   name: docs
 - !ditz.rubyforge.org,2008-03-06/component 
   name: extras
-releases: []
-
+releases: 
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: Version 0.2.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-02-15 13:28:12.779752 Z
+    - Sean O'Halpin <sean.ohalpin@gmail.com>
+    - created
+    - ""
