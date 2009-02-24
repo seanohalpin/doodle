@@ -124,10 +124,8 @@ describe Doodle, 'if default specified before required attributes, they are igno
         include Doodle::XML
       end
       class City < Base
-        has :value
-        def to_xml
-          format_tag(tag, { }, value)
-        end
+        has :_text_
+        has :country, :default => "UK"
       end
       class Address < Base
         has :where, :default => "home"
@@ -142,6 +140,81 @@ describe Doodle, 'if default specified before required attributes, they are igno
       a.to_xml.should_be '<Address><City>London</City></Address>'
     end
 
+    it 'should output specified optional attributes as xml attributes if kind not a doodle class' do
+      a = Address :where => 'home' do
+        city "London"
+      end
+      a.to_xml.should_be %[<Address where="home"><City>London</City></Address>]
+    end
+
+    it 'should output specified optional attributes' do
+      a = Address :where => 'home' do
+        city "London", :country => "England" do
+          country "UK"
+        end
+      end
+      a.to_xml.should_be %[<Address where="home"><City country="UK">London</City></Address>]
+    end
+    
+  end
+
+end
+
+describe Doodle, 'if default specified before required attributes, they are ignored if defined in block #2' do
+  temporary_constant :Base, :City, :Address, :Country do
+    before :each do
+
+      @country_example = %[<Address where="home"><City>London<Country>UK</Country></City></Address>]
+      
+      class Base < Doodle
+        include Doodle::XML
+      end
+      class Country < Base
+        has :_text_
+      end
+      class City < Base
+        has :_text_
+        has Country, :default => "UK"
+      end
+      class Address < Base
+        has :where, :default => "home"
+        has City
+      end
+    end
+
+    it 'should output required tags in XML' do
+      a = Address do
+        city "London"
+      end
+      a.to_xml.should_be '<Address><City>London</City></Address>'
+    end
+
+    it 'should output specified optional attributes' do
+      a = Address :where => 'home' do
+        city "London"
+      end
+      a.to_xml.should_be %[<Address where="home"><City>London</City></Address>]
+    end
+
+    it 'should output specified optional attributes as tags if kind is a Doodle class' do
+      a = Address :where => 'home' do
+        city "London", :country => "England" do
+          country "UK"
+        end
+      end
+      a.to_xml.should_be @country_example
+    end
+
+    it 'should reconstruct object graph from xml source' do
+      a = Address :where => 'home' do
+        city "London", :country => "England" do
+          country "UK"
+        end
+      end
+      a.to_xml.should_be @country_example
+      b = Doodle::XML.from_xml(Base, a.to_xml)
+      b.should_be a
+    end
   end
 
 end

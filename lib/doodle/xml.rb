@@ -9,17 +9,18 @@ class Doodle
       s.to_s.gsub(/[&"><]/) { |special| ESCAPE[special] }
     end
     def self.unescape(s)
-      s = s.to_s
-      ESCAPE.each do |k, v|
-        s = s.gsub(v, k)
+      ESCAPE.inject(s.to_s) do |str, (k, v)|
+        # don't use gsub! here - don't want to modify argument
+        str.gsub(v, k)
       end
-      s
     end
   end
 
   module Utils
+    # normalize a name to contain only legal characters for a Ruby
+    # constant
     def self.normalize_const(const)
-      const.to_s.gsub(/[-]/, '')
+      const.to_s.gsub(/[^A-Za-z_0-9]/, '')
     end
     # lookup a constant along the module nesting path
     def const_lookup(const, context = self)
@@ -119,6 +120,11 @@ class Doodle
       attributes = []
       self.doodle.attributes.map do |k, attr|
         next if self.default?(k)
+        # arbitrary
+        if k == :_text_
+          body << self._text_
+          next
+        end
         v = send(k)
         if v.kind_of?(Doodle)
           body << v.to_xml

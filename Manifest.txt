@@ -28,6 +28,7 @@ lib/doodle/datatypes.rb
 lib/doodle/rfc822.rb
 lib/doodle/utils.rb
 lib/doodle/version.rb
+lib/doodle/xml.rb
 lib/molic_orderedhash.rb
 log/debug.log
 script/console
