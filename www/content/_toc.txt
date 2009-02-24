@@ -21,8 +21,8 @@ h6. contents
 
 h6. extras
 
-* [[doodle/datatypes]] - data definition DSL
 * [[doodle/app]] - command line option handling DSL
+* [[doodle/xml]] - @to_xml@ and @from_xml@
 
 h6. examples
 
@@ -34,5 +34,5 @@ h6. misc
 
 * [[design notes]]
 * "Rubyforge project":http://rubyforge.org/projects/doodle
-* [[github]]
-* [[rubydoc]]
+* "github":http://github.com/seanohalpin/doodle/tree/master
+* "rubydoc":./doc/index.html
