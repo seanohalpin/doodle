@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: rationalize doodle/datatypes and doodle/app
+desc: |-
+  lot of overlap between doodle/app and doodle/datatypes
+  - need to decide best way to add custom datatypes
+  - and how to enable them
+  doodle do ... end is just a little annoying
+type: :task
+component: extras
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-24 10:43:09.598987 Z
+references: []
+
+id: c47deaedc5faca725c2edb353a3b1170b503cb0e
+log_events: 
+- - 2009-02-24 10:43:11.671204 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

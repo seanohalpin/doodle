@@ -14,7 +14,7 @@ components:
   name: extras
 releases: 
 - !ditz.rubyforge.org,2008-03-06/release 
-  name: Version 0.2.0
+  name: r0.2.0
   status: :unreleased
   release_time: 
   log_events: 
@@ -22,3 +22,30 @@ releases:
     - Sean O'Halpin <sean.ohalpin@gmail.com>
     - created
     - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: r1.0.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-02-24 10:37:18.487877 Z
+    - Sean O'Halpin <sean.ohalpin@gmail.com>
+    - created
+    - |-
+      First feature complete release
+      - need to define what I consider the full set of features :)
+      - compatible across ruby 1.8.6, 1.8.7, 1.9.x, JRuby, Rubinius?
+      - tidied up
+      - full docs (again that word 'full')
+        - every feature documented
+        - example for every feature
+      - full set of examples
+      - rdoc-friendly
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: r0.3.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-02-24 10:40:37.526900 Z
+    - Sean O'Halpin <sean.ohalpin@gmail.com>
+    - created
+    - aiming for 1.8.7, 1.9.1, JRuby and Rubinius compatibility
