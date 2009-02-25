@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: add rake task to verify examples
+desc: ""
+type: :task
+component: doodle
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-25 00:57:51.433004 Z
+references: []
+
+id: 8b4eb0a2ad339394ba0b965580458fb2da087095
+log_events: 
+- - 2009-02-25 00:57:52.696407 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
