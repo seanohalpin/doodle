@@ -30,6 +30,16 @@ describe 'Doodle', 'block initialization of scalar attributes' do
       farm.to_hash.should_be( {:barn=>{:animals=>[{:species=>"pig"}]}} )
       farm.to_string_hash.should_be( {"barn"=>{"animals"=>[{"species"=>"pig"}]}} )
     end
+
+    it 'should do something sensible with Proc-valued attributes' do
+      pending
+      source_block = proc { puts "hello" }
+      b = Bar do
+        block &source_block
+      end
+      b.to_hash.should_be( { :block => source_block } )
+    end
+    
   end
 end
 
