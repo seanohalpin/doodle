@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: in ruby 1.9.1 in rspec, classes are created in anonymous class - this causes problems with the factory function
+desc: When defining a class in rspec before :each, it is created in an anonymous class - this causes a class named, e.g., Foo to get the name "#<Class:0x10c352c>::Foo". Unless I define the classes as "class ::Foo", i.e., top-level namespace, this causes the factory function to break. So, I can't define factory functions in an anonymous class
+type: :bugfix
+component: core
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-25 23:03:59.230819 Z
+references: []
+
+id: fb886738b81c37d77eff2c19c47fcd33441a256d
+log_events: 
+- - 2009-02-25 23:04:00.166674 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

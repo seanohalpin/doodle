@@ -9,7 +9,7 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 if RUBY_VERSION < '1.9.0'
-  require 'molic_orderedhash'  # todo[replace this with own (required functions only) version]
+  require 'molic_orderedhash'  # TODO: replace this with own (required functions only) version
 else
   # 1.9+ hashes are ordered by default
   class Doodle
@@ -104,7 +104,7 @@ class Doodle
       doodle.values <=> o.doodle.values
     end
   end
-  
+
   # debugging utilities
   module Debug
     class << self
@@ -426,7 +426,7 @@ class Doodle
     def values(tf = true)
       attributes(tf).map{ |k, a| @this.send(k)}
     end
-    
+
     # return class level attributes
     def class_attributes
       attrs = Doodle::OrderedHash.new
@@ -630,7 +630,7 @@ class Doodle
     include SmokeAndMirrors
 
 # NOTE: can't do either of these
-    
+
 #     include Equality
 #     include Comparable
 
@@ -640,7 +640,7 @@ class Doodle
 #         include Comparable
 #       }
 #     end
-    
+
     # this is the only way to get at internal values. Note: this is
     # initialized on the fly rather than in #initialize because
     # classes and singletons don't call #initialize
@@ -1028,7 +1028,7 @@ class Doodle
     def default?(name)
       doodle.attributes[name.to_sym].optional? && !ivar_defined?(name)
     end
-    
+
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
@@ -1130,17 +1130,63 @@ class Doodle
   #   end
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
+    module Utils
+    # normalize a name to contain only legal characters for a Ruby
+    # constant
+    def self.normalize_const(const)
+      const.to_s.gsub(/[^A-Za-z_0-9]/, '')
+    end
+
+    # lookup a constant along the module nesting path
+    def const_lookup(const, context = self)
+      p [:const_lookup, const, context]
+      const = Utils.normalize_const(const)
+      result = nil
+      if !context.kind_of?(Module)
+        context = context.class
+      end
+      klasses = context.to_s.split(/::/)
+      #p klasses
+
+      path = []
+      0.upto(klasses.size - 1) do |i|
+        path << Doodle::Utils.const_resolve(klasses[0..i].join('::'))
+      end
+      path = (path.reverse + context.ancestors).flatten
+      #p [:const, context, path]
+      path.each do |ctx|
+        #p [:checking, ctx]
+        if ctx.const_defined?(const)
+          result = ctx.const_get(const)
+          break
+        end
+      end
+      raise NameError, "Uninitialized constant #{const} in context #{context}" if result.nil?
+      result
+    end
+    module_function :const_lookup
+  end
+
   module Factory
     RX_IDENTIFIER = /^[A-Za-z_][A-Za-z_0-9]+\??$/
-    class << self
+    #class << self
       # create a factory function in appropriate module for the specified class
-      def factory(konst)
+      def self.factory(konst)
+        p [:factory, :ancestors, konst.ancestors]
+        p [:factory, :lookup, Module.nesting]
         name = konst.to_s
+        p [:factory, name]
+        anon_class = false
+        if name =~ /#<Class:0x[a-fA-F0-9]+>::/
+          #name = name.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
+          #p [:factory_after, name]
+          anon_class = true
+        end
         names = name.split(/::/)
         name = names.pop
-        if names.empty?
+        if names.empty? && !anon_class
           # top level class - should be available to all
-          klass = Object
+          parent_class = Object
           method_defined = begin
                              method(name)
                              true
@@ -1148,25 +1194,46 @@ class Doodle
                              false
                            end
 
-          if name =~ Factory::RX_IDENTIFIER && !method_defined && !klass.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING)
+          if name =~ Factory::RX_IDENTIFIER && !method_defined && !parent_class.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING)
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
-          klass = names.inject(self) {|c, n| c.const_get(n)}
+          parent_class = Object
+          if !anon_class
+            parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
+          else
+            parent_class_name = names.join('::')
+            #p [:parent_class_name, parent_class_name]
+            # FIXME: this is truly horrible...
+            ObjectSpace.each_object do |obj|
+              if obj.class == String
+                next
+              end
+              if obj.to_s == parent_class_name
+                parent_class = obj
+                break
+              end
+            end
+            #p [:names, konst, parent_class, names, self]
+            #parent_class = parent_class.const_get(name)
+          end
+          #p [:name, konst, name, names, parent_class, self, name =~ Factory::RX_IDENTIFIER, "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"]
+          #parent_class = Utils.const_lookup(name, konst)
           # todo[check how many times this is being called]
-          if name =~ Factory::RX_IDENTIFIER && !klass.respond_to?(name)
-            klass.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+          if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+            parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         end
       end
 
       # inherit the factory function capability
-      def included(other)
+      def self.included(other)
+        p [:included, other]
         super
         # make +factory+ method available
         factory other
       end
-    end
+    #end
   end
 
   # Include Doodle::Core if you want to derive from another class
@@ -1186,10 +1253,6 @@ class Doodle
     end
   end
 
-  # wierd 1.9 shit
-  class IAmNotUsedBut1_9GoesIntoAnInfiniteRegressInInspectIfIAmNotDefined
-    include Core
-  end
   include Core
 end
 
