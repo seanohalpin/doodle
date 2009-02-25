@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: get rid of commented out code
+desc: ""
+type: :task
+component: doodle
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-25 00:56:51.537973 Z
+references: []
+
+id: 0ebc677f4afc22100cd66ee393bd051a4d5af9bc
+log_events: 
+- - 2009-02-25 00:56:52.386318 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
