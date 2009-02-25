@@ -7,7 +7,7 @@ desc: |-
   to have unified handling of datatype specifications
 type: :task
 component: extras
-release: 
+release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -19,4 +19,8 @@ log_events:
 - - 2009-02-15 13:05:52.175342 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-25 00:02:55.447709 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from unassigned
   - ""

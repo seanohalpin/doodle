@@ -3,7 +3,7 @@ title: Tidy up examples
 desc: ""
 type: :task
 component: examples
-release: 
+release: r0.2.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -19,4 +19,8 @@ log_events:
 - - 2009-02-04 00:37:39.151421 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to component examples from doodle
+  - ""
+- - 2009-02-25 00:03:09.663530 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.0 from unassigned
   - ""

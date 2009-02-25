@@ -3,7 +3,7 @@ title: Update docs
 desc: include new features and more examples
 type: :task
 component: docs
-release: 
+release: r0.2.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -34,4 +34,8 @@ log_events:
 - - 2009-02-04 00:37:54.095628 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to component docs from doodle
+  - ""
+- - 2009-02-25 00:02:12.063679 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.0 from unassigned
   - ""

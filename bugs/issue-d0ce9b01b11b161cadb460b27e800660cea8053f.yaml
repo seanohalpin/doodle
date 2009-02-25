@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: not including Equality and Comparable modules when including Doodle::Core
+desc: "need to revise the whole #embrace idea"
+type: :bugfix
+component: core
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-25 00:38:59.778420 Z
+references: []
+
+id: d0ce9b01b11b161cadb460b27e800660cea8053f
+log_events: 
+- - 2009-02-25 00:39:00.834222 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
