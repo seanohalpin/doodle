@@ -14,8 +14,6 @@ components:
   name: extras
 - !ditz.rubyforge.org,2008-03-06/component 
   name: packaging
-- !ditz.rubyforge.org,2008-03-06/component 
-  name: specs
 releases: 
 - !ditz.rubyforge.org,2008-03-06/release 
   name: r0.2.0
@@ -26,6 +24,15 @@ releases:
     - Sean O'Halpin <sean.ohalpin@gmail.com>
     - created
     - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: r0.3.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-02-24 10:40:37.526900 Z
+    - Sean O'Halpin <sean.ohalpin@gmail.com>
+    - created
+    - aiming for 1.8.7, 1.9.1, JRuby and Rubinius compatibility
 - !ditz.rubyforge.org,2008-03-06/release 
   name: r1.0.0
   status: :unreleased
@@ -44,12 +51,3 @@ releases:
         - example for every feature
       - full set of examples
       - rdoc-friendly
-- !ditz.rubyforge.org,2008-03-06/release 
-  name: r0.3.0
-  status: :unreleased
-  release_time: 
-  log_events: 
-  - - 2009-02-24 10:40:37.526900 Z
-    - Sean O'Halpin <sean.ohalpin@gmail.com>
-    - created
-    - aiming for 1.8.7, 1.9.1, JRuby and Rubinius compatibility
