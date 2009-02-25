@@ -83,14 +83,20 @@ class Doodle
   # considered equal
   module Equality
     def eql?(o)
-      self.class == o.class &&
-        doodle.attributes.all? { |k, a| send(k).eql?(o.send(k)) }
+#       p [:comparing, self.class, o.class, self.class == o.class]
+#       p [:values, self.doodle.values, o.doodle.values, self.doodle.values == o.doodle.values]
+#       p [:attributes, doodle.attributes.map { |k, a| [k, send(k).==(o.send(k))] }]
+      res = self.class == o.class &&
+        #self.doodle.values == o.doodle.values
+        # short circuit comparison
+        doodle.attributes.all? { |k, a| send(k).==(o.send(k)) }
+#       p [:res, res]
+      res
     end
     def ==(o)
       eql?(o)
     end
   end
-  include Equality
 
   # doodles are compared (sorted) on values
   module Comparable
@@ -98,7 +104,6 @@ class Doodle
       doodle.values <=> o.doodle.values
     end
   end
-  include Comparable
   
   # debugging utilities
   module Debug
@@ -624,6 +629,18 @@ class Doodle
     include SelfClass
     include SmokeAndMirrors
 
+# NOTE: can't do either of these
+    
+#     include Equality
+#     include Comparable
+
+    #     def self.included(other)
+#       other.module_eval {
+#         include Equality
+#         include Comparable
+#       }
+#     end
+    
     # this is the only way to get at internal values. Note: this is
     # initialized on the fly rather than in #initialize because
     # classes and singletons don't call #initialize
@@ -1159,6 +1176,9 @@ class Doodle
     def self.included(other)
       super
       other.module_eval {
+        # FIXME: this is getting a bit arbitrary
+        include Doodle::Equality
+        include Doodle::Comparable
         extend Embrace
         embrace BaseMethods
         include Factory
