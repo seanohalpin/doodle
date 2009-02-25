@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: remove dependency on newgems (and hoe, etc.)
+desc: prefer bones over newgems (less intrusive)
+type: :task
+component: doodle
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-25 00:00:28.127751 Z
+references: []
+
+id: e407a07e6932ac67eeaa00a72f47c7b63b225fdb
+log_events: 
+- - 2009-02-25 00:00:29.023078 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
