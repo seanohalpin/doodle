@@ -2,7 +2,7 @@
 title: remove dependency on newgems (and hoe, etc.)
 desc: prefer bones over newgems (less intrusive)
 type: :task
-component: doodle
+component: packaging
 release: r0.2.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -15,4 +15,8 @@ log_events:
 - - 2009-02-25 00:00:29.023078 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-25 00:42:18.097512 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component packaging from doodle
   - ""

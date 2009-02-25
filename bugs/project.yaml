@@ -12,6 +12,10 @@ components:
   name: docs
 - !ditz.rubyforge.org,2008-03-06/component 
   name: extras
+- !ditz.rubyforge.org,2008-03-06/component 
+  name: packaging
+- !ditz.rubyforge.org,2008-03-06/component 
+  name: specs
 releases: 
 - !ditz.rubyforge.org,2008-03-06/release 
   name: r0.2.0

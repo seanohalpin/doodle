@@ -11,7 +11,7 @@ class Location < Doodle
   has :events, :collect => :Event, :key => :name
 end
 
-class Event
+class Event #< Doodle
   # or if you want to inherit from another class
   include Doodle::Core
 
@@ -34,7 +34,8 @@ event = Event "Festival" do
   end
 end
 
-puts event.to_yaml
+yaml = event.to_yaml
+puts yaml
 # >> --- !ruby/object:Event 
 # >> date: 2018-04-01
 # >> locations: 
@@ -54,3 +55,27 @@ puts event.to_yaml
 # >> 
 # >>     name: The muddy field
 # >> name: Festival
+event2 = YAML::load(yaml).validate!
+
+# p event.doodle.values == event2.doodle.values
+# pp event.doodle.values
+# pp event2.doodle.values
+
+# pp event.locations["Beer tent"].events == event2.locations["Beer tent"].events
+# pp event.locations["Beer tent"].events["Drinking"] == event2.locations["Beer tent"].events["Drinking"]
+
+e1 = event.locations["Beer tent"].events["Drinking"]
+e2 = event2.locations["Beer tent"].events["Drinking"]
+# p e1 == e2
+# pp e1
+# pp e2
+
+# pp e1.doodle.values 
+# pp e2.doodle.values
+pp e1.doodle.values == e2.doodle.values
+# pp e1.class.ancestors
+pp e1.eql?(e2)
+pp [:event_event2, event == event2]
+# pp e2.class.ancestors
+# o = Doodle.new
+# pp o.class.ancestors
