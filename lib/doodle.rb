@@ -1172,19 +1172,21 @@ class Doodle
     #class << self
       # create a factory function in appropriate module for the specified class
       def self.factory(konst)
-        p [:factory, :ancestors, konst.ancestors]
-        p [:factory, :lookup, Module.nesting]
+        p [:factory, :ancestors, konst, konst.ancestors]
+        #p [:factory, :lookup, Module.nesting]
         name = konst.to_s
-        p [:factory, name]
+        p [:factory, :name, name]
         anon_class = false
         if name =~ /#<Class:0x[a-fA-F0-9]+>::/
           #name = name.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
-          #p [:factory_after, name]
+          p [:factory_anon_class, name]
           anon_class = true
         end
         names = name.split(/::/)
         name = names.pop
+        p [:factory, :names, names, name]
         if names.empty? && !anon_class
+          p [:factory, :top_level_class]
           # top level class - should be available to all
           parent_class = Object
           method_defined = begin
@@ -1198,31 +1200,49 @@ class Doodle
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
+          p [:factory, :other_level_class]
           parent_class = Object
           if !anon_class
             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
+            p [:factory, :parent_class, parent_class]
+            if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+              parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+            end
           else
+            # this is ruby 1.9.1 specific
             parent_class_name = names.join('::')
+            p [:factory, :parent_class_name, parent_class_name]
             #p [:parent_class_name, parent_class_name]
             # FIXME: this is truly horrible...
-            ObjectSpace.each_object do |obj|
-              if obj.class == String
-                next
-              end
-              if obj.to_s == parent_class_name
-                parent_class = obj
-                break
-              end
+#             ObjectSpace.each_object(Class) do |m|
+#               p [:checking, m]
+#               if m.to_s =~ parent_class_name
+#                 parent_class = m
+#               end
+#             end
+            hex_object_id = parent_class_name.match(/:(0x[a-zA-Z0-9]+)/)[1]
+            oid = hex_object_id.to_i(16) >> 1
+#             p [:object_id, oid, hex_object_id, hex_object_id.to_i(16) >> 1]
+            parent_class = ObjectSpace._id2ref(oid)
+
+            p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
+#             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
+#             #parent_class = class << base_parent_class; self; end
+#             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
+            if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+              #parent_class.instance_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+              context = parent_class.class_eval { binding }
+              p [:context, context]
+              #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
+              eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
             end
-            #p [:names, konst, parent_class, names, self]
-            #parent_class = parent_class.const_get(name)
           end
           #p [:name, konst, name, names, parent_class, self, name =~ Factory::RX_IDENTIFIER, "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"]
           #parent_class = Utils.const_lookup(name, konst)
           # todo[check how many times this is being called]
-          if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-            parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-          end
+#           if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+#             parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+#           end
         end
       end
 
