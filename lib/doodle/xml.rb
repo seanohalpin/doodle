@@ -17,43 +17,6 @@ class Doodle
     end
   end
 
-  module Utils
-    # normalize a name to contain only legal characters for a Ruby
-    # constant
-    def self.normalize_const(const)
-      const.to_s.gsub(/[^A-Za-z_0-9]/, '')
-    end
-
-    # lookup a constant along the module nesting path
-    def const_lookup(const, context = self)
-      const = Utils.normalize_const(const)
-      result = nil
-      if !context.kind_of?(Module)
-        context = context.class
-      end
-      klasses = context.to_s.split(/::/)
-      #p klasses
-
-      path = []
-      0.upto(klasses.size - 1) do |i|
-        path << Doodle::Utils.const_resolve(klasses[0..i].join('::'))
-      end
-      path = (path.reverse + context.ancestors).flatten
-      #p [:const, context, path]
-      path.each do |ctx|
-        #p [:checking, ctx]
-        if ctx.const_defined?(const)
-          result = ctx.const_get(const)
-          break
-        end
-      end
-      raise NameError, "Uninitialized constant #{const} in context #{context}" if result.nil?
-      result
-    end
-    module_function :const_lookup
-
-  end
-
   # adds to_xml and from_xml methods for serializing and deserializing
   # Doodle object graphs to and from XML
   #
@@ -123,7 +86,7 @@ class Doodle
         ["<#{tag}#{format_attributes(attributes)}>", body, "</#{tag}>"]
       else
         ["<#{tag}#{format_attributes(attributes)} />"]
-      end.to_s
+      end.join('')
     end
 
     def to_xml

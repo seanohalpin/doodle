@@ -41,12 +41,12 @@ end
 describe Doodle, 'nested equality via inheritance' do
   temporary_constants :Location, :Event do
     before :each do 
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
         has :events, :collect => :Event, :key => :name
       end
 
-      class Event < Doodle
+      class ::Event < Doodle
         has :name, :kind => String
         has :date, :kind => Date do
           default { Date.today }
@@ -79,12 +79,12 @@ end
 describe Doodle, 'nested equality via including Doodle::Core' do
   temporary_constants :Location, :Event do
     before :each do 
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
         has :events, :collect => :Event, :key => :name
       end
 
-      class Event
+      class ::Event
         # or if you want to inherit from another class
         include Doodle::Core
 

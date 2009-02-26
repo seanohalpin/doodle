@@ -24,7 +24,7 @@ end
 describe 'Doodle', 'loading good data from yaml' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -57,7 +57,7 @@ end
 describe 'Doodle', 'loading bad data from yaml' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :date, :kind => Date do
           from String do |s|
             Date.parse(s)
@@ -83,7 +83,7 @@ end
 describe 'Doodle', 'loading bad data from yaml with default defined' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :date, :kind => Date do
           default Date.today
           from String do |s|
@@ -110,7 +110,7 @@ end
 describe Doodle, 'class attributes:' do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :ivar
         class << self
           has :cvar
@@ -127,13 +127,13 @@ end
 describe Doodle, 'initializing from hashes and yaml' do
   temporary_constants :AddressLine, :Person do
     before :each do
-      class AddressLine < Doodle
+      class ::AddressLine < Doodle
         has :text, :kind => String
       end
 
-      class Person < Doodle
+      class ::Person < Doodle
         has :name, :kind => String
-        has :address, :collect => { :line => AddressLine }
+        has :address, :collect => { :line => ::AddressLine }
       end
     end
 
@@ -176,20 +176,20 @@ end
 describe 'Doodle', 'hiding @__doodle__' do
   temporary_constant :Foo, :Bar, :DString, :DHash, :DArray do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :var1, :kind => Integer
       end
-      class Bar
+      class ::Bar
         include Doodle::Core
         has :var2, :kind => Integer
       end
-      class DString < String
+      class ::DString < String
         include Doodle::Core
       end
-      class DHash < Hash
+      class ::DHash < Hash
         include Doodle::Core
       end
-      class DArray < Array
+      class ::DArray < Array
         include Doodle::Core
       end
     end
@@ -236,15 +236,15 @@ end
 describe 'Doodle', 'initalizing class level collectors' do
   temporary_constant :Menu, :KeyedMenu, :Item, :SubMenu do
     before :each do
-      class Item < Doodle
+      class ::Item < Doodle
         has :title
       end
-      class Menu < Doodle
+      class ::Menu < Doodle
         class << self
           has :items, :collect => Item
         end
       end
-      class KeyedMenu < Doodle
+      class ::KeyedMenu < Doodle
         class << self
           has :items, :collect => Item, :key => :title
         end

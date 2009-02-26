@@ -5,7 +5,7 @@ require 'yaml'
 describe Doodle, "Serialization" do
   temporary_constant :Foo do
     before :each do
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :var, :kind => Integer
       end
       @foo = Foo 42 

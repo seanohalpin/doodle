@@ -55,11 +55,11 @@ end
 describe Doodle, "Typed collector with default collector name" do
   temporary_constant :Event, :Location do
     before :each do
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
       end
-      class Event < Doodle
-        has :locations, :init => [], :collect => Location
+      class ::Event < Doodle
+        has :locations, :init => [], :collect => ::Location
       end
       @event = Event do
         location "Stage 1"
@@ -88,10 +88,10 @@ end
 describe Doodle, "Typed collector with specified collector name" do
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
       end
-      class Event < Doodle
+      class ::Event < Doodle
         has :locations, :init => [], :collect => { :place => :Location }
       end
     end
@@ -104,11 +104,11 @@ end
 describe Doodle, "typed collector with specified collector name" do
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
       end
       class Event < Doodle
-        has :locations, :init => [], :collect => { :place => Location }
+        has :locations, :init => [], :collect => { :place => ::Location }
       end
     end
     it "should collect items into attribute :list" do
@@ -120,7 +120,7 @@ describe Doodle, "typed collector with specified collector name" do
         end
       }.should_not raise_error
       event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
-      event.locations.map{|loc| loc.class}.should_be [Location, Location]
+      event.locations.map{|loc| loc.class}.should_be [::Location, ::Location]
     end
   end
 end
@@ -129,11 +129,11 @@ describe Doodle, "typed collector with specified collector name initialized from
   # note: this spec also checks for resolving collector class
   temporary_constant :Location, :Event do
     before :each do
-      class Location < Doodle
+      class ::Location < Doodle
         has :name, :kind => String
         has :events, :collect => :Event
       end
-      class Event < Doodle
+      class ::Event < Doodle
         has :name, :kind => String
         has :locations, :collect => :Location
       end
@@ -154,7 +154,7 @@ describe Doodle, "typed collector with specified collector name initialized from
         event = Event(data)
       }.should_not raise_error
       event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
-      event.locations.map{|loc| loc.class}.should_be [Location, Location]
+      event.locations.map{|loc| loc.class}.should_be [::Location, ::Location]
       event.locations[0].events[0].kind_of?(Event).should_be true
     end
   end
@@ -189,10 +189,10 @@ end
 describe Doodle, "Simple keyed collector #2" do
   temporary_constant :Foo, :Item do
     before :each do
-      class Item < Doodle
+      class ::Item < Doodle
         has :name
       end
-      class Foo < Doodle
+      class ::Foo < Doodle
         has :list, :collect => Item, :key => :name
       end
     end

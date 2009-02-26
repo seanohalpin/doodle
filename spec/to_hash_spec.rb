@@ -4,7 +4,7 @@ require 'yaml'
 describe 'Doodle', 'block initialization of scalar attributes' do
   temporary_constant :Foo, :Bar, :Farm, :Barn, :Animal do
     before :each do
-      class Animal < Doodle
+      class ::Animal < Doodle
         has :species
       end
       class Barn < Doodle

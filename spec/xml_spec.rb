@@ -5,7 +5,7 @@ describe Doodle, 'xml serialization within a module' do
   temporary_constants :Container, :Base, :Slideshow, :Layout do
     before(:each) do
       @xml_source = '<Slideshow id="1" name="test"><Layout template="generic" /></Slideshow>'
-      module Container
+      module ::Container
         class Base < Doodle
           include Doodle::XML
         end
@@ -47,13 +47,13 @@ describe Doodle, 'xml serialization at top level' do
   temporary_constants :Base, :Slideshow, :Layout do
     before(:each) do
       @xml_source = '<Slideshow id="1" name="test"><Layout template="generic" /></Slideshow>'
-      class Base < Doodle
+      class ::Base < Doodle
         include Doodle::XML
       end
-      class Layout < Base
+      class ::Layout < Base
         has :template
       end
-      class Slideshow < Base
+      class ::Slideshow < Base
         has :id, :kind => Integer do
           from String do |s|
             s.to_i
@@ -64,7 +64,7 @@ describe Doodle, 'xml serialization at top level' do
       end
     end
     it 'should serialize to xml' do
-      slideshow = Slideshow.new do
+      slideshow = ::Slideshow.new do
         id 1
         name "test"
         layout "generic"
@@ -72,7 +72,7 @@ describe Doodle, 'xml serialization at top level' do
       slideshow.to_xml.should_be @xml_source
     end
     it 'should serialize from xml' do
-      slideshow = Slideshow.new do
+      slideshow = ::Slideshow.new do
         id 1
         name "test"
         layout "generic"
@@ -166,17 +166,17 @@ describe Doodle, 'if default specified before required attributes, they are igno
 
       @country_example = %[<Address where="home"><City>London<Country>UK</Country></City></Address>]
       
-      class Base < Doodle
+      class ::Base < Doodle
         include Doodle::XML
       end
-      class Country < Base
+      class ::Country < Base
         has :_text_
       end
-      class City < Base
+      class ::City < Base
         has :_text_
         has Country, :default => "UK"
       end
-      class Address < Base
+      class ::Address < Base
         has :where, :default => "home"
         has City
       end

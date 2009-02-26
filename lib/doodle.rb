@@ -125,7 +125,13 @@ class Doodle
     class << self
       # Unnest arrays by one level of nesting, e.g. [1, [[2], 3]] => [1, [2], 3].
       def flatten_first_level(enum)
-        enum.inject([]) {|arr, i| if i.kind_of? Array then arr.push(*i) else arr.push(i) end }
+        enum.inject([]) {|arr, i|
+          if i.kind_of?(Array)
+            arr.push(*i)
+          else
+            arr.push(i)
+          end
+        }
       end
       # from facets/string/case.rb, line 80
       def snake_case(camel_cased_word)
@@ -136,7 +142,9 @@ class Doodle
           camel_cased_word.to_s.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
         end
       end
-      # resolve a constant of the form Some::Class::Or::Module
+      # resolve a constant of the form Some::Class::Or::Module -
+      # doesn't work with constants defined in anonymous
+      # classes/modules
       def const_resolve(constant)
         constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
       end
@@ -1139,7 +1147,7 @@ class Doodle
 
     # lookup a constant along the module nesting path
     def const_lookup(const, context = self)
-      p [:const_lookup, const, context]
+      #p [:const_lookup, const, context]
       const = Utils.normalize_const(const)
       result = nil
       if !context.kind_of?(Module)
@@ -1210,17 +1218,11 @@ class Doodle
               parent_class.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
             end
           else
-            # this is ruby 1.9.1 specific
+            # NOTE: ruby 1.9.1 specific
             parent_class_name = names.join('::')
             #p [:factory, :parent_class_name, parent_class_name]
             #p [:parent_class_name, parent_class_name]
             # FIXME: this is truly horrible...
-#             ObjectSpace.each_object(Class) do |m|
-#               p [:checking, m]
-#               if m.to_s =~ parent_class_name
-#                 parent_class = m
-#               end
-#             end
             hex_object_id = parent_class_name.match(/:(0x[a-zA-Z0-9]+)/)[1]
             oid = hex_object_id.to_i(16) >> 1
 #             p [:object_id, oid, hex_object_id, hex_object_id.to_i(16) >> 1]
@@ -1232,11 +1234,13 @@ class Doodle
 #             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
             if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
               #parent_class.instance_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-              context = parent_class.class_eval { binding }
+              #context = parent_class.class_eval { binding }
               #p [:context, context]
               #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
               #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
-              eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
+              # NOTE: the difference with above is that this is not defined on self
+              #eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
+              parent_class.module_eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
             end
           end
           #p [:name, konst, name, names, parent_class, self, name =~ Factory::RX_IDENTIFIER, "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"]
@@ -1334,7 +1338,9 @@ class Doodle
             collector_class = collector.to_s
             #p [:collector_klass, collector_klass]
             collector_name = Utils.snake_case(collector_class.split(/::/).last)
-            #p [:collector_name, collector_name]
+            #p [:collector_name, collector_class, collector_name]
+            # FIXME: sanitize class name (make this a Utils function)
+            collector_class = collector_class.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
             if collector_class !~ /^[A-Z]/
               collector_class = nil
             end

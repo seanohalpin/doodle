@@ -293,9 +293,9 @@ describe Doodle, 'inherited singleton class attributes' do
       if RUBY_VERSION < '1.9.0'
         @foo.singleton_class.metadata.should_be 'foo meta'
       else
-        pending 'figuring out why this fails in 1.9' do
+        #pending 'figuring out why this fails in 1.9' do
           @foo.singleton_class.metadata.should_be 'foo meta'
-        end
+        #end
       end
     end
 
