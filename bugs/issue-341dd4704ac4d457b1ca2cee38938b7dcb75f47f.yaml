@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Rework collector_class, etc. for ruby 1.9.1
+desc: Specs introduce anonymous classes - this breaks all the eval stuff because the names aren't valid - would work with direct references to classes - fix so refs to classes are stored (though how I resolve the constants is another story)
+type: :bugfix
+component: core
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-26 01:16:09.956225 Z
+references: []
+
+id: 341dd4704ac4d457b1ca2cee38938b7dcb75f47f
+log_events: 
+- - 2009-02-26 01:16:11.140165 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
