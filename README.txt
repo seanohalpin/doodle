@@ -1,6 +1,7 @@
 = doodle
 
-* http://doodle.rubyforge.org
+* Homepage: http://doodle.rubyforge.org
+* Github repo: http://github.com/seanohalpin/doodle/tree/master
 
 == DESCRIPTION:
 
@@ -11,8 +12,8 @@ Doodle is eco-friendly: it does not globally modify Object, Class or
 Module, nor does it pollute instances with its own instance variables
 (i.e. it plays nice with yaml).
 
-Doodle has been tested with Ruby 1.8.6 and JRuby 1.1. It does not yet
-work with Ruby 1.9 or Rubinius.
+Doodle has been tested with Ruby 1.8.6, 1.9.1 and JRuby 1.1. It has
+not yet been tested with Rubinius.
 
 Please feel free to post bug reports, feature requests, and any
 comments or discussion topics to the doodle Google group: 
@@ -144,7 +145,7 @@ http://groups.google.com/group/ruby-doodle
 
 (The MIT License)
 
-Copyright (c) 2008 Sean O'Halpin
+Copyright (c) 2007-2009 Sean O'Halpin
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
