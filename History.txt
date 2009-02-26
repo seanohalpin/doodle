@@ -13,6 +13,9 @@
     - from_xml
   - reworked website using webby
 
+- Bug fixes:
+  - all specs now pass in ruby 1.8.6, 1.9.1 and JRuby 1.1.6 (1 pending)
+
 == 0.1.9 / 2008-08-13
 - Features:
   - to_hash

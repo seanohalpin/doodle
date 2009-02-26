@@ -1,10 +1,16 @@
 # doodle
 # -*- mode: ruby; ruby-indent-level: 2; tab-width: 2 -*- vim: sw=2 ts=2
-# Copyright (C) 2007-2008 by Sean O'Halpin
+# Copyright (C) 2007-2009 by Sean O'Halpin
 # 2007-11-24 first version
 # 2008-04-18 latest release 0.0.12
 # 2008-05-07 0.1.6
 # 2008-05-12 0.1.7
+# 2009-02-26 0.2.0
+# require Ruby 1.8.6 or higher
+if RUBY_VERSION < '1.8.6'
+  raise Exception, "Sorry - doodle does not work with versions of Ruby below 1.8.6"
+end
+
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
@@ -14,45 +20,6 @@ else
   # 1.9+ hashes are ordered by default
   class Doodle
     OrderedHash = ::Hash
-  end
-end
-
-# require Ruby 1.8.6 or higher
-if RUBY_VERSION < '1.8.6'
-  raise Exception, "Sorry - doodle does not work with versions of Ruby below 1.8.6"
-end
-
-#
-# instance_exec for ruby 1.8 by Mauricio Fernandez
-# http://eigenclass.org/hiki.rb?bounded+space+instance_exec
-# thread-safe and handles frozen objects in bounded space
-#
-# (tag "ruby instance_exec")
-#
-if !Object.respond_to?(:instance_exec)
-  class Object
-    module InstanceExecHelper; end
-    include InstanceExecHelper
-    def instance_exec(*args, &block)
-      begin
-        old_critical, Thread.critical = Thread.critical, true
-        n = 0
-        methods = InstanceExecHelper.instance_methods
-        # this in order to make the lookup O(1), and name generation O(n) on the
-        # number of nested/concurrent instance_exec calls instead of O(n**2)
-        table = Hash[*methods.zip(methods).flatten]
-        n += 1 while table.has_key?(mname="__instance_exec#{n}")
-      ensure
-        Thread.critical = old_critical
-      end
-      InstanceExecHelper.module_eval{ define_method(mname, &block) }
-      begin
-        ret = send(mname, *args)
-      ensure
-        InstanceExecHelper.module_eval{ remove_method(mname) } rescue nil
-      end
-      ret
-    end
   end
 end
 
@@ -693,7 +660,7 @@ class Doodle
 
     # either get an attribute value (if no args given) or set it
     # (using args and/or block)
-    # fixme: move
+    # FIXME: move
     def getter_setter(name, *args, &block)
       #p [:getter_setter, name]
       name = name.to_sym
@@ -708,7 +675,7 @@ class Doodle
     private :getter_setter
 
     # get an attribute by name - return default if not otherwise defined
-    # fixme: init deferred blocks are not getting resolved in all cases
+    # FIXME: init deferred blocks are not getting resolved in all cases
     def _getter(name, &block)
       #p [:_getter, name]
       ivar = "@#{name}"
@@ -748,6 +715,7 @@ class Doodle
     def after_update(params)
     end
 
+    # set an instance variable by symbolic name and call after_update if changed
     def ivar_set(name, *args)
       ivar = "@#{name}"
       if instance_variable_defined?(ivar)
@@ -765,11 +733,10 @@ class Doodle
     private :ivar_set
 
     # set an attribute by name - apply validation if defined
-    # fixme: move
+    # FIXME: move
     def _setter(name, *args, &block)
       ##DBG: Doodle::Debug.d { [:_setter, name, args] }
       #p [:_setter, name, *args]
-      #ivar = "@#{name}"
       att = __doodle__.lookup_attribute(name)
       if att && doodle.validation_on && att.readonly
         raise Doodle::ReadOnlyError, "Trying to set a readonly attribute: #{att.name}", Doodle::Utils.doodle_caller
@@ -788,7 +755,6 @@ class Doodle
           # this is used by init do ... block
           args.unshift(DeferredBlock.new(block))
         end
-        #elsif
       end
       if att # = __doodle__.lookup_attribute(name)
         if att.kind && !att.abstract && klass = att.kind.first
@@ -802,9 +768,7 @@ class Doodle
             end
           end
         end
-        #  args = [klass.new(*args, &block)]        ##DBG: Doodle::Debug.d { [:_setter, name, args] }
         #p [:_setter, :got_att1, name, ivar, *args]
-        #        v = instance_variable_set(ivar, att.validate(self, *args))
         v = ivar_set(name, att.validate(self, *args))
 
         #p [:_setter, :got_att2, name, ivar, :value, v]
@@ -812,7 +776,6 @@ class Doodle
       else
         #p [:_setter, :no_att, name, *args]
         ##DBG: Doodle::Debug.d { [:_setter, "no attribute"] }
-        #        v = instance_variable_set(ivar, *args)
         v = ivar_set(name, *args)
       end
       validate!(false)
@@ -856,7 +819,7 @@ class Doodle
     end
 
     # convert a value according to conversion rules
-    # fixme: move
+    # FIXME: move
     def convert(owner, *args)
       #pp( { :convert => 1, :owner => owner, :args => args, :conversions => __doodle__.conversions } )
       begin
@@ -865,7 +828,6 @@ class Doodle
           if (converter = __doodle__.conversions[value.class])
             #p [:convert, 3, value, self, caller]
             value = converter[value]
-            #value = instance_exec(value, &converter)
             #!p [:convert, 4, value]
           else
             #!p [:convert, 5, value]
@@ -883,7 +845,6 @@ class Doodle
               if converter = __doodle__.conversions[converter_class]
                 #!p [:convert, 11, converter]
                 value = converter[value]
-                #value = instance_exec(value, &converter)
                 #!p [:convert, 12, value]
               end
             else
@@ -896,7 +857,6 @@ class Doodle
                   if converter = mappable_kind.doodle.conversions[value.class]
                     #!p [:convert, 15, value, mappable_kind, args]
                     value = converter[value]
-                    #value = instance_exec(value, &converter)
                     break
                   else
                     #!p [:convert, 16, :no_conversion_for, value.class]
@@ -1108,7 +1068,7 @@ class Doodle
       #p [:doodle_parent, __doodle__.parent]
     end
 
-    # create 'pure' hash of scalars only from attributes - hacky but works fine
+    # create 'pure' hash of scalars only from attributes - hacky but works (kinda)
     def to_hash
       Doodle::Utils.symbolize_keys!(YAML::load(to_yaml.gsub(/!ruby\/object:.*$/, '')) || { }, true)
       #begin
@@ -1186,12 +1146,12 @@ class Doodle
         #p [:factory, :name, name]
         anon_class = false
         if name =~ /#<Class:0x[a-fA-F0-9]+>::/
-          #name = name.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
           #p [:factory_anon_class, name]
           anon_class = true
         end
         names = name.split(/::/)
         name = names.pop
+        # TODO: the code below is almost the same - refactor
         #p [:factory, :names, names, name]
         if names.empty? && !anon_class
           #p [:factory, :top_level_class]
@@ -1214,7 +1174,6 @@ class Doodle
             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
             #p [:factory, :parent_class, parent_class]
             if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-              #parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
               parent_class.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
             end
           else
@@ -1229,26 +1188,13 @@ class Doodle
             parent_class = ObjectSpace._id2ref(oid)
 
             #p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
-#             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
-#             #parent_class = class << base_parent_class; self; end
 #             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
             if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-              #parent_class.instance_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-              #context = parent_class.class_eval { binding }
               #p [:context, context]
-              #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
-              #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
-              # NOTE: the difference with above is that this is not defined on self
-              #eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
               parent_class.module_eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
             end
           end
-          #p [:name, konst, name, names, parent_class, self, name =~ Factory::RX_IDENTIFIER, "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"]
-          #parent_class = Utils.const_lookup(name, konst)
-          # todo[check how many times this is being called]
-#           if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-#             parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-#           end
+          # TODO: check how many times this is being called
         end
       end
 
@@ -1474,6 +1420,7 @@ class Doodle
     # define a collector for appendable collections
     # - collection should provide a :<< method
     def define_collection
+      # FIXME: don't use eval in 1.9+
       if collector_class.nil?
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
                    junk = #{name} if !#{name} # force initialization for classes
@@ -1511,6 +1458,7 @@ class Doodle
     # - collection should provide a :[] method
     def define_collection
       # need to use string eval because passing block
+      # FIXME: don't use eval in 1.9+
       if collector_class.nil?
         doodle_owner.sc_eval("def #{collector_name}(*args, &block)
                    junk = #{name} if !#{name} # force initialization for classes
