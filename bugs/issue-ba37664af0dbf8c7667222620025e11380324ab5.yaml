@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "'union' has for either/or situations"
+desc: |-
+  see smqueue_atmsg - want either a configuration hash or a queue symbol
+  union {:configuration => {:kind => Hash, ...}, :queue => {:kind => Symbol, ...}}
+type: :feature
+component: core
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-02-26 04:26:37.053810 Z
+references: []
+
+id: ba37664af0dbf8c7667222620025e11380324ab5
+log_events: 
+- - 2009-02-26 04:26:38.438782 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
