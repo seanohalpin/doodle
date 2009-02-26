@@ -123,17 +123,19 @@ class Doodle
       # - updates target hash
       # - optionally recurse into child hashes
       def normalize_keys!(hash, recursive = false, method = :to_sym)
-        hash.keys.each do |key|
-          normalized_key = key.respond_to?(method) ? key.send(method) : key
-          v = hash.delete(key)
-          if recursive
-            if v.kind_of?(Hash)
-              v = normalize_keys!(v, recursive, method)
-            elsif v.kind_of?(Array)
-              v = v.map{ |x| normalize_keys!(x, recursive, method) }
+        if hash.kind_of?(Hash)
+          hash.keys.each do |key|
+            normalized_key = key.respond_to?(method) ? key.send(method) : key
+            v = hash.delete(key)
+            if recursive
+              if v.kind_of?(Hash)
+                v = normalize_keys!(v, recursive, method)
+              elsif v.kind_of?(Array)
+                v = v.map{ |x| normalize_keys!(x, recursive, method) }
+              end
             end
+            hash[normalized_key] = v
           end
-          hash[normalized_key] = v
         end
         hash
       end
