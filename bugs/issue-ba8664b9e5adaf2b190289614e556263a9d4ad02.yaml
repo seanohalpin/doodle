@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: doodle/xml adds to_xml and from_xml
+desc: Simple dump to and load from xml
+type: :feature
+component: extras
+release: r0.2.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-02-26 02:47:40.282953 Z
+references: []
+
+id: ba8664b9e5adaf2b190289614e556263a9d4ad02
+log_events: 
+- - 2009-02-26 02:47:41.555404 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
+- - 2009-02-26 02:48:00.243519 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - ""

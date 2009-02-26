@@ -290,26 +290,16 @@ describe Doodle, 'inherited singleton class attributes' do
       @foo.singleton_class.doodle.attributes[:metadata].should_be nil
       @foo.singleton_class.metadata = 'foo meta'
       @foo.singleton_class.instance_eval { @metadata }.should_be 'foo meta'
-      if RUBY_VERSION < '1.9.0'
-        @foo.singleton_class.metadata.should_be 'foo meta'
-      else
-        #pending 'figuring out why this fails in 1.9' do
-          @foo.singleton_class.metadata.should_be 'foo meta'
-        #end
-      end
+      @foo.singleton_class.metadata.should_be 'foo meta'
     end
 
     it 'should behave predictably when setting singleton attributes' do
       @bar.extra = 'bar extra'
       @bar.extra.should_be 'bar extra'
       @bar.singleton_class.metadata = 'bar meta metadata'
-      if RUBY_VERSION < '1.9.0'
-        @bar.singleton_class.metadata.should_be 'bar meta metadata'
-        @bar.singleton_class.notes = 'bar notes'
-        @bar.singleton_class.notes.should_be 'bar notes'
-      else
-        pending 'figuring out why this fails in 1.9'
-      end
+      @bar.singleton_class.metadata.should_be 'bar meta metadata'
+      @bar.singleton_class.notes = 'bar notes'
+      @bar.singleton_class.notes.should_be 'bar notes'
       proc { @foo.singleton_class.notes = 1 }.should raise_error(NoMethodError)
     end
   end

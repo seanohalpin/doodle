@@ -1,9 +1,9 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: ensure compatibility with 1.8.7, 1.9.1, JRuby 1.1.6+
+title: ensure compatibility with 1.8.6, 1.9.1, JRuby 1.1.6+
 desc: ""
 type: :task
 component: core
-release: r0.3.0
+release: r0.2.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :closed
 disposition: :fixed
@@ -19,4 +19,8 @@ log_events:
 - - 2009-02-26 02:39:36.429173 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - closed with disposition fixed
+  - ""
+- - 2009-02-26 02:45:31.257077 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.0 from r0.3.0
   - ""
