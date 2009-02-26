@@ -1172,21 +1172,21 @@ class Doodle
     #class << self
       # create a factory function in appropriate module for the specified class
       def self.factory(konst)
-        p [:factory, :ancestors, konst, konst.ancestors]
+        #p [:factory, :ancestors, konst, konst.ancestors]
         #p [:factory, :lookup, Module.nesting]
         name = konst.to_s
-        p [:factory, :name, name]
+        #p [:factory, :name, name]
         anon_class = false
         if name =~ /#<Class:0x[a-fA-F0-9]+>::/
           #name = name.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
-          p [:factory_anon_class, name]
+          #p [:factory_anon_class, name]
           anon_class = true
         end
         names = name.split(/::/)
         name = names.pop
-        p [:factory, :names, names, name]
+        #p [:factory, :names, names, name]
         if names.empty? && !anon_class
-          p [:factory, :top_level_class]
+          #p [:factory, :top_level_class]
           # top level class - should be available to all
           parent_class = Object
           method_defined = begin
@@ -1200,18 +1200,19 @@ class Doodle
             eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
-          p [:factory, :other_level_class]
+          #p [:factory, :other_level_class]
           parent_class = Object
           if !anon_class
             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
-            p [:factory, :parent_class, parent_class]
+            #p [:factory, :parent_class, parent_class]
             if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-              parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+              #parent_class.module_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
+              parent_class.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
             end
           else
             # this is ruby 1.9.1 specific
             parent_class_name = names.join('::')
-            p [:factory, :parent_class_name, parent_class_name]
+            #p [:factory, :parent_class_name, parent_class_name]
             #p [:parent_class_name, parent_class_name]
             # FIXME: this is truly horrible...
 #             ObjectSpace.each_object(Class) do |m|
@@ -1225,16 +1226,17 @@ class Doodle
 #             p [:object_id, oid, hex_object_id, hex_object_id.to_i(16) >> 1]
             parent_class = ObjectSpace._id2ref(oid)
 
-            p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
+            #p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
 #             parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
 #             #parent_class = class << base_parent_class; self; end
 #             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
             if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
               #parent_class.instance_eval("p [:defining_factory_function, '#{name}', self]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
               context = parent_class.class_eval { binding }
-              p [:context, context]
+              #p [:context, context]
               #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def self.#{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
-              eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
+              #eval("p [:defining_factory_function, '#{name}', self, self.object_id]; def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
+              eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", context, __FILE__, __LINE__)
             end
           end
           #p [:name, konst, name, names, parent_class, self, name =~ Factory::RX_IDENTIFIER, "def self.#{name}(*args, &block); #{name}.new(*args, &block); end"]
@@ -1248,7 +1250,7 @@ class Doodle
 
       # inherit the factory function capability
       def self.included(other)
-        p [:included, other]
+        #p [:included, other]
         super
         # make +factory+ method available
         factory other
