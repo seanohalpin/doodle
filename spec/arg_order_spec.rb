@@ -82,7 +82,7 @@ describe 'arg_order' do
     it 'should specify order of positional arguments' do
       f = Bar.new 1
       f.value.should_be 1
-      f.name.should_be "bar"
+      f.name.should =~ /bar/
     end  
   end
 end
