@@ -4,7 +4,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 shared_code = proc do
-  class DateRange < Doodle
+  class ::DateRange < Doodle
     has :start_date, :kind => Date do
       from String do |s|
         Date.parse(s)
@@ -63,13 +63,13 @@ end
       before :each, &shared_code
       before :each do
 
-        class DerivedDateRange < DateRange
+        class ::DerivedDateRange < DateRange
         end
 
-        class SecondLevelDerivedDateRange < DateRange
+        class ::SecondLevelDerivedDateRange < DateRange
         end
 
-        @klass = self.class.const_get(klass)
+        @klass = Object.const_get(klass)
         @meth = @klass.method(:new)
 
       end
@@ -155,13 +155,13 @@ end
     temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
       before :each, &shared_code
       before :each do
-        class DerivedDateRange < DateRange
+        class ::DerivedDateRange < DateRange
         end
 
-        class SecondLevelDerivedDateRange < DateRange
+        class ::SecondLevelDerivedDateRange < DateRange
         end
 
-        @klass = self.class.const_get(klass)
+        @klass = Object.const_get(klass)
         @dr = @klass.new
       end
   
@@ -179,13 +179,13 @@ end
     temporary_constants :AttributeDate, :Base, :DateRange, :DerivedDateRange, :SecondLevelDerivedDateRange do
       before :each, &shared_code
       before :each do
-        class DerivedDateRange < DateRange
+        class ::DerivedDateRange < DateRange
         end
 
-        class SecondLevelDerivedDateRange < DateRange
+        class ::SecondLevelDerivedDateRange < DateRange
         end
 
-        @klass = self.class.const_get(klass)
+        @klass = Object.const_get(klass)
         @dr = @klass.new
       end
 

@@ -5,7 +5,7 @@ describe :DateRange, 'validation & conversions' do
     
     before :each do
 
-      class DateRange < Doodle
+      class ::DateRange < Doodle
         has :start_date, :kind => Date do
           Doodle::Debug.d { [:start_date, self, self.class] }
           from String do |s|
