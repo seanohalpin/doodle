@@ -3,7 +3,7 @@ title: add rake task to verify examples
 desc: ""
 type: :task
 component: doodle
-release: r0.2.0
+release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-02-25 00:57:52.696407 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-26 02:41:57.037170 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from r0.2.0
   - ""

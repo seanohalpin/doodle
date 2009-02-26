@@ -5,8 +5,8 @@ type: :task
 component: core
 release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-02-24 10:45:14.462921 Z
 references: []
 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-02-24 10:45:17.031168 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-02-26 02:39:36.429173 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
   - ""
