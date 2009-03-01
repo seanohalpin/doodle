@@ -1,8 +1,12 @@
+# provide the means to import source code into webby site
+# running through xmpfilter and selecting sections
+# with pre and post filters
 require 'rubygems'
 require 'wiki_creole'
 require 'coderay'
 require 'shellwords'
 require 'yaml'
+require 'systemu'
 
 def plugin_tag(input)
   tag = :none
@@ -30,66 +34,87 @@ def plugin_tag(input)
 end
 
 module CreolePlugin
-  def self.plugin_source(input, args = { })
-    lang = args.delete(:lang).to_sym
-    output = '<div class="CodeRay"><pre>'
-    #STDERR.puts [lang, args].inspect
-    output << ::CodeRay.scan(input, lang).html(args)
-    output << '</pre></div>'
-    output
-  end
-
-  def self.plugin_ruby(input, args = { })
-    #STDERR.puts args.inspect
-    plugin_source(input, args.merge(:lang => :ruby))
-  end
-
-  def self.plugin_xmp(input, args = { })
-    #STDERR.puts args.inspect
-    filename = args.delete(:filename)
-    path = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'content', 'examples', filename))
-    p [:PATH, path]
-    #input = File.read(filename)
-    input = `xmpfilter #{path}`
-    if wanted_sections = args.delete(:sections)
-      wanted_sections = [wanted_sections].flatten
-      #p [:sections, wanted_sections]
-      input = sections(input, *wanted_sections)
+  module ModuleMethods
+    def resolve_path(filename)
+      File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'content', 'examples', filename))
     end
-    plugin_source(input, args.merge(:lang => :ruby))
-  end
 
-  def self.sections(input, *wanted_sections)
-    h = split_file(input)
-    res = wanted_sections.inject([]) { |acc, section| acc << h[section] }.join('')
-    #STDERR.puts res
-    # strip trailing newlines
-    res.gsub(/\n+\Z/,'')
-  end
-  
-  def self.split_file(input)
-    sections = input.split(/^(#:\s*.*)$/)
-    # p sections.first
-    while sections.first == ""
-      sections.shift
+    def sections(input, *wanted_sections)
+      h = split_file(input)
+      res = wanted_sections.inject([]) { |acc, section| acc << h[section] }.join('')
+      # strip trailing newlines
+      res.gsub(/\n+\Z/,'')
     end
-    sections = sections.
-      map{ |x| x.gsub(/\A\s*\Z/, '')}.
-      map{ |x| x.gsub(/\A\n*/, '')}.
-      map{ |x| x == '' ? nil : x}.
-      map{ |x| x =~ /^#:\s*(.*)$/ ? $1 : x}
-    #p [:sections, sections]
-    
-    res = Hash[*sections]
-    #p res
-    res
-  end
 
+    def split_file(input)
+      sections = input.split(/^(#:\s*.*)$/)
+      # p sections.first
+      while sections.first == ""
+        sections.shift
+      end
+      sections = sections.
+        map{ |x| x.gsub(/\A\s*\Z/, '')}.
+        map{ |x| x.gsub(/\A\n*/, '')}.
+        map{ |x| x == '' ? nil : x}.
+        map{ |x| x =~ /^#:\s*(.*)$/ ? $1 : x}
+      #p [:sections, sections]
 
-  
-  def self.plugin_output(input, args = { })
-    %[<pre class="output">#{input}</pre>]
+      res = Hash[*sections]
+      #p res
+      res
+    end
+
+    def plugin_source(input, args = { }, &block)
+      if filename = args.delete(:filename)
+        path = resolve_path(filename)
+        input = File.read(path)
+      end
+      # pre filter chain
+      if filters = args.delete(:filters) || args.delete(:filter) || args.delete(:pre)
+        filters.each do |filter|
+          status, input = systemu(filter, :stdin => input)
+        end
+      end
+      # select sections
+      if wanted_sections = args.delete(:sections) || args.delete(:section)
+        wanted_sections = [wanted_sections].flatten
+        #p [:sections, wanted_sections]
+        input = sections(input, *wanted_sections)
+      end
+      if filters = args.delete(:after) || args.delete(:post)
+        filters.each do |filter|
+          status, input = systemu(filter, :stdin => input)
+        end
+      end
+      lang = args.delete(:lang).to_sym
+      output = '<div class="CodeRay"><pre>'
+      #STDERR.puts [lang, args].inspect
+      output << ::CodeRay.scan(input, lang).html(args)
+      output << '</pre></div>'
+      output
+    end
+
+    def plugin_ruby(input, args = { })
+      #STDERR.puts args.inspect
+      plugin_source(input, { :lang => :ruby }.merge(args) )
+    end
+
+    def plugin_xmp(input, args = { })
+#       filename = args.delete(:filename)
+#       path = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'content', 'examples', filename))
+#       #p [:PATH, path]
+#       #STDERR.puts args.inspect
+#       input = File.read(path)
+#       #input = `xmpfilter #{path}`
+#       status, stdout = systemu( "xmpfilter", :stdin => input )
+      plugin_source(input, { :lang => :ruby, :filter => 'xmpfilter' }.merge(args) )
+    end
+
+    def plugin_output(input, args = { })
+      %[<pre class="output">#{input}</pre>]
+    end
   end
+  extend ModuleMethods
 end
 
 WikiCreole.creole_plugin {|input|

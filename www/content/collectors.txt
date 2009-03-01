@@ -1,5 +1,4 @@
 ---
-# -*- mode: creole; -*-
 title:       collectors
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
@@ -103,8 +102,7 @@ end
 foo.list['A'] # => #<Item:0xb7cf76ac @value=1, @name="A">
 >>>
 
-If you _do_ specify an @:init@ value, it should provide a <tt>#[]</tt> method
-that accepts the type of the @:key@ specified.
+If you _do_ specify an @:init@ value, it should provide a <tt>#[]</tt> method that accepts the type of the @:key@ specified.
 
 == using your own collection types
 

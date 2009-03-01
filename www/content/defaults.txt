@@ -1,5 +1,4 @@
 ---
-# -*- mode: creole; -*-
 title:       defaults
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
@@ -10,9 +9,7 @@ filter:
 == <%= @page.title %>
 
 Doodle assumes that attributes specified without defaults
-or [[initial values]] are **required**. If you try to initialize an instance
-without providing values for all required attributes, Doodle will
-raise an exception. For example:
+or [[initial_values.html|initial values]] are **required**. If you try to initialize an instance without providing values for all required attributes, Doodle will raise an exception. For example:
 
 <<< ruby
 class Event < Doodle
@@ -42,18 +39,18 @@ Now we can create an Event without specifying a date:
 
 <<< ruby
 event = Event()
-=> #<Event:0x71343c>
+ => #<Event:0x71343c>
 event.date
-=> #<Date: 4909061/2,0,2299161>
+ => #<Date: 4909061/2,0,2299161>
 >>>
 
 You can of course override the default on initialization or later:
 
 <<< ruby
 event = Event(:date => Date.new(2008, 03, 01))
-=> #<Event:0x7036e0 @date=#<Date: 4909053/2,0,2299161>>
+ => #<Event:0x7036e0 @date=#<Date: 4909053/2,0,2299161>>
 event.date = Date.new(2008, 03, 05)
-=> #<Date: 4909061/2,0,2299161>
+ => #<Date: 4909061/2,0,2299161>
 >>>
 
 Note that if you do not specify a value for an attribute with a
@@ -63,8 +60,7 @@ default, no instance variable is created.
 
 With the default specified as above, the @date@ attribute will take on
 the value current when the class is defined.  If you want the default
-value to be recalculated every time, use a Proc object or block as the default
-value.
+value to be recalculated every time, use a Proc object or block as the default value.
 
 <<< ruby
 class Event < Doodle
@@ -78,9 +74,9 @@ class Event < Doodle
 end
 
 event.time
-=> Wed Mar 05 14:44:01 +0000 2008
+ => Wed Mar 05 14:44:01 +0000 2008
 event.time
-=> Wed Mar 05 14:44:03 +0000 2008
+ => Wed Mar 05 14:44:03 +0000 2008
 >>>
 
 === dependent attributes

@@ -1,0 +1,61 @@
+---
+title:       doodle/xml
+author:      Sean O'Halpin
+created_at:  2009-03-01 11:32:48
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
+
+{{{Doodle::XML}}} is an ~experimental~ module to enable simple saving and loading of doodles to and from XML. It is best suited to content that can be represented as only tags and attributes, i.e. not 'mixed' content including text.
+
+* Doodle instances get their own CamelCase tag based on their class name
+* Doodle collections are listed as repeated tags
+* non-Doodle scalar values are represented as attributes
+* XML text has to be denoted as such by naming an attribute {{{_text_}}}
+* You can override the output tag names by overriding @tag@ in your classes
+* You can get more control over output by overriding @format_tag@ and @format_attributes@
+
+The serialization scheme is fixed - in other words, this module is not intended to provide generic mappings to and from xml. Its primary purpose is to provide a serialization and deserialization scheme for Doodle objects.
+
+Having said that, the scheme is actually quite flexible, as the following example shows.
+
+== example: loading objects from xml
+
+This example is based on the one at http://xml-mapping.rubyforge.org/, itself in turn lifted from http://www.castor.org/xml-mapping.html :) Honour among thieves, eh?
+
+The source file looks like this:
+
+<<< source filename: castor-xml-example.xml, lang: xml >>>
+
+The doodle definitions:
+
+<<< xmp filename: castor-xml-example.rb, sections: definition >>>
+
+This is how you load the above file and create corresponding object graph:
+
+<<< xmp filename: castor-xml-example.rb, sections: use >>>
+
+The object graph:
+
+<<< xmp filename: castor-xml-example2.rb, sections: output, after: ["sed 's/# >> //g'"], lang: ruby >>>
+
+and output as xml using @to_xml@:
+
+<<< xmp filename: castor-xml-example.rb, sections: output, after: ["sed 's/# >> //g' | tidy -xml -i"], lang: xml >>>
+
+== example: generating new xml
+
+<<< xmp filename: castor-example-use-order.rb, sections: use >>>
+
+and its output:
+
+<<< xmp filename: castor-example-use-order.rb, sections: output, after: ["sed 's/# >> //g' | tidy -xml -i"], lang: xml >>>
+
+=== Shortcomings
+
+* Cycles are not handled at all (and won't be until I complete the more general Doodle graph visitor framework)
+* Having to use {{{_text_}}} as an attribute name - though it is meant to be ugly to dissuade you from using it at all :)
+* Fixed method of deciding whether something is an attribute or has its own tag. This can be overridden (see @TextValue@ above) but it's not always obvious how to go about it for more complex cases.

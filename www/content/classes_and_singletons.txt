@@ -1,5 +1,4 @@
 ---
-# -*- mode: creole; -*-
 title:       classes and singletons
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
@@ -12,20 +11,20 @@ filter:
 You can also use @has@ for class attributes:
 
 <<< ruby
-  class Foo < Doodle
-    class << self
-      has :doc, :default => "This is the Foo class"
-    end
+class Foo < Doodle
+  class << self
+    has :doc, :default => "This is the Foo class"
   end
+end
 >>>
 
 or singleton instances:
 
 <<< ruby
-  foo = Foo.new
-  class << foo
-    has :special, :default => 'This object is special'
-  end
-  p foo.special
-  # => 'This object is special'
+foo = Foo.new
+class << foo
+  has :special, :default => 'This object is special'
+end
+p foo.special
+# => 'This object is special'
 >>>
