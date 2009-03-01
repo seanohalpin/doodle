@@ -1387,10 +1387,13 @@ class Doodle
     end
     def resolve_value(value)
       if value.kind_of?(collector_class)
+        #p [:resolve_value, :value, value]
         value
       elsif collector_class.__doodle__.conversions.key?(value.class)
+        #p [:resolve_value, :collector_class_from, value]
         collector_class.from(value)
       else
+        #p [:resolve_value, :collector_class_new, value]
         collector_class.new(value)
       end
     end
@@ -1404,16 +1407,20 @@ class Doodle
           h
         end
       end
-      from String do |enum|
-        resolve_collector_class
-        post_process( resolve_value(enum) )
-      end
       from Enumerable do |enum|
+        #p [:enum, Enumerable]
         resolve_collector_class
-        post_process( enum.map{ |value| resolve_value(value) } )
+        # this is not very elegant but String is a classified as an
+        # Enumerable in 1.8.x (but behaves differently)
+        if enum.kind_of?(String) && self.init.kind_of?(String)
+          post_process( resolve_value(enum) )
+        else
+          post_process( enum.map{ |value| resolve_value(value) } )
+        end
       end
     end
     def post_process(results)
+      #p [:post_process, results]
       self.init.clone.replace(results)
     end
   end
