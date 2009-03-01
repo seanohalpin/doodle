@@ -1,117 +1,123 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       collectors
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
   - wikilinks
-  - outline
+  - creole
 ---
-<toc numbering="off"/>
-
-h2(title). <%= @page.title %>
+== <%= @page.title %>
 
 Collectors provide a means to define a convenience method you can use to add items
 to a collection. For example:
 
-<% coderay(:lang => "ruby") do -%>
-  class Location < Doodle
-    has :name
-  end
-  class Event < Doodle
-    has :locations, :collect => Location
-  end
+<<< ruby
+class Location < Doodle
+  has :name
+end
+class Event < Doodle
+  has :locations, :collect => Location
+end
 
-  event = Event do
-    location "Stage 1"
-    location "Stage 2"
-  end
-<% end %>
+event = Event do
+  location "Stage 1"
+  location "Stage 2"
+end
+>>>
 
 In the example above, we want @locations@ to be an array of @Location@
 objects. Using the
 
-<% coderay(:lang => "ruby") do -%>
-  :collect => Location
-<% end %>
+<<< ruby
+:collect => Location
+>>>
 
 option defines a method called @location@ (derived from the class
 name). Each time the @location@ method is called a new @Location@
-object is added to the @locations@ array
+object is added to the @locations@ array.
+
+If the class hasn't been defined yet, you can use a Symbol or String
+to name the class:
+
+<<< ruby
+:collect => :Location
+>>>
 
 To use a specific name for the collecting method, pass a hash
 containing
 
-<% coderay(:lang => "ruby") do -%>
-  {:method_name => ClassName}
-<% end %>
+<<< ruby
+{:method_name => ClassName}
+>>>
 
 to the @collect@ option like this:
 
-<% coderay(:lang => "ruby") do -%>
-    has :locations, :collect => {:place => Location}
-    ...
-    event = Event do
-      place "Stage 1"
-      place "Stage 2"
-    end
-<% end %>
+<<< ruby
+has :locations, :collect => {:place => Location}
+...
+event = Event do
+  place "Stage 1"
+  place "Stage 2"
+end
+>>>
 
 @ClassName@ can be a ClassConstant, a :Symbol or a "String".
 
 Finally, if you don't want to restrict the value to a particular
 class, you can just specify a method name:
 
-<% coderay(:lang => "ruby") do -%>
-    has :locations, :collect => :place
-    ...
-    event = Event do
-      place "Stage 1"
-      place 42
-    end
-<% end %>
+<<< ruby
+has :locations, :collect => :place
+...
+event = Event do
+  place "Stage 1"
+  place 42
+end
+>>>
 
-h3. keyed collections
+=== keyed collections
 
 You can also build keyed collections using @:collect@. Use
 
-<% coderay(:lang => "ruby") do -%>
-    :key => :method_name
-<% end %>
+<<< ruby
+:key => :method_name
+>>>
 
 to tell doodle which method to call on the collected object to provide
 a key. If you don't specify an @:init@ value, doodle will create a
 hash to hold the collected items. For example:
 
-<% coderay(:lang => "ruby") do -%>
-    class Item < Doodle
-      has :name
-      has :value
-    end
-    class Foo < Doodle
-      has :list, :collect => Item, :key => :name
-    end
-    foo = Foo do
-      item 'A', 1
-      item 'B', 2
-    end
-    foo.list['A'] # => #<Item:0xb7cf76ac @value=1, @name="A">
-<% end %>
+<<< ruby
+class Item < Doodle
+  has :name
+  has :value
+end
+class Foo < Doodle
+  has :list, :collect => Item, :key => :name
+end
+foo = Foo do
+  item 'A', 1
+  item 'B', 2
+end
+foo.list['A'] # => #<Item:0xb7cf76ac @value=1, @name="A">
+>>>
 
-If you _do_ specify an @:init@ value, it should provide a @#[]@ method
+If you _do_ specify an @:init@ value, it should provide a <tt>#[]</tt> method
 that accepts the type of the @:key@ specified.
 
-h2. notes
+== using your own collection types
 
-h3. Array-like collectors
+=== array-like collectors
 
 To collect into something other than an @Array@, use the
 @:init@ option. You need to supply an instance of an Enumerable that
-provides the @<<@ method.
+provides the {{{<<}}}, {{{clone}}} and {{{replace}}} methods.
 
-h3. Hash-like collectors
+<<< xmp filename: eg-string-collector.rb, sections: [definition, use] >>>
+
+=== hash-like collectors
 
 To collect into something other than an @Hash@, use the
 @:init@ option. You need to supply an instance of an Hash-like class that
-provides the @[]=@, @[]@ and @key@ methods.
+provides the {{{[]=}}}, {{{[]}}}, {{{key}}} methods.

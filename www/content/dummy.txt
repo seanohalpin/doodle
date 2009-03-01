@@ -1,0 +1,44 @@
+---
+# -*- mode: creole; -*-
+title:       dummy
+author:      Sean O'Halpin
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+= <%= @page.title %>
+
+doodle is a Ruby gem for creating extended attribute accessors
+with defaults, conversions and validations.
+
+== example
+
+The example below shows how to define an attribute with a validation
+and a conversion:
+
+<<< ruby
+require 'rubygems'
+require 'doodle'
+
+class Life < Doodle
+  ANSWER = 42
+  has :answer do
+    must "be #{ANSWER}" do |value|
+      value == ANSWER
+    end
+    from String do |s|
+      s.to_i
+    end
+  end
+end
+
+a = Life.new(:answer => "42")   # => #<Life:0x10aba6c @answer=42>
+b = Life(41)                    # =>
+# ~> -:16: Life.answer must be 42 - got Fixnum(41)
+(Doodle::ValidationError)
+>>>
+
+sdasd
+ada

@@ -1,16 +1,13 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       initial values
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
   - wikilinks
-  - outline
+  - creole
 ---
-<toc numbering="off"/>
-
-h2(title). <%= @page.title %>
+== <%= @page.title %>
 
 Sometimes, you don't want _default_ values set when the _class_ is
 _defined_ or recalculated every time. Instead you want _initial_ values which
@@ -18,7 +15,7 @@ are set when the _object_ is _instantiated_. Also, default values are
 fine for simple scalar objects, but can cause problems with aggregates
 such as Arrays because you end up sharing them among all instances:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   class Event < Doodle
     has :locations, :default => []
   end
@@ -27,11 +24,11 @@ such as Arrays because you end up sharing them among all instances:
   e2 = Event()
   e1.locations.object_id == e2.locations.object_id
   => true
-<% end %>
+>>>
 
 In these cases, use @init@ instead of @default@:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   class Event < Doodle
     has :locations, :init => []
   end
@@ -40,20 +37,20 @@ In these cases, use @init@ instead of @default@:
   e2 = Event()
   e1.locations.object_id == e2.locations.object_id
   => false
-<% end %>
+>>>
 
 Internally, Doodle copies the @init@ value by cloning it. Unlike
 @default@, @init@ _does_ create an instance variable.
 
 However, we can set still the @date@ attribute to any value we like.
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   event = Event :start_date => "Hello"
   event.start_date
   => "Hello"
   event.end_date
   => TypeError: can't convert Fixnum into String
-<% end %>
+>>>
 
 To avoid this kind of inconsistency, we can restrict the kinds of
-values the @date@ attribute will accept with [[validations]].
+values the @date@ attribute will accept with link[validations].

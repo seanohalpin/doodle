@@ -1,38 +1,38 @@
 ---
-# -*- mode: textile; -*-
-title:       introduction
+# -*- mode: creole; -*-
+title:       table of contents
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
   - wikilinks
+  - creole
 ---
 
-h6. contents
+====== contents
 
-* [[introduction]]
-* [[initialization]]
-* [[defaults]]
-* [[initial values]]
-* [[validations]]
-* [[conversions]]
-* [[collectors]]
-* [[classes and singletons]]
+* link[introduction]
+* link[initialization]
+* link[defaults]
+* link[initial values]
+* link[validations]
+* link[conversions]
+* link[collectors]
+* link[classes and singletons]
 
-h6. extras
+====== extras
 
-* [[doodle/app]] - command line option handling DSL
-* [[doodle/xml]] - @to_xml@ and @from_xml@
+* link[doodle/app] - command line option handling
+* link[doodle/xml] - {{{to_xml}}} and {{{from_xml}}}
 
-h6. examples
+====== examples
 
-* [[simple]]
-* [[animal house]]
-* [[more]]
+* link[simple]
+* link[animal house]
+* link[more]
 
-h6. misc
+====== project
 
-* [[design notes]]
-* "Rubyforge project":http://rubyforge.org/projects/doodle
-* "github":http://github.com/seanohalpin/doodle/tree/master
-* "rubydoc":./doc/index.html
+* link[design notes]
+* [[http://rubyforge.org/projects/doodle|Rubyforge project]]
+* [[http://github.com/seanohalpin/doodle/tree/master|github]]
+* [[./doc/index.html|rubydoc]]

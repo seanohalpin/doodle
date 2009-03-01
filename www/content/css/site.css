@@ -5,11 +5,12 @@ layout:    nil   # no layout
 
 color:
   background:  "#FFFFFF"
+  foreground:  "#000000"
   border:      "#ddd"
-#  header:      "#d00d1e"
-  header:      "#111111"
-  link:        "#125AA7"
-#  link:      "#d00d1e"
+  header:      "#d00d1e"
+#  header:      "#111111"
+#  link:        "#125AA7"
+  link:      "#d00d1e"
   link-hover:  "#000"
   blockquote:  "#666"
   box-bg:      "#eee"
@@ -18,16 +19,43 @@ color:
   alt:         "#666"
 font_size: "100%"
 code_font_size: "110%"
+pre_font_size: "80%"
 ---
 
 body {
-  font-family: Verdana, "Bitstream Vera Sans", sans-serif;
-  font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
-  font-size: <%= @page.font_size %>;
+   font-family: Verdana, "Bitstream Vera Sans", sans-serif;
+   font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
+   font-family: Palatino,sans-serif;
+   font-family: Cambria, Georgia, Times, Times New Roman, serif;
+   font-size: <%= @page.font_size %>;
+   color: <%= @page.color['foreground'] %>;
+   background-color: <%= @page.color['background'] %>;
+}
+
+pre,code,tt { font-family: 'andale mono', 'monotype.com', 'lucida console', monospace; }
+
+p {
+   margin-top: 1em;
+   margin-bottom: 0.75em;
+}
+
+pre, code {
+   margin-top: 0em;
+   margin-right: 0pt;
+   margin-bottom: 0.75em;
+   margin-left: 0pt;
+   white-space: pre;
 }
 
 pre {
  font-size: <%= @page.code_font_size %>;
+ }
+
+pre.output {
+ font-size: <%= @page.pre_font_size %>;
+ padding: 0.5em;
+ padding-top: 1em;
+ padding-bottom: 1em;
  }
 
 div.tiny {
@@ -82,7 +110,7 @@ p.quiet { color: <%= @page.color['quiet'] %>; }
 .alt    { color: <%= @page.color['alt'] %>; }
 
 p.title {
-  color: #111;
+  color: <%= @page.color['title'] %>;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
   font-size: 2em;
@@ -95,9 +123,21 @@ h1,h2,h3,h4,h5,h6 {
   color: <%= @page.color['header'] %>;
   font-family: Georgia,Palatino,Times,'Times New Roman',sans-serif;
   font-weight: 400;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
 }
 
 /* overrides */
+
+h2 {
+   margin-top: 0em;
+}
+
+h5,h6 {
+   font-weight: bold;
+}
+
+a { text-decoration: none; }
 
 em, dfn {
 font-style: italic;
@@ -107,6 +147,8 @@ background-repeat: repeat;
 background-attachment: scroll;
 background-position: 0% 0%;
 }
+
+
 
 
 /* EOF */

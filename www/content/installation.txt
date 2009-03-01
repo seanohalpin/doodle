@@ -1,53 +1,53 @@
-h2. installation
+== installation
 
 On Linux or Mac OS X:
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   $ sudo gem install doodle
-<% end %>
+>>>
 
 On Windows:
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   C:\> gem install doodle
-<% end %>
+>>>
 
-h2. initialization
+== initialization
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   require 'rubygems'
   require 'doodle'
 
   class Event < Doodle
     has :date
   end
-<% end %>
+>>>
 
 With this declaration, you can now initialize an instance of Event in the following ways.
 
-h3. using positional arguments
+=== using positional arguments
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   event = Event Date.today
-<% end %>
+>>>
 
-h3. named arguments
+=== named arguments
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   event = Event :date => Date.today
-<% end %>
+>>>
 
-h3. block initialization
+=== block initialization
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   event = Event do
     date Date.today
   end
-<% end %>
+>>>
 
 Of course, if you insist on typing @new@, you can:
 
-<% coderay(:lang => "ruby", :line_numbers => "inline") do -%>
+<<< ruby
   event = Event.new(:date => Date.today)
-<% end %>
+>>>
 

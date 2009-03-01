@@ -1,51 +1,48 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       initialization
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
-  - wikiwords
-  - outline
+  - wikilinks
+  - creole
 ---
-<toc numbering="off"/>
+== <%= @page.title %>
 
-h2(title). <%= @page.title %>
-
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   require 'rubygems'
   require 'doodle'
 
   class Event < Doodle
     has :date
   end
-<% end %>
+>>>
 
 With this declaration, you can now initialize an instance of @Event@ in the following ways.
 
-h3. using positional arguments
+=== using positional arguments
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   event = Event Date.today
-<% end %>
+>>>
 
-h3. named arguments
+=== named arguments
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   event = Event :date => Date.today
-<% end %>
+>>>
 
-h3. block initialization
+=== block initialization
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   event = Event do
     date Date.today
   end
-<% end %>
+>>>
 
 Of course, if you insist on typing @new@, you can:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   event = Event.new(:date => Date.today)
-<% end %>
+>>>
 

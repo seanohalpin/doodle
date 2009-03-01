@@ -1,31 +1,31 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       classes and singletons
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
   - wikilinks
+  - creole
 ---
-h2(title). <%= @page.title %>
+== <%= @page.title %>
 
 You can also use @has@ for class attributes:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   class Foo < Doodle
     class << self
       has :doc, :default => "This is the Foo class"
     end
   end
-<% end %>
+>>>
 
 or singleton instances:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   foo = Foo.new
   class << foo
     has :special, :default => 'This object is special'
   end
   p foo.special
   # => 'This object is special'
-<% end %>
+>>>

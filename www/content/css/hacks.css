@@ -1,0 +1,24 @@
+.CodeRay {
+  background-color: #232323;
+  border: 1px solid black;
+  font-family: 'Courier New', 'Terminal', monospace;
+  color: #E6E0DB;
+  padding: 3px 5px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  overflow: auto;
+  font-size: 12px;
+  margin-top: 0em;
+  color: #4EEE94;               /* SeaGreen2 */
+/*   line-height: 1.4; */
+}
+
+tt {
+   font-size: 80%;
+/*    font-weight: bold; */
+/*    background-color: #404040; */
+   color: #80FF80;
+   color: #202020;
+   background-color: #E0E0E0;
+   padding: 2px;
+}

@@ -1,22 +1,20 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       conversions
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
-  - outline
+  - wikilinks
+  - creole
 ---
-<toc numbering="off"/>
-
-h2(title). <%= @page.title %>
+== <%= @page.title %>
 
 Even when you want to restrict an attribute to a particular kind, it
 is often convenient to allow initialization from values that can be
 converted to the target type. To do this in Doodle, use the @from@
 method inside an attribute's definition block:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   class Event < Doodle
     has :start_date, :kind => Date do
       from String do |value|
@@ -35,20 +33,20 @@ method inside an attribute's definition block:
   event.start_date = '2001-01-01'
   event.start_date        # => #<Date: 4903821/2,0,2299161>
   event.start_date.to_s   # => "2001-01-01"
-<% end %>
+>>>
 
 You can pass multiple classes or modules to @from@ - it's up to you to
 ensure that it makes sense to do so. For example:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   from Symbol, String do |name|
     Event(:name => name.to_s)
   end
-<% end %>
+>>>
 
 @from@ also works on the class level:
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
   class Event < Doodle
     ...
     from String do |value|
@@ -59,6 +57,6 @@ ensure that it makes sense to do so. For example:
   event = Event.from '2008-03-05 to 2008-03-06'
   event.start_date.to_s   # => "2008-03-05"
   event.end_date.to_s     # => "2008-03-06"
-<% end %>
+>>>
 
 Note: the class level interface to @from@ may change in a future version.

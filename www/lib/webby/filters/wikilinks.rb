@@ -15,8 +15,10 @@ end
 Webby::Filters.register :wikilinks do |input, cursor|
 
   renderer = cursor.renderer
-  input.gsub %r/\[\[([^\]]+)\]\]/ do
+  input = input.gsub %r/link\[([^\]]+)\]/ do
+  #input.gsub %r/\[\[([^|\]]+)\]\]/ do
     name = $1
+    p [:wikilink, name]
     link, anchor, text = wikilink(name)
     text ||= link
     # apologies for confusing terminology :)

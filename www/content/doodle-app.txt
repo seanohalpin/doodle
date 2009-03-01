@@ -1,23 +1,20 @@
 ---
-# -*- mode: textile; -*-
+# -*- mode: creole; -*-
 title:       doodle/app
 author:      Sean O'Halpin
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
-  - textile
   - wikilinks
-  - outline
+  - creole
 ---
-<toc class="toc" numbering="off"/>
-
-h2(title). <%= @page.title %>
+== <%= @page.title %>
 
 @Doodle::App@ makes it easy to define command line options.
 
-h2. example
+=== example
 
-<% coderay(:lang => "ruby") do -%>
+<<< ruby
 require 'rubygems'
 require 'doodle/app'
 
@@ -34,20 +31,20 @@ end
 if  __FILE__ == $0
   Filter.run(ARGV)
 end
-<% end %>
+>>>
 
-<% coderay(:lang => "shell") do -%>
 $ ruby examples/filter.rb index.txt
+<<< output
 ERROR: #<Filter:0x124a60c> missing required attribute 'output'
-<% end %>
+>>>
 
-<% coderay(:lang => "shell") do -%>
 $ ruby filter.rb foo.txt
+<<< output
 ERROR: Filter.input must exist - got String("foo.txt")
-<% end %>
+>>>
 
-<% coderay(:lang => "shell") do -%>
 $ ruby filter.rb --help
+<<< output
 filter.rb
 
 Usage: ./filter.rb -i STRING -o STRING
@@ -60,4 +57,4 @@ Options:
   -h, --help         BOOLEAN    display this help
   -v, --verbose      BOOLEAN    verbose output
   -D, --debug        BOOLEAN    turn on debugging
-<% end %>
+>>>
