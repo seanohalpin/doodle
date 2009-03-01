@@ -1,16 +1,18 @@
 .CodeRay {
-  background-color: #232323;
-  border: 1px solid black;
-  font-family: 'Courier New', 'Terminal', monospace;
-  color: #E6E0DB;
-  padding: 3px 5px;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  overflow: auto;
-  font-size: 12px;
-  margin-top: 0em;
-  color: #4EEE94;               /* SeaGreen2 */
+   background-color: #232323;
+   border: 1px solid black;
+   font-family: 'Courier New', 'Terminal', monospace;
+   color: #E6E0DB;
+   padding: 1em;
+   overflow: auto;
+   font-size: 12px;
+   margin-top: 0em;
+   color: #4EEE94;               /* SeaGreen2 */
 /*   line-height: 1.4; */
+}
+
+pre {
+   padding: 1em;
 }
 
 tt {
@@ -22,3 +24,4 @@ tt {
    background-color: #E0E0E0;
    padding: 2px;
 }
+

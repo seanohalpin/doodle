@@ -11,78 +11,36 @@ filter:
 
 === by kind
 
-<<< ruby
-  class Event < Doodle
-    has :start_date, :kind => Date
-  end
->>>
+<<< xmp filename: eg-validations1.rb, sections: definitions >>>
 
 Doodle uses @kind_of?@ to test the value, so @kind@ can be set to any module
 (e.g. @Enumerable@), class or superclass that makes sense for your application.
 
 If you now try to initialize @Event#date@ with something that isn't a @Date@:
 
-<<< ruby
-  event = Event.new(:date => "Hello")
->>>
+<<< xmp filename: eg-validations1.rb, sections: use >>>
 
 you'll get a @Doodle::ValidationError@ exception:
 
-<<< output
-  date must be Date - got String("Hello") (Doodle::ValidationError)
->>>
+<<< xmp filename: eg-validations1.rb, sections: output >>>
 
 === attribute validations using @must@
 
 To specify a validation on an attribute, use @must@ inside the attribute's definition block:
 
-<<< ruby
-  class Event < Doodle
-    has :start_date, :kind => Date do
-      must "be >= today" do |value|
-        value >= Date.today
-      end
-    end
-  end
-
-  event = Event :start_date => Date.today
-  event.start_date = Date.parse('2001-01-01')
-  =>  start_date must be >= today - got
-  Date(#<Date: 4903821/2,0,2299161>) (Doodle::ValidationError)
->>>
+<<< xmp filename: eg-validations2.rb, sections: all >>>
 
 The @must@ block should return @true@ if the value is valid, @false@
 otherwise. A failed validation will raise a @Doodle::ValidationError@
 exception.
 
-Attribute validations happen _before_ the instance variable is changed.
+Attribute validations happen ~before~ the instance variable is changed.
 
 === instance level validations
 
 You can also specify validations for the object as a whole:
 
-<<< ruby
-  class Event < Doodle
-    has :start_date, :kind => Date do
-      must "be >= today" do |value|
-        value >= Date.today
-      end
-    end
-    has :end_date, :kind => Date do
-      default { start_date }
-    end
-
-    must "have end_date >= start_date" do
-      end_date >= start_date
-    end
-  end
-
-  event = Event :start_date => Date.today
-  event.end_date = Date.parse('2001-01-01')
-  =>  #<Event:0x657ed0 @start_date=#<Date: 4909061/2,0,2299161>,
-  @end_date=#<Date: 4903821/2,0,2299161>>
-  must have end_date >= start_date (Doodle::ValidationError)
->>>
+<<< xmp filename: eg-validations3.rb, sections: all >>>
 
 Note that you don't need to project the value into the block but you
 can if you like - its value is the object instance itself.
@@ -102,24 +60,9 @@ exception). @validate!@ returns the validated object on success, so
 you can get a validated object from a yaml source using the following:
 
 <<< ruby
-  foo = YAML::load(yaml_source).validate!
+foo = YAML::load(yaml_source).validate!
 >>>
 
 The following will raise an exception, complaining that 'name' is missing:
 
-<<< ruby
-  require "rubygems"
-  require "doodle"
-  require "yaml"
-  class Foo < Doodle
-    has :name
-    has :date
-  end
-  str = %[
-  --- !ruby/object:Foo
-  date: 2000-07-01
-  ]
-  # load from string
-  foo = YAML::load(str).validate!
-  # => #<Foo:0x10c4cb0> missing required attribute 'name' (ArgumentError)
->>>
+<<< xmp filename: eg-validations4.rb, sections: all >>>

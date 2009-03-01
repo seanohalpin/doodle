@@ -9,47 +9,47 @@ filter:
 ---
 == <%= @page.title %>
 
-Sometimes, you don't want _default_ values set when the _class_ is
-_defined_ or recalculated every time. Instead you want _initial_ values which
-are set when the _object_ is _instantiated_. Also, default values are
+Sometimes, you don't want ~default~ values set when the ~class~ is
+~defined~ or recalculated every time. Instead you want ~initial~ values which
+are set when the ~object~ is ~instantiated~. Also, default values are
 fine for simple scalar objects, but can cause problems with aggregates
 such as Arrays because you end up sharing them among all instances:
 
 <<< ruby
-  class Event < Doodle
-    has :locations, :default => []
-  end
+class Event < Doodle
+  has :locations, :default => []
+end
 
-  e1 = Event()
-  e2 = Event()
-  e1.locations.object_id == e2.locations.object_id
-  => true
+e1 = Event()
+e2 = Event()
+e1.locations.object_id == e2.locations.object_id
+=> true
 >>>
 
 In these cases, use @init@ instead of @default@:
 
 <<< ruby
-  class Event < Doodle
-    has :locations, :init => []
-  end
+class Event < Doodle
+  has :locations, :init => []
+end
 
-  e1 = Event()
-  e2 = Event()
-  e1.locations.object_id == e2.locations.object_id
-  => false
+e1 = Event()
+e2 = Event()
+e1.locations.object_id == e2.locations.object_id
+=> false
 >>>
 
 Internally, Doodle copies the @init@ value by cloning it. Unlike
-@default@, @init@ _does_ create an instance variable.
+@default@, @init@ ~does~ create an instance variable.
 
 However, we can set still the @date@ attribute to any value we like.
 
 <<< ruby
-  event = Event :start_date => "Hello"
-  event.start_date
-  => "Hello"
-  event.end_date
-  => TypeError: can't convert Fixnum into String
+event = Event :start_date => "Hello"
+event.start_date
+=> "Hello"
+event.end_date
+=> TypeError: can't convert Fixnum into String
 >>>
 
 To avoid this kind of inconsistency, we can restrict the kinds of

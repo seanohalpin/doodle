@@ -53,9 +53,7 @@ pre {
 
 pre.output {
  font-size: <%= @page.pre_font_size %>;
- padding: 0.5em;
- padding-top: 1em;
- padding-bottom: 1em;
+ padding: 1em;
  }
 
 div.tiny {

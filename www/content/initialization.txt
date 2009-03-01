@@ -10,12 +10,12 @@ filter:
 == <%= @page.title %>
 
 <<< ruby
-  require 'rubygems'
-  require 'doodle'
+require 'rubygems'
+require 'doodle'
 
-  class Event < Doodle
-    has :date
-  end
+class Event < Doodle
+  has :date
+end
 >>>
 
 With this declaration, you can now initialize an instance of @Event@ in the following ways.
@@ -23,26 +23,26 @@ With this declaration, you can now initialize an instance of @Event@ in the foll
 === using positional arguments
 
 <<< ruby
-  event = Event Date.today
+event = Event Date.today
 >>>
 
 === named arguments
 
 <<< ruby
-  event = Event :date => Date.today
+event = Event :date => Date.today
 >>>
 
 === block initialization
 
 <<< ruby
-  event = Event do
-    date Date.today
-  end
+event = Event do
+  date Date.today
+end
 >>>
 
 Of course, if you insist on typing @new@, you can:
 
 <<< ruby
-  event = Event.new(:date => Date.today)
+event = Event.new(:date => Date.today)
 >>>
 
