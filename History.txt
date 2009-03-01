@@ -15,6 +15,7 @@
 
 - Bug fixes:
   - all specs now pass in ruby 1.8.6, 1.9.1 and JRuby 1.1.6 (1 pending)
+  - renabled String collectors
 
 == 0.1.9 / 2008-08-13
 - Features:
@@ -43,7 +44,7 @@
         animal 'pig'
       end
     end
-    
+
     Will not try this for an attribute with :abstract => true
 
   - attributes now have :doc option
@@ -147,7 +148,7 @@
 
 == 0.1.5 / 2008-05-06
 - Bug fixes:
-  - fixed bug where defaults were preventing validation working when loading from 
+  - fixed bug where defaults were preventing validation working when loading from
     YAML and added spec
 
 == 0.1.4 / 2008-05-06
@@ -177,7 +178,7 @@
 - created a Google group: http://groups.google.com/group/ruby-doodle
 - major change: changed Doodle from module to class so you now use
     class Foo < Doodle
-  instead of 
+  instead of
     class Foo < Doodle::Base
 - Doodle::Helper renamed Doodle::Core
 - added #parent method - returns outer object in initialization blocks
@@ -252,7 +253,7 @@
 
 - tidied up validation specs
 
-- fixed dumb bug where validations were getting duplicated resulting from using push on the source array. D'oh! 
+- fixed dumb bug where validations were getting duplicated resulting from using push on the source array. D'oh!
 
 - added Doodle::DoodleInfo.raise_exception_on_error - set to false to have errors collected only
   without raising an exception (which is the default behaviour)
