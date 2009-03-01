@@ -1404,6 +1404,10 @@ class Doodle
           h
         end
       end
+      from String do |enum|
+        resolve_collector_class
+        post_process( resolve_value(enum) )
+      end
       from Enumerable do |enum|
         resolve_collector_class
         post_process( enum.map{ |value| resolve_value(value) } )

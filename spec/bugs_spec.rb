@@ -152,14 +152,14 @@ describe Doodle, 'initializing from hashes and yaml' do
       yaml = person.to_yaml
       # be careful here - Ruby yaml is finicky (spaces after class names)
       yaml = yaml.gsub(/\s*\n/m, "\n")
-#       yaml.should_be %[--- !ruby/object:Person
-# address:
-# - !ruby/object:AddressLine
-#   text: Henry Wood House
-# - !ruby/object:AddressLine
-#   text: London
-# name: Sean
-# ]
+      #       yaml.should_be %[--- !ruby/object:Person
+      # address:
+      # - !ruby/object:AddressLine
+      #   text: Henry Wood House
+      # - !ruby/object:AddressLine
+      #   text: London
+      # name: Sean
+      # ]
       loaded = YAML::load(source_yaml)
       loaded[:name].should_be person.name
       loaded[:address].should_be person.address.map{|x| x.text}
@@ -346,9 +346,41 @@ describe Doodle, 'if default specified before required attributes, they are igno
 
     it 'should define required attributes' do
       a = Address do
-          city "London"
-        end
+        city "London"
+      end
       a.city.should_be "London"
+    end
+  end
+
+end
+
+describe Doodle, 'bugs: using String in collector' do
+  temporary_constant :Text do
+    before :each do
+      #: definition
+      class Text < Doodle
+        has :body, :init => "", :collect => :line
+        def to_s
+          body
+        end
+      end
+    end
+
+    it 'should not raise an exception' do
+      proc { 
+        text = Text do
+          line "line 1"
+          line "line 2"
+        end
+      }.should_not raise_error
+    end
+    
+    it 'should concatenate strings' do
+      text = Text do
+        line "line 1"
+        line "line 2"
+      end
+      text.to_s.should_be "line 1line 2"
     end
   end
 
