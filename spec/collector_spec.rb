@@ -14,11 +14,11 @@ describe Doodle, "Default collector" do
     after :each do
       remove_ivars :foo
     end
-    
+
     it "should define a collector method :item" do
       @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
     end
-    
+
     it "should collect items into attribute :list" do
       @foo.list.should_be ["Hello", "World"]
     end
@@ -40,11 +40,11 @@ describe Doodle, "Simple collector" do
     after :each do
       remove_ivars :foo
     end
-    
+
     it "should define a collector method :item" do
       @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
     end
-    
+
     it "should collect items into attribute :list" do
       @foo.list.should_be ["Hello", "World"]
     end
@@ -73,11 +73,11 @@ describe Doodle, "Typed collector with default collector name" do
     after :each do
       remove_ivars :event
     end
-    
+
     it "should define a collector method :location" do
       @event.methods.map{ |x| x.to_sym }.include?(:location).should_be true
     end
-    
+
     it "should collect items into attribute :list" do
       @event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
     end
@@ -174,11 +174,11 @@ describe Doodle, "Simple keyed collector" do
     after :each do
       remove_ivars :foo
     end
-    
+
     it "should define a collector method :item" do
       @foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
     end
-    
+
     it "should collect items into attribute :list" do
       @foo.list.should_be( { 5 => "World" } )
     end
@@ -196,13 +196,13 @@ describe Doodle, "Simple keyed collector #2" do
         has :list, :collect => Item, :key => :name
       end
     end
-    
+
     it "should define a collector method :item" do
       foo = Foo.new
       foo.methods.map{ |x| x.to_sym }.include?(:item).should_be true
       foo.respond_to?(:item).should_be true
     end
-    
+
     it "should collect items into attribute :list #1" do
       foo = Foo do
         item "Hello"
@@ -220,7 +220,7 @@ describe Doodle, "Simple keyed collector #2" do
                 )
       foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
-    
+
     it "should collect positional argument enumerable into attribute :list" do
       foo = Foo([
                 { :name => "Hello" },
@@ -238,6 +238,73 @@ describe Doodle, "Simple keyed collector #2" do
                 )
       foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
-    
+
+  end
+end
+
+describe Doodle, 'using String as collector' do
+  temporary_constant :Text do
+    before :each do
+      #: definition
+      class Text < Doodle
+        has :body, :init => "", :collect => :line
+        def to_s
+          body
+        end
+      end
+    end
+
+    it 'should not raise an exception' do
+      proc {
+        text = Text do
+          line "line 1"
+          line "line 2"
+        end
+      }.should_not raise_error
+    end
+
+    it 'should concatenate strings' do
+      text = Text do
+        line "line 1"
+        line "line 2"
+      end
+      text.to_s.should_be "line 1line 2"
+    end
+  end
+end
+
+describe Doodle, 'collecting text values into non-String collector' do
+  # this is a regression test - when collecting String values into a
+  # non-String accumulator should instantiate from
+  # collector_class.new(value)
+  temporary_constants :Name, :TextValue, :Signature do
+    before :each do
+      class ::Name < Doodle
+        has :value
+      end
+      class ::Signature < Doodle
+        has Name
+      end
+      class ::SignedBy  < Doodle
+        has :signatures, :collect => Signature
+      end
+    end
+
+    it 'should not raise an exception' do
+      proc {
+        signed_by = SignedBy do
+          signature "Sean"
+        end
+      }.should_not raise_error
+    end
+
+    it 'should convert String values to instances of collector class' do
+      signed_by = SignedBy do
+        signature "Sean"
+      end
+      signed_by.signatures.first.class.should_be Signature
+      signed_by.signatures.first.name.class.should_be Name
+      signed_by.signatures.first.name.value.should_be "Sean"
+    end
   end
 end

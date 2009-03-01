@@ -354,34 +354,3 @@ describe Doodle, 'if default specified before required attributes, they are igno
 
 end
 
-describe Doodle, 'bugs: using String in collector' do
-  temporary_constant :Text do
-    before :each do
-      #: definition
-      class Text < Doodle
-        has :body, :init => "", :collect => :line
-        def to_s
-          body
-        end
-      end
-    end
-
-    it 'should not raise an exception' do
-      proc { 
-        text = Text do
-          line "line 1"
-          line "line 2"
-        end
-      }.should_not raise_error
-    end
-    
-    it 'should concatenate strings' do
-      text = Text do
-        line "line 1"
-        line "line 2"
-      end
-      text.to_s.should_be "line 1line 2"
-    end
-  end
-
-end

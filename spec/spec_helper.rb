@@ -51,4 +51,8 @@ def remove_ivars(*args)
   args.each do |ivar|
     remove_instance_variable "@#{ivar}"
   end
-end 
+end
+
+def no_error(&block)
+  proc(&block).should_not raise_error
+end

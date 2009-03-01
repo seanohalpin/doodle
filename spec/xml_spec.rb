@@ -155,7 +155,7 @@ describe Doodle, 'if default specified before required attributes, they are igno
       end
       a.to_xml.should_be %[<Address where="home"><City country="UK">London</City></Address>]
     end
-    
+
   end
 
 end
@@ -165,7 +165,7 @@ describe Doodle, 'if default specified before required attributes, they are igno
     before :each do
 
       @country_example = %[<Address where="home"><City>London<Country>UK</Country></City></Address>]
-      
+
       class ::Base < Doodle
         include Doodle::XML
       end
@@ -216,5 +216,4 @@ describe Doodle, 'if default specified before required attributes, they are igno
       b.should_be a
     end
   end
-
 end
