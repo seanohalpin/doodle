@@ -20,7 +20,7 @@ describe 'Doodle', 'block initialization of scalar attributes' do
         has :block, :kind => Proc
       end
     end
-    
+
     it 'should initialize an scalar attribute from a block' do
       farm = Farm do
         barn do
@@ -35,11 +35,11 @@ describe 'Doodle', 'block initialization of scalar attributes' do
       pending
       source_block = proc { puts "hello" }
       b = Bar do
-        block &source_block
+        block(&source_block)
       end
       b.to_hash.should_be( { :block => source_block } )
     end
-    
+
   end
 end
 
