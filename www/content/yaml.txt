@@ -1,0 +1,139 @@
+---
+title:       yaml
+author:      Sean O'Halpin
+created_at:  2009-03-02 18:12:43
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
+
+doodle supports both saving to and loading from yaml.
+
+=== saving as yaml
+
+<<< xmp section: all
+require 'doodle'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+foo = Foo("Corum", Date.today)
+puts foo.to_yaml
+#:output
+>>>
+
+will produce:
+
+<<< xmp section: output, post: stripxmp, lang: shell
+require 'doodle'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+foo = Foo("Corum", Date.today)
+puts foo.to_yaml
+#:output
+>>>
+
+=== loading directly from a yaml source
+
+You can load a doodle directly from yaml, just like other objects. For example:
+
+<<< xmp section: all
+require 'doodle'
+require 'pp'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+str = %[
+--- !ruby/object:Foo
+date: 2009-03-02
+name: Corum
+]
+# load from yaml string (without validation)
+foo = YAML::load(str)
+pp foo
+>>>
+
+But don't stop reading yet! The next section will explain all...
+
+=== <a name="validating-yaml"></a>validating data loaded from a yaml source
+
+There is a problem with the example above. The data loaded from yaml is not validated. So this is possible:
+
+<<< xmp section: all
+require 'doodle'
+require 'pp'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+str = %[
+--- !ruby/object:Foo
+date: "I am not a Date"
+name: Corum
+]
+# load from yaml string (without validation)
+foo = YAML::load(str)
+pp foo
+>>>
+
+The reason this can happen is because YAML::load sets an object's instance variables directly, bypassing its attribute accessors. In a Doodle context, this means that loading from a yaml source bypasses attribute validations.
+
+You can apply validations explicitly by using the @validate!@ method (the exclamation mark denotes that this method can raise an exception). @validate!@ returns the validated object on success, so you can get a validated object from a yaml source using the following:
+
+<<< ruby
+foo = YAML::load(yaml_source).validate!
+>>>
+
+The following example shows this in action:
+
+<<< xmp section: all
+require 'doodle'
+require 'pp'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+str = %[
+--- !ruby/object:Foo
+date: "I am not a Date"
+name: Corum
+]
+# load from yaml string (~with~ validation)
+foo = YAML::load(str).validate!
+pp foo
+>>>
+
+The following will raise an exception, complaining that 'name' is missing:
+
+<<< xmp filename: eg-validations4.rb, sections: all >>>
+
+=== loading from yaml via a hash
+
+As you can also initialize a doodle instance directly from a @Hash@, it is often convenient to store data as untyped {{{key: value}}} pairs and load that instead. This has the benefit of being more general (you don't need to annotate data with specific types) and means you don't have to remember to call @validate!@. For example:
+
+<<< xmp section: all
+require 'doodle'
+require 'pp'
+#:all
+class Foo < Doodle
+  has :name
+  has :date, :kind => Date
+end
+str = %[
+date: 2009-03-02
+name: Corum
+]
+# load from hash
+foo = Foo(YAML::load(str))
+pp foo
+>>>
