@@ -5,8 +5,8 @@ type: :task
 component: docs
 release: r0.2.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2008-09-28 22:34:22.847217 Z
 references: []
 
@@ -39,3 +39,7 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to release r0.2.0 from unassigned
   - ""
+- - 2009-03-02 10:43:16.489910 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - Still more work to do, but a good base on which to build
