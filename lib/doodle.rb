@@ -1104,7 +1104,7 @@ class Doodle
   #   end
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
-    module Utils
+  module Utils
     # normalize a name to contain only legal characters for a Ruby
     # constant
     def self.normalize_const(const)
