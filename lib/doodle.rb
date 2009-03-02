@@ -404,6 +404,13 @@ class Doodle
       attributes(tf).map{ |k, a| @this.send(k)}
     end
 
+    # returns array of attribute names
+    # - if tf == true, returns all inherited attribute names (default)
+    # - if tf == false, returns only those attribute names defined in current object
+    def keys(tf = true)
+      attributes(tf).keys
+    end
+
     # return class level attributes
     def class_attributes
       attrs = Doodle::OrderedHash.new
