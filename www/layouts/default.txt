@@ -38,8 +38,9 @@ filter:
       </div>
       <div class="column prepend-1 span-6 last">
         <a href="./doc/README.txt.html">rubydoc</a><br />
-        <a href="http://rubyforge.org/projects/doodle">Rubyforge project</a><br />
-        <a href="http://github.com/seanohalpin/doodle/tree/master">doodle 0.2.0 on github</a><br />
+        <a href="http://rubyforge.org/projects/doodle">rubyforge project</a><br />
+        <a href="http://github.com/seanohalpin/doodle/tree/master">github</a><br />
+        <a href="http://groups.google.com/group/ruby-doodle">google group</a><br />
       </div>
       <hr />
       <div class="column prepend-1 span-16 last">
