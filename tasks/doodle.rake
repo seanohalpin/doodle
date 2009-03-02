@@ -12,7 +12,7 @@ namespace :mm do
     t.spec_files = FileList['spec/**/*.rb']
     t.spec_opts = ['--colour --format html']
   end
-  
+
   desc "Run all specs with RCov"
   Spec::Rake::SpecTask.new('coverage') do |t|
     t.spec_files = FileList['spec/**/*.rb']
@@ -42,18 +42,36 @@ namespace :mm do
     puts Doodle::VERSION::STRING
   end
 
+#   namespace :website do
+#     desc "Generate rote docs"
+#     task :gen do
+#       system "cd ./rote && rake"
+#     end
+
+#     desc "Copy docs to rubyforge"
+#     task :publish => [:rote] do
+#       system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
+#     end
+#   end
+
   namespace :website do
-    desc "Generate rote docs"
-    task :gen do
-      system "cd ./rote && rake"
+    desc "Generate website (default)"
+    task :rebuild => ["redocs"] do
+      system "cd ./www && webby rebuild"
+      system "cp -r doc www/output"
+    end
+
+    desc "Incrementally build website"
+    task :build do
+      system "cd ./www && webby build"
     end
 
     desc "Copy docs to rubyforge"
-    task :publish => [:rote] do
-      system "scp -r rote/html/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
+    task :publish => ["mm:website:gen"] do
+      system "scp -r www/output/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
     end
   end
-  
+
   # rebuild TAGS file
   module Tags
     RUBY_FILES = FileList['**/*.rb'].exclude("pkg")
@@ -70,6 +88,10 @@ namespace :mm do
   rule '.xmp.rb' => ['.rb'] do |t|
     system "xmpfilter #{t.source} > #{t.name}"
   end
-  
+
   task :tags => ["tags:emacs"]
 end
+
+desc 'Alias to mm:website:rebuild'
+task :website => 'mm:website:rebuild'
+
