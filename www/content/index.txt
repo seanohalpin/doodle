@@ -26,6 +26,10 @@ doodle is eco-friendly - it does not globally modify Object, Class or Module, no
 * link[collectors] to help in defining simple DSLs
 * works for [[classes_and_singletons.html|classes, instances and singletons]]
 
+It supports serialization to and from [[loading-from-yaml.html|YAML]] and [[doodle-xml.html|XML]].
+
+== example
+
 Putting all this together, you can initialize objects like this:
 
 <<< xmp filename: eg-event.rb, sections: [use, output] >>>

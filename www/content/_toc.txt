@@ -11,16 +11,18 @@ filter:
 ====== contents
 
 * link[introduction]
-* link[initialization]
-* link[defaults]
-* link[initial values]
-* link[validations]
-* link[conversions]
-* link[collectors]
+* link[initialization]: @has@
+* link[defaults]: @default@
+* link[initial values]: @init@
+* link[validations]: @must@
+* link[conversions]: @from@
+* link[collectors]: @collect@
+* link[documenting]: @doc@
 * link[classes and singletons]
 
 ====== examples
 
+* link[loading from yaml]
 * link[simple]
 * link[animal house]
 

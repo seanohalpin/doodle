@@ -18,14 +18,14 @@ def project_root(*args)
 end
 $:.unshift(project_root('lib'))
 
-ENV['RUBYLIB'] = project_root('lib')
+def example_path(*filenames)
+  project_root('www', 'content', 'examples', *filenames)
+end
+
+ENV['RUBYLIB'] = [project_root('lib'), example_path()].join(':')
 
 require 'doodle'
 require 'doodle/xml'
-
-def example_path(filename)
-  project_root('www', 'content', 'examples', filename)
-end
 
 def plugin_tag(input)
   tag = :none
@@ -62,7 +62,7 @@ module CreolePlugin
     end
 
     def split_file(input)
-      sections = input.split(/^(#:\s*.*)$/)
+      sections = input.split(/^\s*(#:\s*.*)$/)
       # p sections.first
       while sections.first == ""
         sections.shift

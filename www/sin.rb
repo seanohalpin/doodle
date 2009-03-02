@@ -1,4 +1,4 @@
-# hello_world.rb
+#!/usr/bin/env ruby
 require 'rubygems'
 require 'sinatra'
 

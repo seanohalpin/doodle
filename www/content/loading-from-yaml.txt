@@ -1,0 +1,10 @@
+---
+title:       loading from yaml
+author:      Sean O'Halpin
+created_at:  2008-08-02 14:06:40.000000 -06:00
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
