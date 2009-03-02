@@ -31,14 +31,17 @@ filter:
 
     <div class="container">
 
-      <div class="column span-22 prepend-1 append-2 first last" id="header">
+      <div class="column span-16 prepend-1 first" id="header">
         <div class="logo"><img src="images/doodle-logo.png"
-        title="doodle" alt="doodle" /><span style="vertical-align: 200%;">&nbsp;&nbsp;eco-friendly metaprogramming</span></div>
-        <!-- <p class="title">doodle&nbsp;<span class="tinylogo">eco-friendly --
-          -- metaprogramming</span></p> -->
-        <hr />
+        title="doodle" alt="doodle" /><span style="vertical-align: 200%;">&nbsp;&nbsp;eco-friendly metaprogramming</span>
+        </div>
       </div>
-
+      <div class="column prepend-1 span-6 last">
+        <a href="./doc/README.txt.html">rubydoc</a><br />
+        <a href="http://rubyforge.org/projects/doodle">Rubyforge project</a><br />
+        <a href="http://github.com/seanohalpin/doodle/tree/master">doodle 0.2.0 on github</a><br />
+      </div>
+      <hr />
       <div class="column prepend-1 span-16 last">
         <%= @content %>
       </div>

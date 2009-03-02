@@ -11,7 +11,7 @@ filter:
 
 doodle is a Ruby gem for creating extended attribute accessors with defaults, conversions and validations.
 
-doodle is eco-friendly - it does not globally modify Object, Class or Module, nor does it pollute instances with its own instance variables<a href="#1">^^1^^</a> (e.g. it plays nice with yaml).
+doodle is eco-friendly - it does not globally modify Object, Class or Module, nor does it pollute instances with its own instance variables (e.g. it plays nice with yaml).
 
 == features
 
@@ -26,7 +26,7 @@ doodle is eco-friendly - it does not globally modify Object, Class or Module, no
 * link[collectors] to help in defining simple DSLs
 * works for [[classes_and_singletons.html|classes, instances and singletons]]
 
-It supports serialization to and from [[loading-from-yaml.html|YAML]] and [[doodle-xml.html|XML]].
+Doodle also supports link[reflection], serialization to and from [[yaml.html|YAML]] and [[doodle-xml.html|XML]], and [[doodle-app.html|command line argument processing]].
 
 == example
 
@@ -54,4 +54,6 @@ depending on which way you swing ;)
 
 doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.6. It has not yet been tested with Rubinius.
 
-<a name="1">^^1^^</a> Not ~entirely~ true - doodle uses tricks under the hood to hide its footprint. However, the visible effect is the same.
+== similar libraries
+
+You might also be interested in some of the many link[similar libraries].

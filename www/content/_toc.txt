@@ -1,13 +1,12 @@
 ---
 title:       table of contents
+author:      Sean O'Halpin
 created_at:  2008-08-02 14:06:40.000000 -06:00
 filter:
   - erb
   - wikilinks
   - creole
 ---
-[[http://github.com/seanohalpin/doodle/tree/master|doodle version 0.2.0]]
-
 ====== contents
 
 * link[introduction]
@@ -19,10 +18,11 @@ filter:
 * link[collectors]: @collect@
 * link[documenting]: @doc@
 * link[classes and singletons]
+* link[reflection]: @doodle@
 
 ====== examples
 
-* link[loading from yaml]
+* link[yaml]
 * link[simple]
 * link[animal house]
 
@@ -30,10 +30,4 @@ filter:
 
 * link[doodle/app] - command line option handling
 * link[doodle/xml] - {{{to_xml}}} and {{{from_xml}}}
-
-====== project
-
-* [[http://rubyforge.org/projects/doodle|Rubyforge project]]
-* [[http://github.com/seanohalpin/doodle/tree/master|github]]
-* [[./doc/README.txt.html|rubydoc]]
 

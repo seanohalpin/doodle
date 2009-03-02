@@ -73,7 +73,9 @@ module CreolePlugin
         map{ |x| x == '' ? nil : x}.
         map{ |x| x =~ /^#:\s*(.*)$/ ? $1 : x}
       #p [:sections, sections]
-
+      if sections.size % 2 == 1
+        sections.unshift "@BOF@"
+      end
       res = Hash[*sections]
       #p res
       res

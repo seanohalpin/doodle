@@ -1,0 +1,107 @@
+---
+title:       reflection
+author:      Sean O'Halpin
+created_at:  2009-03-02 18:12:37
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
+
+All metadata and reflection is accessed via the @doodle@ method.
+
+=== attribute definitions
+
+<<< xmp section: definition
+require 'doodle'
+require 'pp'
+#:definition
+class Person < Doodle
+  has :name, :kind => String
+  has :age, :kind => Integer do
+    must "be >= 0" do |v|
+      v >= 0
+    end
+  end
+end
+
+pp Person.doodle.attributes
+>>>
+
+=== keys
+
+<<< xmp section: use
+require 'doodle'
+require 'pp'
+#:definition
+class Person < Doodle
+  has :name, :kind => String
+  has :age, :kind => Integer
+end
+#:use
+person = Person :name => "Corum", :age => 999
+pp Person.doodle.keys
+pp person.doodle.keys
+>>>
+
+=== values
+
+<<< xmp section: use
+require 'doodle'
+require 'pp'
+#:definition
+class Person < Doodle
+  has :name, :kind => String
+  has :age, :kind => Integer
+end
+#:use
+person = Person :name => "Corum", :age => 999
+pp person.doodle.values
+>>>
+
+=== validations
+
+Validations belong to either the class as a whole or individual attributes. As attributes are themselves doodles, you need to access their metadata via their own @doodle@ method:
+
+<<< xmp section: definition
+require 'doodle'
+require 'pp'
+#:definition
+class Person < Doodle
+  has :name, :kind => String
+  has :age, :kind => Integer do
+    must "be >= 0" do |v|
+      v >= 0
+    end
+  end
+  must "not be called Arthur" do
+    name !~ /^Arthur$/
+  end
+end
+
+pp Person.doodle.validations
+puts
+pp Person.doodle.attributes[:age].doodle.validations
+>>>
+
+=== conversions
+
+Like validations, conversions belong to the class or individual attributes:
+
+<<< xmp section: definition
+require 'doodle'
+require 'pp'
+#:definition
+class Person < Doodle
+  has :name, :kind => String
+  has :age, :kind => Integer do
+    from String do |s|
+      s.to_i
+    end
+  end
+end
+
+pp Person.doodle.attributes[:age].doodle.conversions
+>>>
+

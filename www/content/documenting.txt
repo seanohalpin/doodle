@@ -1,0 +1,10 @@
+---
+title:       documenting
+author:      Sean O'Halpin
+created_at:  2009-03-02 18:12:37
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>

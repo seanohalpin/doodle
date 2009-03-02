@@ -1,0 +1,41 @@
+---
+title:       similar libraries
+author:      Sean O'Halpin
+created_at:  2009-03-02 19:11:10
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
+
+There are a number of libraries which have similar features to or overlapping concerns with doodle. These are all worth checking out:
+
+=== extended accessors
+* [[http://codeforpeople.com/lib/ruby/attributes/|attributes]], [[http://codeforpeople.com/lib/ruby/fattr/|fattr]] by Ara Howard
+* [[http://www.iinteractive.com/moose/|moose]] - a 'postmodern object system for Perl 5'
+** [[http://draegtun.wordpress.com/2008/03/12/doodling-with-moose-part-1/|comparison with doodle]] by Barry Walsh (from a Moose point of view)
+=== dsl
+* [[http://dslkit.rubyforge.org/|DSL Kit]] by Florian Frank
+
+=== command line option processing
+* [[http://codeforpeople.com/lib/ruby/main/|main]] by Ara Howard
+* [[http://trollop.rubyforge.org/trollop]] by William Morgan
+
+=== configuration
+* [[http://codeforpeople.com/lib/ruby/configuration/|configuration]] by Ara Howard
+* [[http://configtoolkit.rubyforge.org/|Config Toolkit]] by Designing Patterns
+
+=== xml mapping
+* [[http://xml-mapping.rubyforge.org/|XML-MAPPING]] by Olaf Klischat
+* [[http://roxml.rubyforge.org/|roxml]] by Empact
+
+=== modelling/code generation
+* [[http://dataconstellation.com/ActiveFacts/|ActiveFacts]] by Clifford Heath
+* [[http://ruby-gen.org/|rgen]] by Martin Thiede
+
+If you think your library should be on this page, then [[mailto:sean.ohalpin@gmail.com|drop me a line]]!
+
+=== roots
+
+doodle itself is a descendant of an idea I had for [[http://rubyquiz.com/quiz49.html|Lisp Game (Ruby Quiz #49)]] (original code [[http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/159275|here]]). I was also influenced by the famous [[http://rubyquiz.com/quiz67.html|metakoans quiz]].
