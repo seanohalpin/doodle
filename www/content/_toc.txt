@@ -16,7 +16,6 @@ filter:
 * link[validations]: @must@
 * link[conversions]: @from@
 * link[collectors]: @collect@
-* link[documenting]: @doc@
 * link[classes and singletons]
 * link[reflection]: @doodle@
 
