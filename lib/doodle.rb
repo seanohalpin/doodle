@@ -679,37 +679,41 @@ class Doodle
     # get an attribute by name - return default if not otherwise defined
     # FIXME: init deferred blocks are not getting resolved in all cases
     def _getter(name, &block)
-      #p [:_getter, name]
-      ivar = "@#{name}"
-      if instance_variable_defined?(ivar)
-        #p [:_getter, :instance_variable_defined, name, ivar, instance_variable_get(ivar)]
-        instance_variable_get(ivar)
-      else
-        # handle default
-        # Note: use :init => value to cover cases where defaults don't work
-        # (e.g. arrays that disappear when you go out of scope)
-        att = __doodle__.lookup_attribute(name)
-        # special case for class/singleton :init
-        if att && att.optional?
-          optional_value = att.init_defined? ? att.init : att.default
-          #p [:optional_value, optional_value]
-          case optional_value
-          when DeferredBlock
-            #p [:deferred_block]
-            v = instance_eval(&optional_value.block)
-          when Proc
-            v = instance_eval(&optional_value)
-          else
-            v = optional_value
-          end
-          if att.init_defined?
-            _setter(name, v)
-          end
-          v
+      begin
+        #p [:_getter, name]
+        ivar = "@#{name}"
+        if instance_variable_defined?(ivar)
+          #p [:_getter, :instance_variable_defined, name, ivar, instance_variable_get(ivar)]
+          instance_variable_get(ivar)
         else
-          # This is an internal error (i.e. shouldn't happen)
-          __doodle__.handle_error name, NoDefaultError, "'#{name}' has no default defined", Doodle::Utils.doodle_caller
+          # handle default
+          # Note: use :init => value to cover cases where defaults don't work
+          # (e.g. arrays that disappear when you go out of scope)
+          att = __doodle__.lookup_attribute(name)
+          # special case for class/singleton :init
+          if att && att.optional?
+            optional_value = att.init_defined? ? att.init : att.default
+            #p [:optional_value, optional_value]
+            case optional_value
+            when DeferredBlock
+              #p [:deferred_block]
+              v = instance_eval(&optional_value.block)
+            when Proc
+              v = instance_eval(&optional_value)
+            else
+              v = optional_value
+            end
+            if att.init_defined?
+              _setter(name, v)
+            end
+            v
+          else
+            # This is an internal error (i.e. shouldn't happen)
+            __doodle__.handle_error name, NoDefaultError, "'#{name}' has no default defined", Doodle::Utils.doodle_caller
+          end
         end
+      rescue Object => e
+        __doodle__.handle_error name, e, e.to_s, Doodle::Utils.doodle_caller
       end
     end
     private :_getter
@@ -1028,7 +1032,7 @@ class Doodle
             ##DBG: Doodle::Debug.d { [:validate!, :optional, name ]}
             next
           elsif self.class != Class
-            __doodle__.handle_error name, Doodle::ValidationError, "#{self} missing required attribute '#{name}'", Doodle::Utils.doodle_caller
+            __doodle__.handle_error name, Doodle::ValidationError, "#{self.kind_of?(Class) ? self : self.class } missing required attribute '#{name}'", Doodle::Utils.doodle_caller
           end
         end
 
