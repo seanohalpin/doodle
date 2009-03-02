@@ -67,7 +67,7 @@ namespace :mm do
     end
 
     desc "Copy docs to rubyforge"
-    task :publish => ["mm:website:gen"] do
+    task :publish => ["mm:website:rebuild"] do
       system "scp -r www/output/* monkeymind@rubyforge.org:/var/www/gforge-projects/doodle/"
     end
   end
