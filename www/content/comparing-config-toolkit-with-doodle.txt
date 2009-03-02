@@ -1,0 +1,45 @@
+---
+title:       comparing doodle with configtoolkit
+created_at:  2009-03-02 13:25:33
+filter:
+  - erb
+  - creole
+---
+== <%= @page.title %>
+
+[[http://configtoolkit.rubyforge.org/|configtoolkit]] is a described as a:
+
+: package [that] makes sourcing information from (parsing) configuration files robust and easy!
+
+It offers similar facilities to doodle, including:
+
+* restricting the type of data
+* generating parameter accessor methods
+* easy creation of configuration files
+* Ruby as a configuration language
+* YAML loading and dumping
+* Hash loading and dumping
+* Custom data validation
+
+It also provides:
+
+* Overriding one configuration by another
+* Custom format configuration files
+
+Here an example file from the rubydocs:
+
+<<< xmp filename: config-toolkit-machine-config.rb >>>
+
+and a run:
+
+<<< xmp filename: config-toolkit-run-machine-config.rb >>>
+
+Let's see how we would implement this in doodle.
+
+<<< xmp filename: doodle-machine-config.rb >>>
+
+and a run:
+
+<<< xmp filename: doodle-run-machine-config.rb >>>
+
+
