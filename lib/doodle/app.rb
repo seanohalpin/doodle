@@ -1,5 +1,4 @@
 # -*- mode: ruby; -*-
-# command line option handling DSL implemented using Doodle
 # Sean O'Halpin, 2008-09-29
 
 =begin
@@ -26,13 +25,16 @@ require 'pp'
 # confusing :)
 
 class Doodle
+  # command line option handling DSL implemented using Doodle
   class App < Doodle
     # specialised classes for handling attributes
+
+    # replace the full directory path with ./ where appropriate
     def self.tidy_dir(path)
-      path.to_s.gsub(Regexp.new("^#{ Dir.pwd }/"), './')
+      path.to_s.gsub(Regexp.new("^#{ Regexp.escape(Dir.pwd) }/"), './')
     end
 
-    # generic option 
+    # class representing a generic option
     class Option < Doodle::DoodleAttribute
       doodle do
         string :flag, :max => 1, :doc => "one character abbreviation" do
@@ -59,18 +61,20 @@ class Doodle
       end
     end
     # specialied Filename attribute
+    # - :existing => true|false (default = false)
     class Filename < Option
       doodle do
         boolean :existing, :default => false, :doc => "set to true if file must exist"
       end
     end
 
+    # regular expression for ISO date
     RX_ISODATE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
-    
+
     # App directives
     class << self
       public
-      
+
       has :script_name, :default => File.basename($0)
       has :doc, :default => $0
       has :usage do
@@ -98,7 +102,7 @@ class Doodle
         #p [:option, args, :optional, optional?]
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
         key_values = key_values.inject({ }){ |hash, kv| hash.merge(kv)}
-        
+
         errors = []
 
         # handle optional/required flipflop
@@ -118,7 +122,7 @@ class Doodle
         else
           key_values.delete(:required)
           required = { }
-        end        
+        end
         args = [{ :using => Option }.merge(required).merge(key_values), *args]
         da = has(*args, &block)
         if errors.size > 0
@@ -144,12 +148,12 @@ class Doodle
         end
         da
       end
-      # expect string
+      # expect a string
       def string(*args, &block)
         args = [{ :using => Option, :kind => String }, *args]
         da = option(*args, &block)
       end
-      # expect symbol
+      # expect a symbol (and convert from String)
       def symbol(*args, &block)
         args = [{ :using => Option, :kind => Symbol }, *args]
         da = option(*args, &block)
@@ -159,7 +163,7 @@ class Doodle
           end
         end
       end
-      # expect filename
+      # expect a filename - set <tt>:existing => true</tt> to specify that the file must exist
       #   filename :input, :existing => true, :flag => "i", :doc => "input file name"
       def filename(*args, &block)
         args = [{ :using => Filename, :kind => String }, *args ]
@@ -172,9 +176,9 @@ class Doodle
           end
         end
       end
-      # expect on/off flag, e.g. -b
-      # doesn't take any arguments (mere presence sets it to true)
-      # booleans are false by default
+      # expect an on/off flag, e.g. -b
+      # - doesn't take any arguments (mere presence sets it to true)
+      # - booleans are false by default
       def boolean(*args, &block)
         args = [{ :using => Option, :default => false, :arity => 0}, *args]
         da = option(*args, &block)
@@ -199,7 +203,7 @@ class Doodle
         end
       end
       # whole number, e.g. -n 10
-      # you can use, e.g. :values => [1,2,3] or :values => (0..99) to restrict valid values
+      # - you can use, e.g. :values => [1,2,3] or :values => (0..99) to restrict the range of valid values
       def integer(*args, &block)
         args = [{ :using => Option, :kind => Integer }, *args]
         da = option(*args, &block)
@@ -231,7 +235,7 @@ class Doodle
         end
       end
       # utcdate: -d 2008-09-28T21:41:29Z
-      # actually uses Time (so restricted range)
+      # - actually uses Time (so restricted range)
       def utcdate(*args, &block)
         args = [{ :using => Option, :kind => Time }, *args]
         da = option(*args, &block)
@@ -245,7 +249,7 @@ class Doodle
         end
       end
 
-      # use this to include 'standard' flags
+      # use this to include 'standard' flags: help (-h, --help), verbose (-v, --verbose) and debug (-d, --debug)
       def std_flags
         boolean :help, :flag => "h", :doc => "display this help"
         boolean :verbose, :flag => "v", :doc => "verbose output"
@@ -253,7 +257,7 @@ class Doodle
       end
 
       has :exit_status, :default => 0
-      
+
       # call App.run to start your application (calls instance.run)
       def run(argv = ARGV)
         begin
@@ -268,15 +272,13 @@ class Doodle
             exit_status 1
           end
           puts "\nERROR: #{e}"
-          puts
-          puts help_text
         ensure
           exit(exit_status)
         end
       end
 
       private
-      
+
       # helpers
       def flag_to_attribute(flag)
         a = doodle.attributes.select do |key, attr|
@@ -427,6 +429,7 @@ class Doodle
         args + options
       end
       public
+      # defines the help text displayed when option --help passed
       def help_text
         format_block = proc {|key, flag, doc, required, kind|
           sprintf("  %-3s %-14s %-10s %s %s", flag, key, kind, doc, required ? '(REQUIRED)' : '')
