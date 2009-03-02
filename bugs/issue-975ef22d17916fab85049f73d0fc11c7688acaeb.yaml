@@ -1,6 +1,6 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
 title: Review use of parent
-desc: parent not working as I hoped/expected - I find myself trying to use it and getting only nil. I need to rethink both implementation and what it is for.
+desc: parent not working as I hoped/expected - I find myself trying to use it and getting only nil. I need to rethink both implementation and what it is for. Also, doodle.owner, context, etc.
 type: :task
 component: core
 release: r0.3.0
@@ -23,4 +23,8 @@ log_events:
 - - 2009-02-25 00:02:45.791594 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to release r0.3.0 from unassigned
+  - ""
+- - 2009-03-02 11:16:33.989074 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - edited description
   - ""
