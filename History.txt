@@ -1,3 +1,9 @@
+== 0.2.2 / 2009-03-02
+
+- Features:
+  - added obj.doodle.keys method
+  - added more examples to website
+
 == 0.2.1 / 2009-03-02
 
 - Bug fixes:
