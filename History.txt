@@ -1,3 +1,7 @@
+== 0.2.1 / 2009-03-02
+- Bug fixes:
+  - Doodle::App not displaying help text
+
 == 0.2.0 / 2009-02-08
 - Features:
   - object.doodle.values for easy access to array of attribute values

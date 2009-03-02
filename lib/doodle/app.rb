@@ -27,6 +27,8 @@ require 'pp'
 class Doodle
   # command line option handling DSL implemented using Doodle
   class App < Doodle
+    class HelpExit < ::Exception
+    end
     # specialised classes for handling attributes
 
     # replace the full directory path with ./ where appropriate
@@ -251,6 +253,8 @@ class Doodle
 
       # use this to include 'standard' flags: help (-h, --help), verbose (-v, --verbose) and debug (-d, --debug)
       def std_flags
+        # FIXME: this is bogus
+        m = method(:help_text)
         boolean :help, :flag => "h", :doc => "display this help"
         boolean :verbose, :flag => "v", :doc => "verbose output"
         boolean :debug, :flag => "D", :doc => "turn on debugging"
@@ -261,13 +265,14 @@ class Doodle
       # call App.run to start your application (calls instance.run)
       def run(argv = ARGV)
         begin
-          app = from_argv(argv)
-          if app.help
+          # cheating
+          if argv.include?('-h') or argv.include?('--help')
             puts help_text
           else
+            app = from_argv(argv)
             app.run
           end
-        rescue Object => e
+        rescue Exception => e
           if exit_status == 0
             exit_status 1
           end
