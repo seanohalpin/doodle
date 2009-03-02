@@ -54,6 +54,8 @@ and its output:
 
 <<< xmp filename: castor-example-use-order.rb, sections: output, after: ["sed 's/# >> //g' | tidy -xml -i"], lang: xml >>>
 
+For more details see the [[doc/Doodle/Xml.html|rubydocs]].
+
 === Shortcomings
 
 * Cycles are not handled at all (and won't be until I complete the more general Doodle graph visitor framework)

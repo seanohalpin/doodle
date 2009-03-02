@@ -12,8 +12,7 @@ filter:
 
 <<< xmp filename: eg-validations1.rb, sections: definitions >>>
 
-Doodle uses @kind_of?@ to test the value, so @kind@ can be set to any module
-(e.g. @Enumerable@), class or superclass that makes sense for your application.
+Doodle uses @kind_of?@ to test the value, so @kind@ can be set to any module (e.g. @Enumerable@), class or superclass that makes sense for your application.
 
 If you now try to initialize @Event#date@ with something that isn't a @Date@:
 
@@ -29,9 +28,7 @@ To specify a validation on an attribute, use @must@ inside the attribute's defin
 
 <<< xmp filename: eg-validations2.rb, sections: all >>>
 
-The @must@ block should return @true@ if the value is valid, @false@
-otherwise. A failed validation will raise a @Doodle::ValidationError@
-exception.
+The @must@ block should return @true@ if the value is valid, @false@ otherwise. A failed validation will raise a @Doodle::ValidationError@ exception.
 
 Attribute validations happen ~before~ the instance variable is changed.
 
@@ -41,22 +38,15 @@ You can also specify validations for the object as a whole:
 
 <<< xmp filename: eg-validations3.rb, sections: all >>>
 
-Note that you don't need to project the value into the block but you
-can if you like - its value is the object instance itself.
+Note that you don't need to project the value into the block but you can if you like - its value is the object instance itself.
 
-Object level validations occur _after_ all instance variables have been
-set.
+Object level validations occur ~after~ all instance variables have been set.
 
 === validating data loaded from a yaml source
 
-YAML::load sets an object's instance variables directly, bypassing its
-attribute accessors. In a Doodle context, this means that loading from
-a yaml source bypasses attribute validations.
+YAML::load sets an object's instance variables directly, bypassing its attribute accessors. In a Doodle context, this means that loading from a yaml source bypasses attribute validations.
 
-You can apply validations explicitly by using the @validate!@ method
-(the exclamation mark denotes that this method can raise an
-exception). @validate!@ returns the validated object on success, so
-you can get a validated object from a yaml source using the following:
+You can apply validations explicitly by using the @validate!@ method (the exclamation mark denotes that this method can raise an exception). @validate!@ returns the validated object on success, so you can get a validated object from a yaml source using the following:
 
 <<< ruby
 foo = YAML::load(yaml_source).validate!

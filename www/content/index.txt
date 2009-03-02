@@ -9,14 +9,9 @@ filter:
 ---
 == <%= @page.title %>
 
-doodle is a Ruby gem for creating extended attribute accessors
-with defaults, conversions and validations.
+doodle is a Ruby gem for creating extended attribute accessors with defaults, conversions and validations.
 
-<<< xmp filename: eg1.rb >>>
-
-doodle is eco-friendly - it does not globally modify Object, Class or
-Module, nor does it pollute instances with its own instance
-variables<a href="#1">^^1^^</a> (e.g. it plays nice with yaml).
+doodle is eco-friendly - it does not globally modify Object, Class or Module, nor does it pollute instances with its own instance variables<a href="#1">^^1^^</a> (e.g. it plays nice with yaml).
 
 == features
 
@@ -53,8 +48,6 @@ depending on which way you swing ;)
 
 == compatibility
 
-doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.6. It
-has not yet been tested with Rubinius.
+doodle has been tested with Ruby 1.8.6, Ruby 1.9.0 and JRuby 1.1.6. It has not yet been tested with Rubinius.
 
-<a name="1">^^1^^</a> Not ~entirely~ true - doodle uses tricks under the hood to hide
-its footprint. However, the visible effect is the same.
+<a name="1">^^1^^</a> Not ~entirely~ true - doodle uses tricks under the hood to hide its footprint. However, the visible effect is the same.

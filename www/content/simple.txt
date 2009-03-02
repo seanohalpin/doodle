@@ -1,0 +1,39 @@
+---
+title:       simple
+created_at:  2009-03-01 23:04:29
+filter:
+  - erb
+  - creole
+---
+== <%= @page.title %>
+
+The following example shows a [[validations.html|validation]] using @must@ and a [[conversions.html|conversion]] using @from@:
+
+<<< xmp filename: eg1.rb >>>
+
+This could be rewritten using a closure:
+
+<<< ruby
+class Life < Doodle
+  answer = 42
+  has :answer, :kind => Integer, :default => answer do
+    must "be #{answer}" do |value|
+      value == answer
+    end
+  end
+end
+>>>
+
+or even using the value of @default@:
+
+<<< ruby
+class Life < Doodle
+  has :answer, :kind => Integer, :default => 42 do
+    must "be #{default}" do |value|
+      value == default
+    end
+  end
+end
+>>>
+
+<div class="tiny">With apologies to David Black ;)</div>

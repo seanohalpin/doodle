@@ -8,8 +8,7 @@ filter:
 ---
 == <%= @page.title %>
 
-Collectors provide a means to define a convenience method you can use to add items
-to a collection. For example:
+Collectors provide a means to define a convenience method you can use to add items to a collection. For example:
 
 <<< ruby
 class Location < Doodle
@@ -25,26 +24,21 @@ event = Event do
 end
 >>>
 
-In the example above, we want @locations@ to be an array of @Location@
-objects. Using the
+In the example above, we want @locations@ to be an array of @Location@ objects. Using the
 
 <<< ruby
 :collect => Location
 >>>
 
-option defines a method called @location@ (derived from the class
-name). Each time the @location@ method is called a new @Location@
-object is added to the @locations@ array.
+option defines a method called @location@ (derived from the class name). Each time the @location@ method is called a new @Location@ object is added to the @locations@ array.
 
-If the class hasn't been defined yet, you can use a Symbol or String
-to name the class:
+If the class hasn't been defined yet, you can use a Symbol or String to name the class:
 
 <<< ruby
 :collect => :Location
 >>>
 
-To use a specific name for the collecting method, pass a hash
-containing
+To use a specific name for the collecting method, pass a hash containing
 
 <<< ruby
 {:method_name => ClassName}
@@ -63,8 +57,7 @@ end
 
 @ClassName@ can be a ClassConstant, a :Symbol or a "String".
 
-Finally, if you don't want to restrict the value to a particular
-class, you can just specify a method name:
+Finally, if you don't want to restrict the value to a particular class, you can just specify a method name:
 
 <<< ruby
 has :locations, :collect => :place
@@ -83,9 +76,7 @@ You can also build keyed collections using @:collect@. Use
 :key => :method_name
 >>>
 
-to tell doodle which method to call on the collected object to provide
-a key. If you don't specify an @:init@ value, doodle will create a
-hash to hold the collected items. For example:
+to tell doodle which method to call on the collected object to provide a key. If you don't specify an @:init@ value, doodle will create a hash to hold the collected items. For example:
 
 <<< ruby
 class Item < Doodle
@@ -102,20 +93,16 @@ end
 foo.list['A'] # => #<Item:0xb7cf76ac @value=1, @name="A">
 >>>
 
-If you _do_ specify an @:init@ value, it should provide a <tt>#[]</tt> method that accepts the type of the @:key@ specified.
+If you ~do~ specify an @:init@ value, it should provide a <tt>#[]</tt> method that accepts the type of the @:key@ specified.
 
 == using your own collection types
 
 === array-like collectors
 
-To collect into something other than an @Array@, use the
-@:init@ option. You need to supply an instance of an Enumerable that
-provides the {{{<<}}}, {{{clone}}} and {{{replace}}} methods.
+To collect into something other than an @Array@, use the @:init@ option. You need to supply an instance of an Enumerable that provides the {{{<<}}}, {{{clone}}} and {{{replace}}} methods.
 
 <<< xmp filename: eg-string-collector.rb, sections: [definition, use] >>>
 
 === hash-like collectors
 
-To collect into something other than an @Hash@, use the
-@:init@ option. You need to supply an instance of an Hash-like class that
-provides the {{{[]=}}}, {{{[]}}}, {{{key}}} methods.
+To collect into something other than an @Hash@, use the @:init@ option. You need to supply an instance of an Hash-like class that provides the {{{[]=}}}, {{{[]}}}, {{{key}}} methods.

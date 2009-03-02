@@ -8,6 +8,25 @@ require 'shellwords'
 require 'yaml'
 require 'systemu'
 
+def project_root(*args)
+  path = [File.dirname(__FILE__)]
+  while !File.exist?(File.join(path, 'lib', 'doodle.rb'))
+    path << '..'
+  end
+  path = path.push(*args)
+  File.expand_path(File.join(*path))
+end
+$:.unshift(project_root('lib'))
+
+ENV['RUBYLIB'] = project_root('lib')
+
+require 'doodle'
+require 'doodle/xml'
+
+def example_path(filename)
+  project_root('www', 'content', 'examples', filename)
+end
+
 def plugin_tag(input)
   tag = :none
   args = []
@@ -35,10 +54,6 @@ end
 
 module CreolePlugin
   module ModuleMethods
-    def resolve_path(filename)
-      File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'content', 'examples', filename))
-    end
-
     def sections(input, *wanted_sections)
       h = split_file(input)
       res = wanted_sections.inject([]) { |acc, section| acc << h[section] }.join('')
@@ -66,7 +81,7 @@ module CreolePlugin
 
     def plugin_source(input, args = { }, &block)
       if filename = args.delete(:filename)
-        path = resolve_path(filename)
+        path = example_path(filename)
         input = File.read(path)
       end
       # pre filter chain
@@ -83,14 +98,24 @@ module CreolePlugin
       end
       if filters = args.delete(:after) || args.delete(:post)
         filters.each do |filter|
+          if filter == "stripxmp"
+            filter = "sed 's/# >> //g'"
+          end
           status, input = systemu(filter, :stdin => input)
         end
       end
-      lang = args.delete(:lang).to_sym
-      output = '<div class="CodeRay"><pre>'
-      #STDERR.puts [lang, args].inspect
-      output << ::CodeRay.scan(input, lang).html(args)
-      output << '</pre></div>'
+      lang = args.delete(:lang) || "ruby"
+      lang = lang.to_sym
+      css_class = args.delete(:class) || :coderay
+      case css_class
+      when :coderay
+        output = '<div class="CodeRay"><pre>'
+        #STDERR.puts [lang, args].inspect
+        output << ::CodeRay.scan(input, lang).html(args)
+        output << '</pre></div>'
+      when :output
+        output = %[<pre class="output">#{Doodle::EscapeXML.escape(input)}</pre>]
+      end
       output
     end
 
@@ -100,18 +125,11 @@ module CreolePlugin
     end
 
     def plugin_xmp(input, args = { })
-#       filename = args.delete(:filename)
-#       path = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'content', 'examples', filename))
-#       #p [:PATH, path]
-#       #STDERR.puts args.inspect
-#       input = File.read(path)
-#       #input = `xmpfilter #{path}`
-#       status, stdout = systemu( "xmpfilter", :stdin => input )
       plugin_source(input, { :lang => :ruby, :filter => 'xmpfilter' }.merge(args) )
     end
 
     def plugin_output(input, args = { })
-      %[<pre class="output">#{input}</pre>]
+      plugin_source(input, { :class => :output }.merge(args))
     end
   end
   extend ModuleMethods

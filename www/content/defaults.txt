@@ -24,7 +24,7 @@ event = Event.new
 will result in:
 
 <<< output
-ArgumentError: #<Event:0x72b118> missing required attribute 'date'
+Event missing required attribute 'date' (Doodle::ValidationError)
 >>>
 
 To specify a default, use the @default@ option:

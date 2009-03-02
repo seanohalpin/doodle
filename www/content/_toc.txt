@@ -6,6 +6,7 @@ filter:
   - wikilinks
   - creole
 ---
+[[http://github.com/seanohalpin/doodle/tree/master|doodle version 0.2.0]]
 
 ====== contents
 
@@ -18,20 +19,19 @@ filter:
 * link[collectors]
 * link[classes and singletons]
 
+====== examples
+
+* link[simple]
+* link[animal house]
+
 ====== extras
 
 * link[doodle/app] - command line option handling
 * link[doodle/xml] - {{{to_xml}}} and {{{from_xml}}}
 
-====== examples
-
-* link[simple]
-* link[animal house]
-* link[more]
-
 ====== project
 
-* link[design notes]
 * [[http://rubyforge.org/projects/doodle|Rubyforge project]]
 * [[http://github.com/seanohalpin/doodle/tree/master|github]]
-* [[./doc/index.html|rubydoc]]
+* [[./doc/README.txt.html|rubydoc]]
+

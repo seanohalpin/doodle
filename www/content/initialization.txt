@@ -9,7 +9,6 @@ filter:
 == <%= @page.title %>
 
 <<< ruby
-require 'rubygems'
 require 'doodle'
 
 class Event < Doodle

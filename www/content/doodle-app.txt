@@ -9,38 +9,26 @@ filter:
 ---
 == <%= @page.title %>
 
-@Doodle::App@ makes it easy to define command line options.
+@Doodle::App@ makes it easy to define command line options. For details on the available option types, see the [[doc/Doodle/App.html|rubydocs]].
 
 === example
 
-<<< ruby
-require 'rubygems'
-require 'doodle/app'
+<<< ruby filename: filter.rb, sections: [requires, definition, run] >>>
+$ ruby filter.rb no_such_file.txt
 
-class Filter < Doodle::App
-  filename :input, :existing => true,
-    :doc => "name of existing input file"
-  filename :output, :doc => "name of output file"
-  std_flags
-  def run
-    puts "input: #{input} => output: #{output}"
-  end
-end
+<<< output filename: filter.rb, filter: ["xmpfilter -- no_such_file.txt"], post: stripxmp, section: output, lang: shell >>>
 
-if  __FILE__ == $0
-  Filter.run(ARGV)
-end
->>>
+$ ruby filter.rb Sitefile
 
-$ ruby examples/filter.rb index.txt
-<<< output
-ERROR: #<Filter:0x124a60c> missing required attribute 'output'
->>>
+<<< output filename: filter.rb, filter: ["xmpfilter -- Sitefile"], post: stripxmp, section: output, lang: shell >>>
 
-$ ruby filter.rb foo.txt
-<<< output
-ERROR: Filter.input must exist - got String("foo.txt")
->>>
+$ ruby filter.rb Sitefile output.txt
+
+<<< output filename: filter.rb, filter: ["xmpfilter -- Sitefile output"], post: stripxmp, section: output, lang: shell >>>
+
+$ ruby filter.rb -o output.txt -i Sitefile
+
+<<< output filename: filter.rb, filter: ["xmpfilter -- -o output -i Sitefile"], post: stripxmp, section: output, lang: shell >>>
 
 $ ruby filter.rb --help
 <<< output
