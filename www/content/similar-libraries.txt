@@ -20,7 +20,7 @@ There are a number of libraries which have similar features to or overlapping co
 
 === command line option processing
 * [[http://codeforpeople.com/lib/ruby/main/|main]] by Ara Howard
-* [[http://trollop.rubyforge.org/trollop]] by William Morgan
+* [[http://trollop.rubyforge.org/trollop|trollop]]] by William Morgan
 
 === configuration
 * [[http://codeforpeople.com/lib/ruby/configuration/|configuration]] by Ara Howard
