@@ -1,5 +1,6 @@
 ---
 extension: html
+project:   doodle
 filter:
 - erb
 - wikilinks
@@ -10,7 +11,7 @@ filter:
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>doodle - <%= @page.title %></title>
+    <title><%= @page.project %> - <%= @page.title %></title>
     <meta name="author" content="<%= @page.author %>" />
 
     <!--- Blueprint CSS Framework -->
@@ -37,12 +38,14 @@ filter:
         </div>
       </div>
       <div class="column prepend-1 span-6 last">
-        <a href="./doc/README.txt.html">rubydoc</a><br />
-        <a href="http://rubyforge.org/projects/doodle">rubyforge project</a><br />
-        <a href="http://github.com/seanohalpin/doodle/tree/master">github</a><br />
+        <a href="http://seanohalpin.lighthouseapp.com/projects/26673-doodle/overview">bug reports and feature requests</a><br />
         <a href="http://groups.google.com/group/ruby-doodle">google group</a><br />
+        <a href="http://github.com/seanohalpin/doodle/tree/master">github</a><br />
+        <a href="http://rubyforge.org/projects/doodle">rubyforge project</a><br />
+        <a href="./doc/README.txt.html">rubydoc</a><br />
       </div>
       <hr />
+
       <div class="column prepend-1 span-16 last">
         <%= @content %>
       </div>
