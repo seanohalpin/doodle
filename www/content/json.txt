@@ -1,0 +1,39 @@
+---
+title:       json
+author:      Sean O'Halpin
+created_at:  2009-03-03 15:53:15
+filter:
+  - erb
+  - wikilinks
+  - creole
+---
+== <%= @page.title %>
+
+@Doodle::JSON@ adds the {{{#to_json}}} method:
+
+<<< xmp
+#:requires
+require 'rubygems'
+require 'doodle'
+require 'doodle/json'
+#:definitions
+class Name < Doodle
+  has :value, :kind => String
+end
+class Age < Doodle
+  has :value, :kind => Integer
+end
+class Person < Doodle
+  has Name
+  has Age
+end
+#:use
+person = Person do
+  name "Corum"
+  age 999
+end
+
+puts person.to_json
+#:output
+>>>
+
