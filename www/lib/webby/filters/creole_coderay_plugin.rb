@@ -89,7 +89,7 @@ module CreolePlugin
       # pre filter chain
       if filters = args.delete(:filters) || args.delete(:filter) || args.delete(:pre)
         filters.each do |filter|
-          status, input = systemu(filter, :stdin => input)
+          status, input = systemu(filter, :stdin => input, :env => { "RUBYLIB" => ENV['RUBYLIB'] })
         end
       end
       # select sections
