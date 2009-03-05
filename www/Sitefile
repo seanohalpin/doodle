@@ -4,7 +4,7 @@ task :default => :build
 desc 'deploy the site to the webserver'
 task :deploy => [:build, 'deploy:rsync']
 
-SITE.tidy_options = '-indent -wrap 80'
+SITE.tidy_options = '-indent -wrap 80 -utf8'
 
 require 'ostruct'
 PROJECT = OpenStruct.new

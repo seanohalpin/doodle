@@ -48,7 +48,6 @@ filter:
 
       <div class="column span-6 prepend-1 first">
         <%= render :partial => 'toc' %>
-        <%= render :partial => 'footer' %>
       </div>
 
       <div class="column span-22 prepend-1 append-2 first last" id="footer">
