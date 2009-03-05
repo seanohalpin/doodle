@@ -1,0 +1,12 @@
+---
+title:       logo
+author:      Sean O'Halpin
+created_at:  2009-03-05 00:46:55
+---
+<div class="logo">
+  <img
+     src="images/doodle-logo.png"
+     title="doodle"
+     alt="doodle"/>
+  <span style="vertical-align: 200%;">&nbsp;&nbsp;eco-friendly metaprogramming</span>
+</div>
