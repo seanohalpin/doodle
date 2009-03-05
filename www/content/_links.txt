@@ -1,0 +1,13 @@
+---
+title:       links
+author:      Sean O'Halpin
+created_at:  2009-03-05 00:46:55
+filter:
+  - erb
+  - creole
+---
+[[http://seanohalpin.lighthouseapp.com/projects/26673-doodle/overview|issue tracker]]\\
+[[http://groups.google.com/group/ruby-doodle|forum]]\\
+[[http://github.com/seanohalpin/doodle/tree/master|source]]\\
+[[http://rubyforge.org/projects/doodle|rubyforge]]\\
+[[./doc/README.txt.html|rubydoc]]

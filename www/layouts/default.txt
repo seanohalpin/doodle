@@ -2,16 +2,17 @@
 extension: html
 filter:
 - erb
-- wikilinks
+- tidy
 ---
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>doodle - <%= @page.title %></title>
-    <meta name="author" content="<%= @page.author %>" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title><%= PROJECT.name %> - <%= @page.title %></title>
+    <meta name="author" content="<%= PROJECT.author %>" />
 
     <!--- Blueprint CSS Framework -->
     <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" />
@@ -27,41 +28,34 @@ filter:
     <link rel="stylesheet" href="/css/hacks.css" type="text/css" media="screen, projection" />
 
   </head>
+
   <body>
 
     <div class="container">
 
       <div class="column span-16 prepend-1 first" id="header">
-        <div class="logo"><img src="images/doodle-logo.png"
-        title="doodle" alt="doodle" /><span style="vertical-align: 200%;">&nbsp;&nbsp;eco-friendly metaprogramming</span>
-        </div>
+        <%= render :partial => "logo" %>
       </div>
+
       <div class="column prepend-1 span-6 last">
-        <a href="./doc/README.txt.html">rubydoc</a><br />
-        <a href="http://rubyforge.org/projects/doodle">rubyforge project</a><br />
-        <a href="http://github.com/seanohalpin/doodle/tree/master">github</a><br />
-        <a href="http://groups.google.com/group/ruby-doodle">google group</a><br />
+        <%= render :partial => "links" %>
       </div>
       <hr />
+
       <div class="column prepend-1 span-16 last">
         <%= @content %>
       </div>
 
       <div class="column span-6 prepend-1 first">
         <%= render :partial => 'toc' %>
-
-        <blockquote>
-          Post bug reports, feature requests, and any comments or
-          discussion topics to the
-          <a href="http://groups.google.com/group/ruby-doodle">doodle Google group</a>.
-        </blockquote>
-
       </div>
 
       <div class="column span-22 prepend-1 append-2 first last" id="footer">
         <hr />
-        <p>&copy; 2008-2009, Sean O'Halpin</p>
+        <p>&copy; <%= PROJECT.copyright %></p>
       </div>
+
     </div>
   </body>
+
 </html>
