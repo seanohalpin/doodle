@@ -1,11 +1,11 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: want to be able to have multiple types in collector (cf. union)
+title: multiple types in collector (cf. union)
 desc: |-
   e.g. has :items, :collect => [Thing, Place, Person]
   or has :items, :collect => {:thing => Item, :place => Location}
 type: :feature
 component: core
-release: 
+release: r0.2.3
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -17,4 +17,16 @@ log_events:
 - - 2009-02-26 04:28:13.301991 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-05 23:48:40.411940 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from unassigned
+  - ""
+- - 2009-03-05 23:55:32.642963 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.3 from r0.3.0
+  - ""
+- - 2009-03-05 23:56:03.307530 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - edited title
   - ""

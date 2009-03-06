@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: General visitor framework
+desc: |-
+  Provide generic visitor framework (or equivalent) to make it easier to do graph traversal
+  e.g. for to_hash
+type: :feature
+component: core
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-05 23:51:25.995962 Z
+references: []
+
+id: a83adf41afcb6c1f31627c6f70309d29ddd410a2
+log_events: 
+- - 2009-03-05 23:51:26.691937 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

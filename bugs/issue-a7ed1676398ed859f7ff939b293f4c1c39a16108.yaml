@@ -3,7 +3,7 @@ title: page about factory/constructor functions
 desc: ""
 type: :task
 component: docs
-release: 
+release: r0.2.3
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,12 @@ log_events:
 - - 2009-03-02 23:56:28.406848 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-05 23:49:17.091935 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from unassigned
+  - ""
+- - 2009-03-06 00:55:30.773795 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.3 from r0.3.0
   - ""

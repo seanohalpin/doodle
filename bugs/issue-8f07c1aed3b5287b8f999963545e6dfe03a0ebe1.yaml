@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Explain defer_validation
+desc: ""
+type: :task
+component: docs
+release: r0.2.3
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-05 23:57:29.653783 Z
+references: []
+
+id: 8f07c1aed3b5287b8f999963545e6dfe03a0ebe1
+log_events: 
+- - 2009-03-05 23:57:30.429934 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
