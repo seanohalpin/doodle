@@ -1,3 +1,10 @@
+== 0.2.3 / 2009-03-06
+
+- Features:
+  - added #assigned? to Doodle for attributes, e.g.
+      if assigned?(:name)
+  - added expand => boolean to Doodle::App::Filename - expands path if set to true. Default = false
+
 == 0.2.2 / 2009-03-02
 
 - Features:

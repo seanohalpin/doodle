@@ -67,6 +67,7 @@ class Doodle
     class Filename < Option
       doodle do
         boolean :existing, :default => false, :doc => "set to true if file must exist"
+        boolean :expand, :default => false, :doc => "set to true if you want to have the filename expanded"
       end
     end
 
@@ -174,6 +175,11 @@ class Doodle
           if da.existing
             must "exist" do |s|
               File.exist?(s)
+            end
+          end
+          if da.expand
+            from String do |s|
+              File.expand_path(s)
             end
           end
         end

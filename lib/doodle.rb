@@ -1010,6 +1010,11 @@ class Doodle
       doodle.attributes[name.to_sym].optional? && !ivar_defined?(name)
     end
 
+    # return true if attribute has been assigned to
+    def assigned?(name)
+      ivar_defined?(name)
+    end
+
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
