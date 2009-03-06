@@ -4,6 +4,7 @@
   - added #assigned? to Doodle for attributes, e.g.
       if assigned?(:name)
   - added expand => boolean to Doodle::App::Filename - expands path if set to true. Default = false
+  - added key_values
 
 == 0.2.2 / 2009-03-02
 
