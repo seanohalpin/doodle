@@ -411,6 +411,13 @@ class Doodle
       attributes(tf).keys
     end
 
+    # returns array of [key, value] pairs
+    # - if tf == true, returns all inherited [key, value] pairs (default)
+    # - if tf == false, returns only those [key, value] pairs defined in current object
+    def key_values(tf = true)
+      keys(tf).zip(values(tf))
+    end
+
     # return class level attributes
     def class_attributes
       attrs = Doodle::OrderedHash.new
