@@ -308,3 +308,80 @@ describe Doodle, 'collecting text values into non-String collector' do
     end
   end
 end
+
+describe Doodle, 'collector' do
+  temporary_constants :List, :Item do
+
+    before :each do
+      class Item < Doodle
+        has :title
+      end
+      class List < Doodle
+        has :items, :collect => Item
+        # TODO: add warning/exception if collection name same as item name
+      end
+    end
+
+    it 'should allow adding items of specified type' do
+      no_error {
+        list = List do
+          item "one"
+          item "two"
+        end
+      }
+    end
+
+    it 'should restrict collected items to specified type' do
+      proc {
+        list = List do
+          item Date.new
+        end
+      }.should raise_error
+    end
+
+  end
+end
+
+describe Doodle, 'collector' do
+  temporary_constants :Canvas, :Shape, :Circle, :Square do
+    before :each do
+      class Shape < Doodle
+        has :x
+        has :y
+      end
+      class Circle < Shape
+        has :radius
+      end
+      class Square < Shape
+        has :w
+        has :h
+      end
+    end
+
+    it 'should accept an array of types' do
+      class ::Canvas < Doodle
+        has :shapes, :collect => [Circle, Square]
+      end
+      canvas = Canvas do
+        circle 10,10,5
+        square 20,30,40,50
+      end
+      canvas.shapes.size.should_be 2
+      canvas.shapes[0].kind_of?(Circle).should_be true
+      canvas.shapes[0].kind_of?(Square).should_be true
+    end
+
+    it 'should accept a hash of types' do
+      class ::Canvas < Doodle
+        has :shapes, :collect => { :circle => Circle, :square => Square }
+      end
+      canvas = Canvas do
+        circle 10,10,5
+        square 20,30,40,50
+      end
+      canvas.shapes.size.should_be 2
+      canvas.shapes[0].kind_of?(Circle).should_be true
+      canvas.shapes[0].kind_of?(Square).should_be true
+    end
+  end
+end
