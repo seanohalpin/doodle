@@ -109,6 +109,8 @@ class Doodle
           camel_cased_word.to_s.gsub(/([A-Z]+)([A-Z])/,'\1_\2').gsub(/([a-z])([A-Z])/,'\1_\2').downcase
         end
       end
+      alias :snakecase :snake_case
+
       # resolve a constant of the form Some::Class::Or::Module -
       # doesn't work with constants defined in anonymous
       # classes/modules
@@ -1301,6 +1303,9 @@ class Doodle
           end
           # this in generic CollectorAttribute class
           # collector from(Hash)
+
+          # TODO: rework this to allow multiple classes and mappings
+          p [:collector, collector]
           if collector.kind_of?(Hash)
             collector_name, collector_class = collector.to_a[0]
           else
@@ -1317,6 +1322,7 @@ class Doodle
             end
             #!p [:collector_klass, collector_klass, params[:init]]
           end
+
           params[:collector_class] = collector_class
           params[:collector_name] = collector_name
         end
@@ -1371,6 +1377,8 @@ class Doodle
     def abstract
       @abstract = false
     end
+
+    # temporarily fake existence of readonly attribute
     def readonly
       false
     end
@@ -1397,7 +1405,9 @@ class Doodle
     remove_method(:readonly) # because we faked it earlier - remove to avoid redefinition warning
     has :readonly, :default => false
   end
+end
 
+class Doodle
   # base class for attribute collector classes
   class AttributeCollector < DoodleAttribute
     has :collector_class
