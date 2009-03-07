@@ -1,0 +1,28 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Work out how to do Doodle::Value properly
+desc: |-
+  I want a class that can stand for a simple scalar value but still participate as a doodle (e.g. in serialization). I can do this with a simple:
+  class Value < Doodle
+    has :value
+  end
+  but then participants have to know about the :value attribute. I would rather have:
+  class DoodleString < String
+    include Doodle
+  end
+  and have DoodleString work like both a String and a Doodle. However, this is proving hard to get working right.
+  Anyway, this feature/task is to make this work in an elegant way.
+type: :feature
+component: core
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-07 11:12:29.445878 Z
+references: []
+
+id: 91fe85ab3dbce1d7b3117286cc7d63b29fc9bfdf
+log_events: 
+- - 2009-03-07 11:12:30.125619 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
