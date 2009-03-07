@@ -113,12 +113,12 @@ describe Doodle, "typed collector with specified collector name" do
     end
     it "should collect items into attribute :list" do
       event = nil
-      proc {
+      no_error {
         event = Event do
           place "Stage 1"
           place "Stage 2"
         end
-      }.should_not raise_error
+      }
       event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
       event.locations.map{|loc| loc.class}.should_be [::Location, ::Location]
     end
@@ -150,9 +150,9 @@ describe Doodle, "typed collector with specified collector name initialized from
               :locations =>
               [ { :name => 'Backstage' } ] } ] }, { :name => "Stage 2" } ] }
       # note: wierd formatting above simply to pass coverage
-      proc {
+      no_error {
         event = Event(data)
-      }.should_not raise_error
+      }
       event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
       event.locations.map{|loc| loc.class}.should_be [::Location, ::Location]
       event.locations[0].events[0].kind_of?(Event).should_be true
@@ -255,12 +255,12 @@ describe Doodle, 'using String as collector' do
     end
 
     it 'should not raise an exception' do
-      proc {
+      no_error {
         text = Text do
           line "line 1"
           line "line 2"
         end
-      }.should_not raise_error
+      }
     end
 
     it 'should concatenate strings' do
@@ -291,11 +291,11 @@ describe Doodle, 'collecting text values into non-String collector' do
     end
 
     it 'should not raise an exception' do
-      proc {
+      no_error {
         signed_by = SignedBy do
           signature "Sean"
         end
-      }.should_not raise_error
+      }
     end
 
     it 'should convert String values to instances of collector class' do
@@ -309,12 +309,12 @@ describe Doodle, 'collecting text values into non-String collector' do
   end
 end
 
-describe Doodle, 'collector' do
+describe Doodle, ':collect' do
   temporary_constants :List, :Item do
 
     before :each do
       class Item < Doodle
-        has :title
+        has :title, :kind => String
       end
       class List < Doodle
         has :items, :collect => Item
@@ -325,6 +325,15 @@ describe Doodle, 'collector' do
     it 'should allow adding items of specified type' do
       no_error {
         list = List do
+          item Item("one")
+          item Item("two")
+        end
+      }
+    end
+
+    it 'should allow adding items of specified type via implicit type constructor' do
+      no_error {
+        list = List do
           item "one"
           item "two"
         end
@@ -332,17 +341,17 @@ describe Doodle, 'collector' do
     end
 
     it 'should restrict collected items to specified type' do
-      proc {
+      expect_error(Doodle::ValidationError) {
         list = List do
           item Date.new
         end
-      }.should raise_error
+      }
     end
 
   end
 end
 
-describe Doodle, 'collector' do
+describe Doodle, ':collect' do
   temporary_constants :Canvas, :Shape, :Circle, :Square do
     before :each do
       class Shape < Doodle
@@ -359,6 +368,7 @@ describe Doodle, 'collector' do
     end
 
     it 'should accept an array of types' do
+      pending 'implementation'
       class ::Canvas < Doodle
         has :shapes, :collect => [Circle, Square]
       end
@@ -372,6 +382,7 @@ describe Doodle, 'collector' do
     end
 
     it 'should accept a hash of types' do
+      pending 'implementation'
       class ::Canvas < Doodle
         has :shapes, :collect => { :circle => Circle, :square => Square }
       end

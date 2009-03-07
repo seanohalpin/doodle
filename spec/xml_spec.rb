@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'doodle/xml'
 
-describe Doodle, 'xml serialization within a module' do
+describe Doodle, 'XML serialization within a module' do
   temporary_constants :Container, :Base, :Slideshow, :Layout do
     before(:each) do
       @xml_source = '<Slideshow id="1" name="test"><Layout template="generic" /></Slideshow>'
@@ -43,7 +43,7 @@ describe Doodle, 'xml serialization within a module' do
   end
 end
 
-describe Doodle, 'xml serialization at top level' do
+describe Doodle, 'XML serialization at top level' do
   temporary_constants :Base, :Slideshow, :Layout do
     before(:each) do
       @xml_source = '<Slideshow id="1" name="test"><Layout template="generic" /></Slideshow>'
@@ -83,7 +83,7 @@ describe Doodle, 'xml serialization at top level' do
   end
 end
 
-describe Doodle, 'if default specified before required attributes, they are ignored if defined in block' do
+describe Doodle, 'XML' do
   temporary_constant :Address do
     before :each do
       class Address < Doodle
@@ -93,7 +93,7 @@ describe Doodle, 'if default specified before required attributes, they are igno
       end
     end
 
-    it 'should raise an error that required attributes have not been set' do
+    it 'should not raise an error when supplying attribute values' do
       proc {
         Address do
           city "London"
@@ -101,14 +101,14 @@ describe Doodle, 'if default specified before required attributes, they are igno
       }.should_not raise_error
     end
 
-    it 'should define required attributes' do
+    it 'should accept attributes defined in block' do
       a = Address do
         city "London"
       end
       a.city.should_be "London"
     end
 
-    it 'should output required attributes in XML' do
+    it 'should output non-doodle attributes as XML attributes' do
       a = Address do
         city "London"
       end
@@ -117,7 +117,7 @@ describe Doodle, 'if default specified before required attributes, they are igno
   end
 end
 
-describe Doodle, 'if default specified before required attributes, they are ignored if defined in block #2' do
+describe Doodle, 'XML' do
   temporary_constant :Base, :City, :Address do
     before :each do
       class Base < Doodle
@@ -160,7 +160,7 @@ describe Doodle, 'if default specified before required attributes, they are igno
 
 end
 
-describe Doodle, 'if default specified before required attributes, they are ignored if defined in block #2' do
+describe Doodle, 'XML' do
   temporary_constant :Base, :City, :Address, :Country do
     before :each do
 

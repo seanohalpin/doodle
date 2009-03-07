@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
-describe Doodle, "Definitions within rspec" do
+describe Doodle, "definitions within rspec" do
   temporary_constant :Foo1 do
     before :each do
       class Foo1 < Doodle
@@ -13,7 +13,7 @@ describe Doodle, "Definitions within rspec" do
   end
 end
 
-describe Doodle, "Definitions at top level" do
+describe Doodle, "definitions at top level" do
   temporary_constant :Foo2 do
     before :each do
       class ::Object
@@ -28,7 +28,7 @@ describe Doodle, "Definitions at top level" do
   end
 end
 
-describe Doodle, "Definitions in modules" do
+describe Doodle, "definitions in modules" do
   temporary_constant :Foo3, :Bar3 do
     before :each do
       module ::Bar3
@@ -43,7 +43,7 @@ describe Doodle, "Definitions in modules" do
   end
 end
 
-describe Doodle, "Definitions in module_eval" do
+describe Doodle, "definitions in module_eval" do
   temporary_constant :Foo4, :Bar4 do
     before :each do
       module Bar4
