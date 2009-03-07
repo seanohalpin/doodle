@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: make it possible to use :must and :from in hash params
+desc: ""
+type: :feature
+component: core
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-07 12:50:00.612660 Z
+references: []
+
+id: ddad75fe46361668dae817e43fded49ead03b1f6
+log_events: 
+- - 2009-03-07 12:50:01.260540 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
