@@ -313,7 +313,7 @@ describe Doodle, ':collect' do
   temporary_constants :List, :Item do
 
     before :each do
-      class Item < Doodle
+      class ::Item < Doodle
         has :title, :kind => String
       end
       class List < Doodle
