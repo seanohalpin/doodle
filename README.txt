@@ -2,6 +2,7 @@
 
 * Homepage: http://doodle.rubyforge.org
 * Github repo: http://github.com/seanohalpin/doodle/tree/master
+* Lighthouse issue tracker: http://seanohalpin.lighthouseapp.com/projects/26673-doodle/overview
 
 == DESCRIPTION:
 
@@ -16,7 +17,7 @@ Doodle has been tested with Ruby 1.8.6, 1.9.1 and JRuby 1.1. It has
 not yet been tested with Rubinius.
 
 Please feel free to post bug reports, feature requests, and any
-comments or discussion topics to the doodle Google group: 
+comments or discussion topics to the doodle Google group:
 http://groups.google.com/group/ruby-doodle
 
 == FEATURES:
@@ -40,7 +41,7 @@ http://groups.google.com/group/ruby-doodle
   require 'date'
   require 'doodle'
 
-  class DateRange < Doodle 
+  class DateRange < Doodle
     has :start_date do
       default { Date.today }
     end
@@ -60,7 +61,7 @@ http://groups.google.com/group/ruby-doodle
   require 'doodle'
   require 'doodle/utils' # for try
 
-  class DateRange < Doodle 
+  class DateRange < Doodle
     has :start_date, :kind => Date do
       default { Date.today }
       from String do |s|
@@ -119,14 +120,14 @@ http://groups.google.com/group/ruby-doodle
 
   p try {
     dr = DateRange.from 'Hello World'
-    dr.start_date                   # => 
-    dr.end_date                     # => 
+    dr.start_date                   # =>
+    dr.end_date                     # =>
   }
 
   p try {
-    dr = DateRange '2008-01-01', '2007-12-31' 
-    dr.start_date                   # => 
-    dr.end_date                     # => 
+    dr = DateRange '2008-01-01', '2007-12-31'
+    dr.start_date                   # =>
+    dr.end_date                     # =>
   }
   # >> #<Doodle::ConversionError: Cannot parse date: 'Hello World'>
   # >> #<Doodle::ValidationError: DateRange must have end_date >= start_date>
