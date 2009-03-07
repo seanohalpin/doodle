@@ -56,3 +56,7 @@ end
 def no_error(&block)
   proc(&block).should_not raise_error
 end
+
+def expect_error(*args, &block)
+  proc(&block).should raise_error(*args)
+end

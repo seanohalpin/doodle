@@ -75,9 +75,18 @@ class Doodle
   # debugging utilities
   module Debug
     class << self
+      # Robert Klemme, (ruby-talk 205150), (ruby-talk 205950)
+      def calling_method(level = 1)
+        caller[level] =~ /`([^']*)'/ and $1
+      end
+
+      def this_method
+        calling_method
+      end
+
       # output result of block if ENV['DEBUG_DOODLE'] set
       def d(&block)
-        p(block.call) if ENV['DEBUG_DOODLE']
+        puts(calling_method + ": " + block.call.inspect) if ENV['DEBUG_DOODLE']
       end
     end
   end
@@ -808,6 +817,7 @@ class Doodle
     # if block passed, define a conversion from class
     # if no args, apply conversion to arguments
     def from(*args, &block)
+      Doodle::Debug.d { [self, args, block]}
       #p [:from, self, args]
       if block_given?
         # set the rule for each arg given
@@ -975,9 +985,10 @@ class Doodle
     #  end
     #
     def has(*args, &block)
-      #DBG: Doodle::Debug.d { [:has, self, self.class, args] }
+      Doodle::Debug.d { [:args, self, self.class, args] }
 
       params = DoodleAttribute.params_from_args(self, *args)
+      Doodle::Debug.d { [:params, self, params] }
       # get specialized attribute class or use default
       attribute_class = params.delete(:using) || DoodleAttribute
 
@@ -986,6 +997,24 @@ class Doodle
       define_getter_setter params[:name], params, &block
       #p [:attribute, attribute_class, params]
       attr = __doodle__.local_attributes[params[:name]] = attribute_class.new(params, &block)
+
+      # FIXME: not sure this is really the right place for this (but
+      # right now the only place I can get it to work :)
+      if from_defined = params[:from]
+        from_defined.each do |k, v|
+          Doodle::Debug.d { [:defining, self, k, v]}
+          attr.instance_eval { from k, &v }
+        end
+      end
+
+      if must_defined = params[:must]
+        must_defined.each do |k, v|
+          attr.instance_eval { must k, &v }
+        end
+      end
+
+      attr
+
     end
 
     # define order for positional arguments
@@ -1268,6 +1297,7 @@ class Doodle
     class << self
       # rewrite rules for the argument list to #has
       def params_from_args(owner, *args)
+        Doodle::Debug.d { [owner, args] }
         key_values, positional_args = args.partition{ |x| x.kind_of?(Hash)}
         params = { }
         if positional_args.size > 0
@@ -1305,7 +1335,7 @@ class Doodle
           # collector from(Hash)
 
           # TODO: rework this to allow multiple classes and mappings
-          p [:collector, collector]
+          #p [:collector, collector]
           if collector.kind_of?(Hash)
             collector_name, collector_class = collector.to_a[0]
           else

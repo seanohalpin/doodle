@@ -13,16 +13,16 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
         has :v2, :kind => String, :default => "bar"
       end
     end
-    
+
     it 'should initialize an attribute from a hash' do
       foo = Foo do
-        bar :name => "hello", :count => 1 
+        bar :name => "hello", :count => 1
       end
       foo.bar.name.should_be "hello"
       foo.bar.count.should_be 1
     end
     it 'should fail trying to initialize with incorrect keyword values' do
-      proc { 
+      proc {
         foo = Foo do
           bar :name => 1, :count => "hello"
         end
@@ -30,7 +30,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should work with positional args' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar "hello", 1
         end
@@ -40,7 +40,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should work with block initialization' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar do
             name "hello"
@@ -53,7 +53,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should work with arg and block initialization' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar "hello" do
             count 1
@@ -65,7 +65,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should work with keyword and block initialization' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar :name => "hello" do
             count 1
@@ -77,7 +77,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should raise error with invalid keyword and block initialization' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar :name => 1 do
             count "hello"
@@ -87,7 +87,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should raise error with keyword and invalid block initialization' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar :name => "hello" do
             count "hello"
@@ -97,7 +97,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
     end
     it 'should initialize non-Doodle or Proc with simple value' do
       foo = nil
-      proc { 
+      proc {
         foo = Foo do
           bar :name => "hello", :count => 1
           v2 "Hello"
@@ -108,7 +108,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
       foo.v2.should_be "Hello"
     end
     it 'should fail trying to initialize an inappropriate attribute (not a Doodle or Proc) from a block' do
-      proc { 
+      proc {
         foo = Foo do
           bar :name => "hello", :count => 1
           v2 do
