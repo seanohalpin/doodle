@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: Explain defer_validation
+title: explain defer_validation
 desc: ""
 type: :task
 component: docs
@@ -15,4 +15,8 @@ log_events:
 - - 2009-03-05 23:57:30.429934 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-08 21:07:55.131969 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - edited title
   - ""
