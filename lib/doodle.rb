@@ -50,14 +50,14 @@ class Doodle
   # considered equal
   module Equality
     def eql?(o)
-#       p [:comparing, self.class, o.class, self.class == o.class]
-#       p [:values, self.doodle.values, o.doodle.values, self.doodle.values == o.doodle.values]
-#       p [:attributes, doodle.attributes.map { |k, a| [k, send(k).==(o.send(k))] }]
+      #       p [:comparing, self.class, o.class, self.class == o.class]
+      #       p [:values, self.doodle.values, o.doodle.values, self.doodle.values == o.doodle.values]
+      #       p [:attributes, doodle.attributes.map { |k, a| [k, send(k).==(o.send(k))] }]
       res = self.class == o.class &&
         #self.doodle.values == o.doodle.values
         # short circuit comparison
         doodle.attributes.all? { |k, a| send(k).==(o.send(k)) }
-#       p [:res, res]
+      #       p [:res, res]
       res
     end
     def ==(o)
@@ -402,6 +402,7 @@ class Doodle
     def attributes(tf = true)
       results = handle_inherited_hash(tf, :local_attributes)
       # if an instance, include the singleton_class attributes
+      #p [:attributes, @this, @this.singleton_class, @this.singleton_class.methods(false), results]
       if !@this.kind_of?(Class) && @this.singleton_class.doodle.respond_to?(:attributes)
         results = results.merge(@this.singleton_class.doodle.attributes)
       end
@@ -631,17 +632,17 @@ class Doodle
     include SelfClass
     include SmokeAndMirrors
 
-# NOTE: can't do either of these
+    # NOTE: can't do either of these
 
-#     include Equality
-#     include Comparable
+    #     include Equality
+    #     include Comparable
 
     #     def self.included(other)
-#       other.module_eval {
-#         include Equality
-#         include Comparable
-#       }
-#     end
+    #       other.module_eval {
+    #         include Equality
+    #         include Comparable
+    #       }
+    #     end
 
     # this is the only way to get at internal values. Note: this is
     # initialized on the fly rather than in #initialize because
@@ -986,7 +987,6 @@ class Doodle
     #
     def has(*args, &block)
       Doodle::Debug.d { [:args, self, self.class, args] }
-
       params = DoodleAttribute.params_from_args(self, *args)
       Doodle::Debug.d { [:params, self, params] }
       # get specialized attribute class or use default
@@ -1053,6 +1053,11 @@ class Doodle
       ivar_defined?(name)
     end
 
+    # get an instance variable by symbolic name
+    def ivar_get(name)
+      instance_variable_get("@#{name}")
+    end
+
     # validate this object by applying all validations in sequence
     # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
     def validate!(all = true)
@@ -1069,14 +1074,13 @@ class Doodle
           ##DBG: Doodle::Debug.d { [:validate!, "using instance_attributes", doodle.attributes] }
         end
         attribs.each do |name, att|
-          ivar_name = "@#{att.name}"
-          if instance_variable_defined?(ivar_name)
+          if ivar_defined?(name)
             # if all == true, reset values so conversions and
             # validations are applied to raw instance variables
             # e.g. when loaded from YAML
             if all && !att.readonly
               ##DBG: Doodle::Debug.d { [:validate!, :sending, att.name, instance_variable_get(ivar_name) ] }
-              __send__("#{att.name}=", instance_variable_get(ivar_name))
+              __send__("#{name}=", ivar_get(name))
             end
           elsif att.optional?   # treat default/init as special case
             ##DBG: Doodle::Debug.d { [:validate!, :optional, name ]}
@@ -1194,73 +1198,73 @@ class Doodle
   module Factory
     RX_IDENTIFIER = /^[A-Za-z_][A-Za-z_0-9]+\??$/
     #class << self
-      # create a factory function in appropriate module for the specified class
-      def self.factory(konst)
-        #p [:factory, :ancestors, konst, konst.ancestors]
-        #p [:factory, :lookup, Module.nesting]
-        name = konst.to_s
-        #p [:factory, :name, name]
-        anon_class = false
-        if name =~ /#<Class:0x[a-fA-F0-9]+>::/
+    # create a factory function in appropriate module for the specified class
+    def self.factory(konst)
+      #p [:factory, :ancestors, konst, konst.ancestors]
+      #p [:factory, :lookup, Module.nesting]
+      name = konst.to_s
+      #p [:factory, :name, name]
+      anon_class = false
+      if name =~ /#<Class:0x[a-fA-F0-9]+>::/
           #p [:factory_anon_class, name]
           anon_class = true
-        end
-        names = name.split(/::/)
-        name = names.pop
-        # TODO: the code below is almost the same - refactor
-        #p [:factory, :names, names, name]
-        if names.empty? && !anon_class
-          #p [:factory, :top_level_class]
-          # top level class - should be available to all
-          parent_class = Object
-          method_defined = begin
-                             method(name)
-                             true
-                           rescue Object
-                             false
-                           end
+      end
+      names = name.split(/::/)
+      name = names.pop
+      # TODO: the code below is almost the same - refactor
+      #p [:factory, :names, names, name]
+      if names.empty? && !anon_class
+        #p [:factory, :top_level_class]
+        # top level class - should be available to all
+        parent_class = Object
+        method_defined = begin
+                           method(name)
+                           true
+                         rescue Object
+                           false
+                         end
 
-          if name =~ Factory::RX_IDENTIFIER && !method_defined && !parent_class.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING)
-            eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
+        if name =~ Factory::RX_IDENTIFIER && !method_defined && !parent_class.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING)
+          eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
+        end
+      else
+        #p [:factory, :other_level_class]
+        parent_class = Object
+        if !anon_class
+          parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
+          #p [:factory, :parent_class, parent_class]
+          if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+            parent_class.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
         else
-          #p [:factory, :other_level_class]
-          parent_class = Object
-          if !anon_class
-            parent_class = names.inject(parent_class) {|c, n| c.const_get(n)}
-            #p [:factory, :parent_class, parent_class]
-            if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-              parent_class.module_eval("def self.#{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-            end
-          else
-            # NOTE: ruby 1.9.1 specific
-            parent_class_name = names.join('::')
-            #p [:factory, :parent_class_name, parent_class_name]
-            #p [:parent_class_name, parent_class_name]
-            # FIXME: this is truly horrible...
-            hex_object_id = parent_class_name.match(/:(0x[a-zA-Z0-9]+)/)[1]
-            oid = hex_object_id.to_i(16) >> 1
-#             p [:object_id, oid, hex_object_id, hex_object_id.to_i(16) >> 1]
-            parent_class = ObjectSpace._id2ref(oid)
+          # NOTE: ruby 1.9.1 specific
+          parent_class_name = names.join('::')
+          #p [:factory, :parent_class_name, parent_class_name]
+          #p [:parent_class_name, parent_class_name]
+          # FIXME: this is truly horrible...
+          hex_object_id = parent_class_name.match(/:(0x[a-zA-Z0-9]+)/)[1]
+          oid = hex_object_id.to_i(16) >> 1
+          #             p [:object_id, oid, hex_object_id, hex_object_id.to_i(16) >> 1]
+          parent_class = ObjectSpace._id2ref(oid)
 
-            #p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
-#             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
-            if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
-              #p [:context, context]
-              parent_class.module_eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
-            end
+          #p [:parent_object_id, parent_class.object_id, names, parent_class, parent_class_name, parent_class.name]
+          #             p [:names, :oid, "%x" % (oid << 1), :konst, konst, :pc, parent_class, :names, names, :self, self]
+          if name =~ Factory::RX_IDENTIFIER && !parent_class.respond_to?(name)
+            #p [:context, context]
+            parent_class.module_eval("def #{name}(*args, &block); #{name}.new(*args, &block); end", __FILE__, __LINE__)
           end
-          # TODO: check how many times this is being called
         end
+        # TODO: check how many times this is being called
       end
+    end
 
-      # inherit the factory function capability
-      def self.included(other)
-        #p [:included, other]
-        super
-        # make +factory+ method available
-        factory other
-      end
+    # inherit the factory function capability
+    def self.included(other)
+      #p [:included, other]
+      super
+      # make +factory+ method available
+      factory other
+    end
     #end
   end
 
@@ -1521,6 +1525,7 @@ class Doodle
   class KeyedAttribute < AttributeCollector
     #    has :init, :init => DoodleHash.new
     has :init, :init => { }
+    #has :init, :init => OrderedHash.new
     has :key
 
     def post_process(results)
