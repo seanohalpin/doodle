@@ -29,6 +29,16 @@ class Doodle
       super
       @order = []
     end
+    def clone
+      c = super
+      c.order = order.clone
+      c
+    end
+    def dup
+      c = super
+      c.order = order.dup
+      c
+    end
     def store_only(a,b)
       store a,b
     end
@@ -39,9 +49,13 @@ class Doodle
     end
     alias []= store
     def ==(hsh2)
+      return false if !hsh2.respond_to?(:order)
       return false if @order != hsh2.order
       super hsh2
     end
+#     def eql?(hsh2)
+#       super hsh2
+#     end
     def clear
       @order = []
       super
