@@ -14,3 +14,4 @@ semantic.cache
 /www/output/
 local/*
 .ditz-config
+*.rbc
