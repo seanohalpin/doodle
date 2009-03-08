@@ -180,7 +180,8 @@ describe Doodle, "Simple keyed collector" do
     end
 
     it "should collect items into attribute :list" do
-      @foo.list.should_be( { 5 => "World" } )
+      # @foo.list.should_be( Doodle::OrderedHash[5, "World"] )
+      @foo.list.to_a.flatten.should_be( [5, "World"] )
     end
 
   end
@@ -208,7 +209,7 @@ describe Doodle, "Simple keyed collector #2" do
         item "Hello"
         item "World"
       end
-      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+      foo.list.to_a.sort.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
 
     it "should collect keyword argument enumerable into attribute :list" do
@@ -218,7 +219,7 @@ describe Doodle, "Simple keyed collector #2" do
                  { :name => "World" }
                 ]
                 )
-      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+      foo.list.to_a.sort.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
 
     it "should collect positional argument enumerable into attribute :list" do
@@ -227,7 +228,7 @@ describe Doodle, "Simple keyed collector #2" do
                 { :name => "World" }
                 ]
                 )
-      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+      foo.list.to_a.sort.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
 
     it "should collect named argument hash into attribute :list" do
@@ -236,7 +237,7 @@ describe Doodle, "Simple keyed collector #2" do
                   "World" => { :name => "World" }
                 }
                 )
-      foo.list.to_a.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
+      foo.list.to_a.sort.map{ |k, v| [k, v.class, v.name] }.should_be( [["Hello", Item, "Hello"], ["World", Item, "World"]] )
     end
 
   end
@@ -310,13 +311,13 @@ describe Doodle, 'collecting text values into non-String collector' do
 end
 
 describe Doodle, ':collect' do
-  temporary_constants :List, :Item do
+  temporary_constants :ItemList, :Item do
 
     before :each do
       class ::Item < Doodle
         has :title, :kind => String
       end
-      class List < Doodle
+      class ItemList < Doodle
         has :items, :collect => Item
         # TODO: add warning/exception if collection name same as item name
       end
@@ -324,7 +325,7 @@ describe Doodle, ':collect' do
 
     it 'should allow adding items of specified type' do
       no_error {
-        list = List do
+        list = ItemList do
           item Item("one")
           item Item("two")
         end
@@ -333,7 +334,7 @@ describe Doodle, ':collect' do
 
     it 'should allow adding items of specified type via implicit type constructor' do
       no_error {
-        list = List do
+        list = ItemList do
           item "one"
           item "two"
         end
@@ -342,7 +343,7 @@ describe Doodle, ':collect' do
 
     it 'should restrict collected items to specified type' do
       expect_error(Doodle::ValidationError) {
-        list = List do
+        list = ItemList do
           item Date.new
         end
       }
