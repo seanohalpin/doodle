@@ -42,6 +42,20 @@ Note that you don't need to project the value into the block but you can if you 
 
 Object level validations occur ~after~ all instance variables have been set.
 
+=== deferring validation
+
+Sometimes you need to update attributes in a way that would temporarily cause the object state to be invalid. If you try to simply update an doodle attribute in such a way as to cause the instance to be invalid, Doodle will throw an exception:
+
+<< xmp filename: eg-defer-validation-1.rb, sections: use >>
+
+To allow the object to be in a temporarily invalid state, use {{{obj.doodle.defer_validation}}}:
+
+<< xmp filename: eg-defer-validation-2.rb, sections: use >>
+
+Of course, if at the end of the {{{defer_validation}}} block, the object is still invalid, Doodle will still throw an exception:
+
+<< xmp filename: eg-defer-validation-3.rb, sections: use >>
+
 === validating yaml data
 
 See [[./yaml.html#validating-yaml|validating data loaded from a yaml source]].

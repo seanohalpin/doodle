@@ -18,4 +18,4 @@ class Event < Doodle
 end
 
 event = Event :start_date => Date.today
-event.end_date = Date.parse('2001-01-01')
+event.end_date = Date.parse('2009-01-01')
