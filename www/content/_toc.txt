@@ -29,4 +29,5 @@ filter:
 
 * link[doodle/app] - command line option handling
 * link[doodle/xml] - {{{to_xml}}} and {{{from_xml}}}
+* link[doodle/json] - {{{to_json}}} and {{{from_json}}}
 
