@@ -13,11 +13,24 @@ filter:
 
 Assuming the following definition:
 
-<<< xmp filename: eg-json-person.rb sections: [definitions use] >>>
+<<< xmp filename: eg-json-person.rb, sections: [definitions, use] >>>
 
 You can output JSON using {{{object.to_json}}}:
 
-<<< xmp sections: use
+<<< xmp sections: [use]
+require 'eg-json-person'
+#:use
+person = Person do
+  name "Corum"
+  age 999
+end
+puts person.to_json
+#:output
+>>>
+
+to get the output:
+
+<<< xmp sections: [output], post: stripxmp, lang: javascript
 require 'eg-json-person'
 #:use
 person = Person do
@@ -30,14 +43,30 @@ puts person.to_json
 
 and load from a JSON source using {{{Doodle.from_json}}}:
 
-<<< xmp sections: use
+<<< xmp sections: [use, output]
 require 'eg-json-person'
+require 'pp'
 #:use
-person = Person do
-  name "Corum"
-  age 999
-end
-puts person.to_json
+person = Doodle.from_json(<<EOT)
+{
+  "json_class": "Person",
+  "data": {
+    "name": {
+      "json_class": "Name",
+      "data": {
+        "value":"Corum"
+      }
+    },
+    "age": {
+      "json_class": "Age",
+      "data": {
+        "value":999
+      }
+    }
+  }
+}
+EOT
+pp person
 #:output
 >>>
 
