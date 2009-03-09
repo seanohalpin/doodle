@@ -409,7 +409,7 @@ class Doodle
       results
     end
 
-    # returns array of values
+    # returns array of values (including defaults)
     # - if tf == true, returns all inherited values (default)
     # - if tf == false, returns only those values defined in current object
     def values(tf = true)
@@ -423,7 +423,7 @@ class Doodle
       attributes(tf).keys
     end
 
-    # returns array of [key, value] pairs
+    # returns array of [key, value] pairs (including default values)
     # - if tf == true, returns all inherited [key, value] pairs (default)
     # - if tf == false, returns only those [key, value] pairs defined in current object
     def key_values(tf = true)
