@@ -15,8 +15,6 @@ end
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
-require 'yaml'
-
 # *doodle* is an eco-friendly metaprogramming framework that does not
 # pollute core Ruby objects such as Object, Class and Module.
 #
@@ -26,8 +24,8 @@ require 'yaml'
 #
 # Docs at http://doodle.rubyforge.org
 #
-require 'doodle/ordered-hash'
 require 'doodle/debug'
+require 'doodle/ordered-hash'
 require 'doodle/utils'
 require 'doodle/equality'
 require 'doodle/comparable'
@@ -43,8 +41,8 @@ require 'doodle/datatype-holder'
 require 'doodle/to_hash'
 require 'doodle/marshal'
 require 'doodle/getter-setter'
-require 'doodle/base'
 require 'doodle/factory'
+require 'doodle/base'
 require 'doodle/core'
 require 'doodle/attribute'
 require 'doodle/collector'
