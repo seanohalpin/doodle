@@ -23,7 +23,6 @@ class Doodle
         extend other
         # ensure that subclasses are also embraced
         define_method :inherited do |klass|
-          super
           #p [:embrace, :inherited, klass]
           klass.__send__(:embrace, other)       # n.b. closure
           klass.__send__(:include, Factory)     # is there another way to do this? i.e. not in embrace
