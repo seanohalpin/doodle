@@ -3,7 +3,7 @@ class Doodle
   # provided by Doodle without inheriting from Doodle, include
   # Doodle::Core, not this module
   module BaseMethods
-    include SelfClass
+    include Singleton
     include SmokeAndMirrors
     include ToHash
     include ModMarshal
@@ -150,7 +150,7 @@ class Doodle
     # return true if attribute has default defined and not yet been
     # assigned to (i.e. still has default value)
     def default?(name)
-      doodle.attributes[name.to_sym].optional? && !ivar_defined?(name)
+      __doodle__.attributes[name.to_sym].optional? && !ivar_defined?(name)
     end
 
     # return true if attribute has been assigned to

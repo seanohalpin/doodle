@@ -1,7 +1,7 @@
 class Doodle
   # provides more direct access to the singleton class and a way to
   # treat singletons, Modules and Classes equally in a meta context
-  module SelfClass
+  module Singleton
     # return the 'singleton class' of an object, optionally executing
     # a block argument in the (module/class) context of that object
     def singleton_class(&block)
