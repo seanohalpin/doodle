@@ -28,9 +28,10 @@ class Doodle
           # FIXME: this is getting a bit arbitrary
           include Doodle::Equality
           include Doodle::Comparable
+          include Factory
+
           extend Embrace
           embrace BaseMethods
-          include Factory
         }
       end
     end
@@ -38,5 +39,6 @@ class Doodle
   end
 
   include Core
+
 end
 
