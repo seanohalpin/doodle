@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Sort out rdoc
+desc: rdoc output is a real mess
+type: :task
+component: docs
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-11 21:33:15.622082 Z
+references: []
+
+id: 35a701963443b95be7945ee0a44cf20f44db5284
+log_events: 
+- - 2009-03-11 21:33:16.317777 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

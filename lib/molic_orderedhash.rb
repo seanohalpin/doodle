@@ -1,14 +1,14 @@
-# AUTHOR
-#    jan molic /mig/at/1984/dot/cz/
-#
-# DESCRIPTION
-#    Hash with preserved order and some array-like extensions
-#    Public domain.
-#
-# THANKS
-#    Andrew Johnson for his suggestions and fixes of Hash[],
-#    merge, to_a, inspect and shift
 class Doodle
+  # AUTHOR
+  #    jan molic /mig/at/1984/dot/cz/
+  #
+  # DESCRIPTION
+  #    Hash with preserved order and some array-like extensions
+  #    Public domain.
+  #
+  # THANKS
+  #    Andrew Johnson for his suggestions and fixes of Hash[],
+  #    merge, to_a, inspect and shift
   class OrderedHash < ::Hash
     attr_accessor :order
 

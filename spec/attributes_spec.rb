@@ -16,7 +16,7 @@ describe Doodle::DoodleAttribute, 'basics' do
           has :cvar2
         end
       end
-    
+
       @foo = Foo.new
       class << @foo
         has :svar1
@@ -31,7 +31,7 @@ describe Doodle::DoodleAttribute, 'basics' do
       @bar = nil
       @foo = nil
     end
-    
+
     it 'should have attribute :ivar1 with default defined' do
       @foo.doodle.attributes[:ivar1].default.should == 'Hello'
     end
@@ -68,7 +68,7 @@ describe Doodle::DoodleAttribute, 'basics' do
 #       expected_doodle.parents = RUBY_VERSION <= "1.8.6" ? [Foo, Object] : [Foo, Object, BasicObject]
 #       Bar.doodle.parents.should == expected_doodle.parents
 #     end
-    
+
     it "should have Bar's singleton doodle.parents in reverse order of definition" do
       @bar.singleton_class.doodle.parents.should == []
     end
@@ -84,20 +84,20 @@ describe Doodle::DoodleAttribute, 'basics' do
     it 'should have inherited class_attributes in order of definition' do
       @bar.doodle.class_attributes.keys.should == [:cvar1, :cvar2]
     end
-    
+
     it 'should have local class attributes in order of definition' do
       Bar.singleton_class.doodle.attributes(false).keys.should == [:cvar2]
     end
 
     # bit iffy this test - testing implementation, not interface
     it 'should not inherit singleton doodle.local_attributes' do
-      @bar.singleton_class.class_eval { doodle.collect_inherited(:local_attributes).map { |x| x[0]} }.should == []
+      @bar.singleton_class.class_eval { doodle.send(:collect_inherited, :local_attributes).map { |x| x[0]} }.should == []
     end
 
     it 'should not inherit singleton attributes#1' do
       @bar.singleton_class.doodle.attributes.map { |x| x[0]} .should == [:svar2]
     end
-    
+
     it 'should not inherit singleton attributes#2' do
       @bar.singleton_class.doodle.attributes.keys.should == [:svar2]
     end
@@ -128,7 +128,7 @@ describe Doodle::DoodleAttribute, 'attribute order' do
         has :c
       end
     end
-  
+
 #     it 'should keep order of inherited attributes' do
 #       expected_doodle.parents = RUBY_VERSION <= "1.8.6" ? [B, A, Doodle, Object] : [B, A, Doodle, Object, BasicObject]
 #       C.doodle.parents.should == expected_doodle.parents
