@@ -8,7 +8,7 @@ class Doodle
   #
   # this works down to third level <tt>class << self</tt> - in practice, this is
   # perfectly good - it would be great to have a completely general
-  # solution but I'm doubt whether the payoff is worth the effort
+  # solution but I doubt whether the payoff is worth the effort
 
   module Inherited
     def self.included(other)
@@ -28,9 +28,9 @@ class Doodle
         include other
         # singleton method chain
         extend other
-        # ensure that subclasses are also embraced
+        # ensure that subclasses also inherit this module
         define_method :inherited do |klass|
-          #p [:embrace, :inherited, klass]
+          #p [:inherit, :inherited, klass]
           klass.__send__(:inherit, other)       # n.b. closure
         end
       }
