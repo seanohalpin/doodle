@@ -12,7 +12,7 @@ class Doodle
 
   extend ClassMethods
 
-  # Place to hold ref to built-in classes that need special handling
+  # Place to hold refs to built-in classes that need special handling
   module BuiltIns
     BUILTINS = [String, Hash, Array]
   end
@@ -26,12 +26,10 @@ class Doodle
         super
         other.module_eval {
           # FIXME: this is getting a bit arbitrary
-          include Doodle::Equality
-          include Doodle::Comparable
-          include Factory
-
-          extend Embrace
-          embrace BaseMethods
+          include Equality
+          include Comparable
+          include Inherited
+          inherit BaseMethods
         }
       end
     end

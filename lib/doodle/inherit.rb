@@ -1,6 +1,6 @@
 class Doodle
-  # = embrace
-  # the intent of embrace is to provide a way to create directives
+  # = inherit
+  # the intent of inherit is to provide a way to create directives
   # that affect all members of a class 'family' without having to
   # modify Module, Class or Object - in some ways, it's similar to Ara
   # Howard's mixable[http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/197296]
@@ -10,11 +10,18 @@ class Doodle
   # perfectly good - it would be great to have a completely general
   # solution but I'm doubt whether the payoff is worth the effort
 
-  module Embrace
+  module Inherited
+    def self.included(other)
+      other.extend(Inherited)
+      other.send(:include, Factory)
+    end
+
     # fake module inheritance chain
-    def embrace(other, &block)
+    def inherit(other, &block)
       # include in instance method chain
       include other
+      include Inherited
+
       sc = class << self; self; end
       sc.module_eval {
         # class method chain
@@ -24,12 +31,9 @@ class Doodle
         # ensure that subclasses are also embraced
         define_method :inherited do |klass|
           #p [:embrace, :inherited, klass]
-          klass.__send__(:embrace, other)       # n.b. closure
-          klass.__send__(:include, Factory)     # is there another way to do this? i.e. not in embrace
-          #super(klass) if defined?(super)
+          klass.__send__(:inherit, other)       # n.b. closure
         end
       }
-      sc.module_eval(&block) if block_given?
     end
   end
 
