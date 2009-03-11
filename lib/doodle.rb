@@ -1340,16 +1340,18 @@ class Doodle
 
           # TODO: rework this to allow multiple classes and mappings
           #p [:collector, collector]
+          # FIXME: collector
           if collector.kind_of?(Hash)
             collector_name, collector_class = collector.to_a[0]
           else
+            # FIXME: collector could be array
             # if Capitalized word given, treat as classname
             # and create collector for specific class
             collector_class = collector.to_s
             #p [:collector_klass, collector_klass]
             collector_name = Utils.snake_case(collector_class.split(/::/).last)
             #p [:collector_name, collector_class, collector_name]
-            # FIXME: sanitize class name (make this a Utils function)
+            # FIXME: sanitize class name for 1.9 (make this a Utils function)
             collector_class = collector_class.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
             if collector_class !~ /^[A-Z]/
               collector_class = nil
@@ -1444,30 +1446,37 @@ end
 class Doodle
   # base class for attribute collector classes
   class AttributeCollector < DoodleAttribute
+    # FIXME: collector
     has :collector_class
     has :collector_name
 
     def resolve_collector_class
+      # FIXME: collector - perhaps don't allow non-class collectors - should be resolved by this point
       if !collector_class.kind_of?(Class)
         self.collector_class = Doodle::Utils.const_resolve(collector_class)
       end
     end
     def resolve_value(value)
+      # FIXME: collector - find applicable collector class
       if value.kind_of?(collector_class)
+        # no change required
         #p [:resolve_value, :value, value]
         value
       elsif collector_class.__doodle__.conversions.key?(value.class)
+        # if the collector_class has a specific conversion for this value class
         #p [:resolve_value, :collector_class_from, value]
         collector_class.from(value)
       else
+        # try to instantiate collector_class using raw value
         #p [:resolve_value, :collector_class_new, value]
         collector_class.new(value)
       end
     end
     def initialize(*args, &block)
       super
-      define_collection
+      define_collector
       from Hash do |hash|
+        # FIXME: collector - my bogon detector just went off the scale - I forget why I have to do this here... :/
         resolve_collector_class
         hash.inject(self.init.clone) do |h, (key, value)|
           h[key] = resolve_value(value)
@@ -1476,6 +1485,7 @@ class Doodle
       end
       from Enumerable do |enum|
         #p [:enum, Enumerable]
+        # FIXME: collector
         resolve_collector_class
         # this is not very elegant but String is a classified as an
         # Enumerable in 1.8.x (but behaves differently)
@@ -1499,26 +1509,8 @@ class Doodle
 
     # define a collector for appendable collections
     # - collection should provide a :<< method
-    def define_collection
-      # FIXME: don't use eval in 1.9+
-      if collector_class.nil?
-        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                   junk = #{name} if !#{name} # force initialization for classes
-                   args.unshift(block) if block_given?
-                   #{name}.<<(*args);
-                 end", __FILE__, __LINE__)
-      else
-        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                          junk = #{name} if !#{name} # force initialization for classes
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
-                            #{name}.<<(*args)
-                          else
-                            #{name} << #{collector_class}.new(*args, &block)
-                          end
-                        end", __FILE__, __LINE__)
-      end
+    if RUBY_VERSION >= '1.9.1'
     end
-
   end
 
   # define collector methods for hash-like attribute collectors
@@ -1534,35 +1526,11 @@ class Doodle
         h
       end
     end
-
-    # define a collector for keyed collections
-    # - collection should provide a :[] method
-    def define_collection
-      # need to use string eval because passing block
-      # FIXME: don't use eval in 1.9+
-      if collector_class.nil?
-        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                   junk = #{name} if !#{name} # force initialization for classes
-                   args.each do |arg|
-                     #{name}[arg.send(:#{key})] = arg
-                   end
-                 end", __FILE__, __LINE__)
-      else
-        doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                          junk = #{name} if !#{name} # force initialization for classes
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
-                            args.each do |arg|
-                              #{name}[arg.send(:#{key})] = arg
-                            end
-                          else
-                            obj = #{collector_class}.new(*args, &block)
-                            #{name}[obj.send(:#{key})] = obj
-                          end
-                     end", __FILE__, __LINE__)
-      end
-    end
   end
 end
+
+# load ruby version specific methods
+require 'doodle/collector'
 
 ############################################################
 # and we're bootstrapped! :)
