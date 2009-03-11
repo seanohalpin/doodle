@@ -1,3 +1,4 @@
+require 'yaml'
 class Doodle
   module ToHash
     # create 'pure' hash of scalars only from attributes - hacky but works (kinda)
