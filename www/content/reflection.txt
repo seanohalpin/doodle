@@ -17,8 +17,11 @@ All metadata and reflection is accessed via the @doodle@ method.
 require 'doodle'
 require 'pp'
 #:definition
-class Person < Doodle
-  has :name, :kind => String
+class Named < Doodle
+  has :name
+end
+
+class Person < Named
   has :age, :kind => Integer do
     must "be >= 0" do |v|
       v >= 0
@@ -29,36 +32,39 @@ end
 pp Person.doodle.attributes
 >>>
 
-=== keys
+If you want to see just those attributes defined in a specific class (i.e. exclude inherited attributes), pass {{{false}}} to the {{{attributes}}} method:
 
 <<< xmp section: use
 require 'doodle'
 require 'pp'
 #:definition
-class Person < Doodle
-  has :name, :kind => String
-  has :age, :kind => Integer
+class Named < Doodle
+  has :name
 end
+
+class Person < Named
+  has :age, :kind => Integer do
+    must "be >= 0" do |v|
+      v >= 0
+    end
+  end
+end
+
 #:use
-person = Person :name => "Corum", :age => 999
-pp Person.doodle.keys
-pp person.doodle.keys
+pp Person.doodle.attributes(false)
 >>>
+
+=== keys
+
+<<< xmp filename: corum.rb, section: [use, keys] >>>
 
 === values
 
-<<< xmp section: use
-require 'doodle'
-require 'pp'
-#:definition
-class Person < Doodle
-  has :name, :kind => String
-  has :age, :kind => Integer
-end
-#:use
-person = Person :name => "Corum", :age => 999
-pp person.doodle.values
->>>
+<<< xmp filename: corum.rb, section: [values] >>>
+
+=== keys and values
+
+<<< xmp filename: corum.rb, section: [key_values] >>>
 
 === validations
 

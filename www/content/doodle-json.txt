@@ -9,11 +9,11 @@ filter:
 ---
 == <%= @page.title %>
 
-@Doodle::JSON@ adds the {{{#to_json}}} and {{{from_json}}} methods.
+@Doodle::JSON@ adds the {{{#to_json}}} and {{{from_json}}} methods. To use it you must have the {{{json}}} gem installed.
 
 Assuming the following definition:
 
-<<< xmp filename: eg-json-person.rb, sections: [definitions, use] >>>
+<<< xmp filename: eg-json-person.rb, sections: [requires, definitions, use] >>>
 
 You can output JSON using {{{object.to_json}}}:
 
@@ -70,3 +70,26 @@ pp person
 #:output
 >>>
 
+If you want basic output without all the {{{json_class}}} and {{{data}}} members, use {{{to_hash}}} before the {{{to_json}}}:
+
+<<< xmp sections: [output], post: stripxmp, lang: javascript
+require 'eg-json-person'
+#:use
+person = Person do
+  name "Corum"
+  age 999
+end
+puts person.to_hash.to_json
+#:output
+>>>
+
+Also, remember that doodles can be initialized from hashes, so the following is also possible:
+
+<<< xmp sections: [use, output]
+require 'eg-json-person'
+#:use
+json = '{"name": "Corum", "age": 999}'
+person = Person.from_json(json)
+pp person
+#:output
+>>>

@@ -13,7 +13,7 @@ You can also use @has@ for class attributes:
 <<< ruby
 class Foo < Doodle
   class << self
-    has :doc, :default => "This is the Foo class"
+    has :note, :default => "This is the Foo class"
   end
 end
 >>>
