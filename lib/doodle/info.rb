@@ -185,6 +185,7 @@ class Doodle
     # turn off validation, execute block, then set validation to same
     # state as it was before +defer_validation+ was called - can be nested
     def defer_validation(&block)
+      #p [:defer_validation, self.validation_on, @this]
       old_validation = self.validation_on
       self.validation_on = false
       v = nil
@@ -200,7 +201,7 @@ class Doodle
     # helper function to initialize from hash - this is safe to use
     # after initialization (validate! is called if this method is
     # called after initialization)
-    def initialize_from_hash(*args)
+    def update(*args, &block)
       # p [:doodle_initialize_from_hash, :args, *args]
       defer_validation do
         # hash initializer
@@ -234,6 +235,7 @@ class Doodle
         key_values.keys.each do |key|
           #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
           #p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
+          #p [:update, :setting, key, key_values[key], __doodle__.validation_on]
           if respond_to?(key)
             __send__(key, key_values[key])
           else
@@ -251,7 +253,13 @@ class Doodle
             __send__(key, value)
           end
         end
+        if block_given?
+          #p [:update, block, __doodle__.validation_on]
+          #p [:this, self]
+          instance_eval(&block)
+        end
       end
+      @this
     end
 
     # returns array of values (including defaults)
