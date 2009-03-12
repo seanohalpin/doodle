@@ -276,12 +276,18 @@ class Doodle
       attributes(tf).keys
     end
 
-    # returns array of [key, value] pairs (including default values)
+    # returns array of [key, value] pairs including default values
     # - if tf == true, returns all inherited [key, value] pairs (default)
     # - if tf == false, returns only those [key, value] pairs defined in current object
     def key_values(tf = true)
       keys(tf).zip(values(tf))
     end
 
+    # returns array of [key, value] pairs excluding default values
+    # - if tf == true, returns all inherited [key, value] pairs (default)
+    # - if tf == false, returns only those [key, value] pairs defined in current object
+    def key_values_without_defaults(tf = true)
+      keys(tf).reject{|k| @this.default?(k) }.map{ |k, a| [k, @this.send(k)]}
+    end
   end
 end
