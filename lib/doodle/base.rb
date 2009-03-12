@@ -169,8 +169,7 @@ class Doodle
       #p [:doodle_parent, Doodle.parent, caller[-1]]
       Doodle.context.push(self)
       __doodle__.defer_validation do
-        __doodle__.initialize_from_hash(*args)
-        instance_eval(&block) if block_given?
+        __doodle__.update(*args, &block)
       end
       Doodle.context.pop
       #p [:doodle, __doodle__.__inspect__]
