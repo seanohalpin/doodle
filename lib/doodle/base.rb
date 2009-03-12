@@ -136,7 +136,7 @@ class Doodle
     end
 
     # return true if instance variable +name+ defined
-    # fixme: move
+    # FIXME: move
     def ivar_defined?(name)
       instance_variable_defined?("@#{name}")
     end
@@ -150,6 +150,7 @@ class Doodle
     # return true if attribute has default defined and not yet been
     # assigned to (i.e. still has default value)
     def default?(name)
+      # FIXME: should this be in DoodleInfo or here?
       __doodle__.attributes[name.to_sym].optional? && !ivar_defined?(name)
     end
 
