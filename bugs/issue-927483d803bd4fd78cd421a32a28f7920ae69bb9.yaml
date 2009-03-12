@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: refactor into separate files and make features selectable
+title: modularize and make features selectable
 desc: modularize - also, enable all-on version (and minimal Doodle::Core version)
 type: :feature
 component: doodle
@@ -15,4 +15,8 @@ log_events:
 - - 2009-03-09 16:51:50.564889 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-12 00:06:10.969519 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - edited title
   - ""

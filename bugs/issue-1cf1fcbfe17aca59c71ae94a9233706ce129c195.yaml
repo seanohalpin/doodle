@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: split into separate files
+desc: easier on the brain
+type: :task
+component: doodle
+release: r0.2.3
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-03-12 00:06:50.305017 Z
+references: []
+
+id: 1cf1fcbfe17aca59c71ae94a9233706ce129c195
+log_events: 
+- - 2009-03-12 00:06:51.224742 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
+- - 2009-03-12 00:06:58.928776 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - ""

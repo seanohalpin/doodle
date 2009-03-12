@@ -1,19 +1,19 @@
---- !ditz.rubyforge.org,2008-03-06/issue
+--- !ditz.rubyforge.org,2008-03-06/issue 
 title: reduce footprint
 desc: |-
   Reduce number of methods added to doodleized objects
   Vector as much as possible through single #doodle method
 type: :feature
 component: doodle
-release:
+release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition:
+status: :closed
+disposition: :fixed
 creation_time: 2008-05-10 19:59:21.965098 Z
 references: []
 
 id: ead3655282dfc2bb60552312ee1268af11602c42
-log_events:
+log_events: 
 - - 2008-05-10 20:01:26.238950 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
@@ -22,7 +22,11 @@ log_events:
       doodle_attributes
     use
       doodle.attributes, .validations, .conversions, etc.
-
+    
     I have to be careful however regarding scopes. Also, collect_inherited
     will probably need to be refactored to work inside DoodleInfo using
     doodled object's parents, rather than its own
+- - 2009-03-12 00:07:45.744874 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - ""
