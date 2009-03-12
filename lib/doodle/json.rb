@@ -6,13 +6,10 @@ class Doodle
     module InstanceMethods
       def to_json(*a)
         # don't include default values
-        values = doodle.keys.reject{|k| default?(k) }.map{ |k, a| [k, send(k)]}
+        values = doodle.key_values_without_defaults
         value_hash = Hash[*Doodle::Utils.flatten_first_level(values)]
         {
           'json_class'   => self.class.name,
-          # doodles should be able to load from a hash so this should
-          # be sufficient (in most cases)
-          # 'data'         => self.to_hash,
           'data' => value_hash,
         }.to_json(*a)
       end
@@ -24,7 +21,12 @@ class Doodle
         const.new(o['data'])
       end
       def from_json(src)
-        ::JSON::parse(src)
+        v = ::JSON::parse(src)
+        if v.kind_of?(Hash)
+          new(v)
+        else
+          v
+        end
       end
     end
     def self.included(other)
