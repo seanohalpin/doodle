@@ -1,19 +1,22 @@
 == 0.2.3 / 2009-03-06
 
 - Features:
+  - to_json and from_json - see http:://doodle.rubyforge.org/doodle-json.html for details
   - can now specify :must and :from directly in #has params hash, e.g.
       has :answer, :from => { String => proc {|c| c.to_i } },
         :must => { "be 42" => proc {|c| c == 42 } }
-  - added #assigned? to Doodle for attributes, e.g.
-      if assigned?(:name) # => true if @name exists
-  - added :expand => [false|true] to Doodle::App::Filename - expands path if set to true. Default = false
+  - added #assigned? for attributes, e.g.
+      if obj.assigned?(:name) # => true if @name exists
   - added key_values:
       class Foo < Doodle
         has :name
         has :count
       end
       Foo.new('a', 1).doodle.key_values # => [[:name, "a"], [:count, 1]]
-  - all specs now pass on jruby-1.2.0RC2 and ruby 1.8.7p72
+  - and key_values_without_defaults
+  - added :expand => [false|true] to Doodle::App::Filename - expands path if set to true. Default = false
+  - all specs pass on jruby-1.2.0RC2 and ruby 1.8.7p72
+  - plus more docs + specs
 
 == 0.2.2 / 2009-03-02
 
