@@ -35,7 +35,7 @@ class Doodle
       end
     end
 
-    # validate that args meet rules defined with +must+
+    # validate that individual attribute args meet rules defined with +must+
     # fixme: move
     def validate(owner, *args)
       ##DBG: Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
@@ -45,7 +45,13 @@ class Doodle
       rescue Exception => e
         owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", Doodle::Utils.doodle_caller
       end
-      #p [:validate, 2, args, :becomes, value]
+      #
+      # Note to self: these validations are not affected by
+      # doodle.validation_on because they are for ~individual
+      # attributes~ - validation_on is for the ~object as a whole~ -
+      # so don't futz with this again :)
+      #
+      # p [:validate, 2, args, :becomes, value]
       __doodle__.validations.each do |v|
         ##DBG: Doodle::Debug.d { [:validate, self, v, args, value] }
         if !v.block[value]
@@ -57,12 +63,18 @@ class Doodle
     end
 
     # validate this object by applying all validations in sequence
-    # - if all == true, validate all attributes, e.g. when loaded from YAML, else validate at object level only
+    #
+    # - if all == true, validate all attributes, e.g. when loaded from
+    #   YAML, else validate at object level only
+    #
     def validate!(all = true)
       ##DBG: Doodle::Debug.d { [:validate!, all, caller] }
       if all
         __doodle__.errors.clear
       end
+
+      # first check that individual attributes are valid
+
       if __doodle__.validation_on
         if self.class == Class
           attribs = __doodle__.class_attributes
@@ -88,7 +100,7 @@ class Doodle
           end
         end
 
-        # now apply instance level validations
+        # now apply whole object level validations
 
         ##DBG: Doodle::Debug.d { [:validate!, "validations", doodle_validations ]}
         __doodle__.validations.each do |v|
