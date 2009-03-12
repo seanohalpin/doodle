@@ -42,19 +42,39 @@ Note that you don't need to project the value into the block but you can if you 
 
 Object level validations occur ~after~ all instance variables have been set.
 
-=== deferring validation
+=== deferring validation with {{{doodle.update}}}
 
-Sometimes you need to update attributes in a way that would temporarily cause the object state to be invalid. If you try to simply update an doodle attribute in such a way as to cause the instance to be invalid, Doodle will throw an exception:
+Sometimes you need to update attributes in a way that would temporarily cause the object state to be invalid.
 
-<< xmp filename: eg-defer-validation-1.rb, sections: use >>
+The following class definition has two object level validations defined with {{{must}}}:
 
-To allow the object to be in a temporarily invalid state, use {{{obj.doodle.defer_validation}}}:
+<< xmp filename: dude.rb, sections: definition >>
 
-<< xmp filename: eg-defer-validation-2.rb, sections: use >>
+If you try to simply update an attribute in such a way as to cause the instance to be invalid, Doodle will throw an exception:
 
-Of course, if at the end of the {{{defer_validation}}} block, the object is still invalid, Doodle will still throw an exception:
+<< xmp filename: dude-exception.rb, sections: eg5 >>
 
-<< xmp filename: eg-defer-validation-3.rb, sections: use >>
+Using {{{object.doodle.update}}}, you can temporarily set attributes to values which would invalidate the object:
+
+<< xmp filename: dude-update.rb, sections: eg1 >>
+
+Values set in the block will override values set in the argument list:
+
+<< xmp filename: dude-update.rb, sections: eg2 >>
+
+Of course, if the object is invalid at the end of the block, Doodle will raise an exception:
+
+<< xmp filename: dude-exception2.rb, sections: eg6 >>
+
+You can't escape individual attribute validations:
+
+<< xmp filename: dude-update.rb, sections: eg3 >>
+
+i.e. Doodle will not allow you to set an individual attribute to an invalid value for that attribute, even temporarily.
+
+However if you capture the exception, {{{update}}} will not prevent you from invalidating the whole ~object~:
+
+<< xmp filename: dude-update.rb, sections: eg4 >>
 
 === validating yaml data
 

@@ -84,7 +84,7 @@ class Doodle
       ##DBG: Doodle::Debug.d { [:_setter, name, args] }
       #p [:_setter, name, *args]
       att = __doodle__.lookup_attribute(name)
-      if att && doodle.validation_on && att.readonly
+      if att && __doodle__.validation_on && att.readonly
         raise Doodle::ReadOnlyError, "Trying to set a readonly attribute: #{att.name}", Doodle::Utils.doodle_caller
       end
       if block_given?
