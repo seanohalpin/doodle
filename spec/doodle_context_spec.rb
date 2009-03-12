@@ -11,15 +11,15 @@ describe Doodle, "doodle_context" do
           # - a proc/lamba is treated as a literal argument, i.e. the
           # - value is set to a Proc
           # - a block argument, on the other hand, is instance
-          # - evaluated during initialization
+          #   evaluated during initialization
           # - consequences
           #   - can only be done in init block
           #   - somewhat subtle difference (from programmer's point of
-          #   - view) between a proc and a block
+          #     view) between a proc and a block
           # Also note re: Doodle.parent - its value is only valid
           # during initialization - this is a way to capture that
-          # value for ues later
-          
+          # value for use later
+
           init { doodle.parent }
         end
       end
@@ -29,7 +29,7 @@ describe Doodle, "doodle_context" do
       end
 
     end
-    
+
     it 'should provide a means to find out the current parent of an item in initialization block' do
       dad = Parent 'Conn' do
         child 'Sean'

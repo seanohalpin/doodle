@@ -7,11 +7,11 @@ describe 'Doodle', 'specialized attributes' do
     before :each do
       class SpecializedAttribute < Doodle::DoodleAttribute
       end
-      
+
       class Foo < Doodle
       end
     end
-    
+
     it 'should allow :using keyword' do
       proc {
         Foo.class_eval do
