@@ -169,13 +169,18 @@ class Doodle
                       raise
                     end
                   else
-                    #p [:initial_values, :clone, a.name]
-                    begin
-                      a.init.clone
-                    rescue Exception => e
-                      warn "tried to clone #{a.init.class} in :init option (#{e})"
-                      #p [:initial_values, :exception, a.name, e]
-                      a.init
+                    if a.init.kind_of?(Class)
+                      p [:initial_values, :class]
+                      a.init.new
+                    else
+                      #p [:initial_values, :clone, a.name]
+                      begin
+                        a.init.clone
+                      rescue Exception => e
+                        warn "tried to clone #{a.init.class} in :init option (#{e})"
+                        #p [:initial_values, :exception, a.name, e]
+                        a.init
+                      end
                     end
                   end
         hash

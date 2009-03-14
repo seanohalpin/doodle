@@ -50,6 +50,8 @@ require 'doodle/inherit'
 require 'doodle/base'
 require 'doodle/core'
 require 'doodle/attribute'
+require 'doodle/normalized_array'
+require 'doodle/normalized_hash'
 require 'doodle/collector'
 
 ############################################################

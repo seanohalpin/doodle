@@ -1,16 +1,45 @@
 class Doodle
+
+  def self.TypedArray(*klasses)
+    typed_class = Class.new(NormalizedArray) do
+      define_method :normalize_value do |v|
+        if !klasses.any?{ |klass| v.kind_of?(klass) }
+          raise TypeError, "#{self.class}: #{v.class}(#{v.inspect}) is not a kind of #{klasses.map{ |c| c.to_s }.join(', ')}", [caller[-1]]
+        end
+        v
+      end
+    end
+    p [:creating_class, typed_class]
+    typed_class
+  end
+
   # base class for attribute collector classes
   class AttributeCollector < DoodleAttribute
     # FIXME: collector
     has :collector_class
     has :collector_name
 
+    def create_collection
+      if self.init.kind_of?(Class)
+        p [:create_collection, :class]
+        collection = self.init.new
+      else
+        p [:create_collection, :clone]
+        collection = self.init.clone
+      end
+      p [:create_collection, collection]
+      collection
+    end
+    private :create_collection
+
     def resolve_collector_class
       # FIXME: collector - perhaps don't allow non-class collectors - should be resolved by this point
+      # perhaps do this in init?
       if !collector_class.kind_of?(Class)
         self.collector_class = Doodle::Utils.const_resolve(collector_class)
       end
     end
+
     def resolve_value(value)
       # FIXME: collector - find applicable collector class
       if value.kind_of?(collector_class)
@@ -27,13 +56,17 @@ class Doodle
         collector_class.new(value)
       end
     end
+
     def initialize(*args, &block)
+      p [self.class, :initialize]
       super
       define_collector
       from Hash do |hash|
         # FIXME: collector - my bogon detector just went off the scale - I forget why I have to do this here... :/
+        # oh yes - because I allow forward references using symbols or strings
         resolve_collector_class
-        hash.inject(self.init.clone) do |h, (key, value)|
+        collection = create_collection
+        hash.inject(collection) do |h, (key, value)|
           h[key] = resolve_value(value)
           h
         end
@@ -51,20 +84,11 @@ class Doodle
         end
       end
     end
+
     def post_process(results)
       #p [:post_process, results]
-      self.init.clone.replace(results)
-    end
-  end
-
-  # define collector methods for array-like attribute collectors
-  class AppendableAttribute < AttributeCollector
-    #    has :init, :init => DoodleArray.new
-    has :init, :init => []
-
-    # define a collector for appendable collections
-    # - collection should provide a :<< method
-    if RUBY_VERSION >= '1.9.1'
+      collection = create_collection
+      collection.replace(results)
     end
   end
 
@@ -76,7 +100,8 @@ class Doodle
     has :key
 
     def post_process(results)
-      results.inject(self.init.clone) do |h, result|
+      collection = create_collection
+      results.inject(collection) do |h, result|
         h[result.send(key)] = result
         h
       end
@@ -92,7 +117,13 @@ if false
 else
   # version for ruby 1.8.6
   class Doodle
-    class AppendableAttribute
+    # define collector methods for array-like attribute collectors
+    class AppendableAttribute < AttributeCollector
+      #    has :init, :init => DoodleArray.new
+      has :init, :init => []
+
+      # define a collector for appendable collections
+      # - collection should provide a :<< method
       def define_collector
         # FIXME: don't use eval in 1.9+
         if collector_class.nil?
@@ -104,6 +135,7 @@ else
         else
           doodle_owner.sc_eval("def #{collector_name}(*args, &block)
                           collection = self.send(:#{name})
+p [:collector, :#{collector_name}, collection]
                           if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
                             collection.<<(*args)
                           else
@@ -120,6 +152,7 @@ else
     end
 
     class KeyedAttribute
+
       # define a collector for keyed collections
       # - collection should provide :[], :clone and :replace methods
       def define_collector

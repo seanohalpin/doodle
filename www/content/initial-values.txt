@@ -14,41 +14,62 @@ are set when the ~object~ is ~instantiated~. Also, default values are
 fine for simple scalar objects, but can cause problems with aggregates
 such as Arrays because you end up sharing them among all instances:
 
-<<< ruby
+<<< xmp sections: use
+require 'doodle'
+#:use
 class Event < Doodle
   has :locations, :default => []
 end
 
 e1 = Event()
 e2 = Event()
-e1.locations.object_id == e2.locations.object_id
-=> true
+e1.locations.object_id == e2.locations.object_id # =>
 >>>
 
 In these cases, use @init@ instead of @default@:
 
-<<< ruby
+<<< xmp sections: use
+require 'doodle'
+#:use
 class Event < Doodle
   has :locations, :init => []
 end
 
 e1 = Event()
 e2 = Event()
-e1.locations.object_id == e2.locations.object_id
-=> false
+e1.locations.object_id == e2.locations.object_id # =>
 >>>
 
-Internally, Doodle copies the @init@ value by cloning it. Unlike
+or you can specify the class:
+
+<<< xmp sections: use
+require 'doodle'
+#:use
+class Event < Doodle
+  has :locations, :init => Array
+end
+
+e1 = Event()
+e2 = Event()
+e1.locations.object_id == e2.locations.object_id # =>
+>>>
+
+Internally, Doodle copies the {{{init}}} value by cloning it if given an instance or calling ~class~{{{.new}}} if given a class. Unlike
 @default@, @init@ ~does~ create an instance variable.
 
 However, we can set still the @date@ attribute to any value we like.
 
-<<< ruby
+<<< xmp sections: use
+require 'doodle'
+#:define
+class Event < Doodle
+  has :start_date
+  has :end_date, :default => proc { start_date + 1 }
+end
+#:use
 event = Event :start_date => "Hello"
-event.start_date
-=> "Hello"
-event.end_date
-=> TypeError: can't convert Fixnum into String
+event.start_date # =>
+event.end_date   # =>
 >>>
 
 To avoid this kind of inconsistency, we can restrict the kinds of

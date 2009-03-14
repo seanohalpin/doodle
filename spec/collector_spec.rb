@@ -397,3 +397,33 @@ describe Doodle, ':collect' do
     end
   end
 end
+
+describe Doodle, 'typed collector' do
+  temporary_constant :Text do
+    before :each do
+      #: definition
+      class ::Item < Doodle
+        has :name, :kind => String
+      end
+      class ::List < Doodle
+        has :items, :init => Doodle::TypedArray(Item), :collect => Item
+      end
+    end
+
+    it 'should not raise an exception' do
+      no_error {
+        list = List do
+          item "Hello"
+          item "World"
+        end
+      }
+    end
+
+    it 'should prevent adding invalid values' do
+      list = List.new
+      expect_error(TypeError) {
+        list.items << "Hello"
+      }
+    end
+  end
+end

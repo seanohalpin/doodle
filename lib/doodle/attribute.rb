@@ -49,7 +49,7 @@ class Doodle
           # collector from(Hash)
 
           # TODO: rework this to allow multiple classes and mappings
-          #p [:collector, collector]
+          p [:collector, collector, params, params[:init].kind_of?(Class)]
           # FIXME: collector
           if collector.kind_of?(Hash)
             collector_name, collector_class = collector.to_a[0]
