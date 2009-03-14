@@ -170,7 +170,7 @@ class Doodle
                     end
                   else
                     if a.init.kind_of?(Class)
-                      p [:initial_values, :class]
+                      #p [:initial_values, :class]
                       a.init.new
                     else
                       #p [:initial_values, :clone, a.name]

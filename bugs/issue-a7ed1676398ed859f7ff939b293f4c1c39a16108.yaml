@@ -3,7 +3,7 @@ title: page about factory/constructor functions
 desc: ""
 type: :task
 component: docs
-release: r0.2.3
+release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -24,3 +24,7 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - assigned to release r0.2.3 from r0.3.0
   - ""
+- - 2009-03-14 16:02:42.536026 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from r0.2.3
+  - implicit in examples

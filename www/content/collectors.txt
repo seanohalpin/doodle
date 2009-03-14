@@ -57,7 +57,7 @@ end
 
 @ClassName@ can be a ClassConstant, a :Symbol or a "String".
 
-Finally, if you don't want to restrict the value to a particular class, you can just specify a method name:
+If you don't want to restrict the value to a particular class, you can just specify a method name:
 
 <<< ruby
 has :locations, :collect => :place
@@ -66,6 +66,66 @@ event = Event do
   place "Stage 1"
   place 42
 end
+>>>
+
+=== defining multiple collectors for the same collection
+
+You can specify more than one class in the {{{:collect}}} clause. For example, given these definitions:
+
+<<< ruby
+class ::Shape < Doodle
+  has :x
+  has :y
+end
+class ::Circle < Shape
+  has :radius
+end
+class ::Square < Shape
+  has :size
+end
+>>>
+
+you can define a generic collector like this:
+
+<<< ruby
+class ::Canvas < Doodle
+  has :shapes, :collect => [Circle, Square]
+end
+>>>
+
+or like this:
+
+<<< ruby
+class ::Canvas < Doodle
+  has :shapes, :collect => { :circle => Circle, :square => Square }
+end
+>>>
+
+In both cases, the {{{circle}}} and {{{square}}} methods will add items to the {{{shapes}}} collection:
+
+<<< xmp sections: use
+require 'doodle'
+require 'pp'
+#:define
+class ::Shape < Doodle
+  has :x
+  has :y
+end
+class ::Circle < Shape
+  has :radius
+end
+class ::Square < Shape
+  has :size
+end
+class ::Canvas < Doodle
+  has :shapes, :collect => [Circle, Square]
+end
+#:use
+canvas = Canvas do
+  circle 10,10,5
+  square 20,30,40
+end
+pp canvas
 >>>
 
 === keyed collections

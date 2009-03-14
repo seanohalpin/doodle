@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 
 describe Doodle, 'typed collector' do
-  temporary_constant :Text do
+  temporary_constants :Item, :List do
     before :each do
       #: definition
       class ::Item < Doodle

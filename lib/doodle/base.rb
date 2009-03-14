@@ -114,7 +114,6 @@ class Doodle
       end
 
       attr
-
     end
 
     # define order for positional arguments

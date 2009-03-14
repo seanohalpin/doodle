@@ -1,6 +1,10 @@
 == 0.2.3 / 2009-03-06
 
 - Features:
+  - collect can now take multiple types, e.g.
+      has :shapes, :collect => [Circle, Square]
+    or
+      has :shapes, :collect => {:circle => Circle, :square => Square}
   - to_json and from_json - see http:://doodle.rubyforge.org/doodle-json.html for details
   - can now specify :must and :from directly in #has params hash, e.g.
       has :answer, :from => { String => proc {|c| c.to_i } },

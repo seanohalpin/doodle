@@ -355,75 +355,43 @@ end
 describe Doodle, ':collect' do
   temporary_constants :Canvas, :Shape, :Circle, :Square do
     before :each do
-      class Shape < Doodle
+      class ::Shape < Doodle
         has :x
         has :y
       end
-      class Circle < Shape
+      class ::Circle < Shape
         has :radius
       end
-      class Square < Shape
-        has :w
-        has :h
+      class ::Square < Shape
+        has :size
       end
     end
 
     it 'should accept an array of types' do
-      pending 'implementation'
       class ::Canvas < Doodle
         has :shapes, :collect => [Circle, Square]
       end
       canvas = Canvas do
         circle 10,10,5
-        square 20,30,40,50
+        square 20,30,40
       end
       canvas.shapes.size.should_be 2
       canvas.shapes[0].kind_of?(Circle).should_be true
-      canvas.shapes[0].kind_of?(Square).should_be true
+      canvas.shapes[1].should_be Square(20, 30, 40)
     end
 
     it 'should accept a hash of types' do
-      pending 'implementation'
       class ::Canvas < Doodle
         has :shapes, :collect => { :circle => Circle, :square => Square }
       end
       canvas = Canvas do
         circle 10,10,5
-        square 20,30,40,50
+        square 20,30,40
       end
       canvas.shapes.size.should_be 2
       canvas.shapes[0].kind_of?(Circle).should_be true
-      canvas.shapes[0].kind_of?(Square).should_be true
+      canvas.shapes[1].kind_of?(Square).should_be true
     end
   end
 end
 
-describe Doodle, 'typed collector' do
-  temporary_constant :Text do
-    before :each do
-      #: definition
-      class ::Item < Doodle
-        has :name, :kind => String
-      end
-      class ::List < Doodle
-        has :items, :init => Doodle::TypedArray(Item), :collect => Item
-      end
-    end
-
-    it 'should not raise an exception' do
-      no_error {
-        list = List do
-          item "Hello"
-          item "World"
-        end
-      }
-    end
-
-    it 'should prevent adding invalid values' do
-      list = List.new
-      expect_error(TypeError) {
-        list.items << "Hello"
-      }
-    end
-  end
-end

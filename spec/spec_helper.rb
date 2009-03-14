@@ -30,20 +30,26 @@ def undefine_const(*consts)
 end
 
 def raise_if_defined(*args)
+  where = args.shift
   defined = args.select{ |x| Object.const_defined?(x)}
-  raise "Namespace pollution: #{defined.join(', ')}" if defined.size > 0
+  raise "Namespace pollution #{where}: #{defined.join(', ')}" if defined.size > 0
 end
 
 def temporary_constants(*args, &block)
+  constants = Object.constants.dup
   before :each do
-    raise_if_defined(*args)
+    raise_if_defined(:before, *args)
   end
   after :each do
     undefine_const(*args)
   end
-  raise_if_defined(*args)
+  crud = Object.constants - constants
+  if crud.size > 0
+    raise Exception, "Namespace crud: #{crud.map{ |x| x.to_s}.join(', ')}"
+  end
+  raise_if_defined(:begin, *args)
   yield
-  raise_if_defined(*args)
+  raise_if_defined(:end, *args)
 end
 alias :temporary_constant :temporary_constants
 

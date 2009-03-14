@@ -9,25 +9,24 @@ class Doodle
         v
       end
     end
-    p [:creating_class, typed_class]
+    #p [:creating_class, typed_class]
     typed_class
   end
 
   # base class for attribute collector classes
   class AttributeCollector < DoodleAttribute
     # FIXME: collector
-    has :collector_class
-    has :collector_name
+    has :collector_spec, :init => { }
 
     def create_collection
       if self.init.kind_of?(Class)
-        p [:create_collection, :class]
+        #p [:create_collection, :class]
         collection = self.init.new
       else
-        p [:create_collection, :clone]
+        #p [:create_collection, :clone]
         collection = self.init.clone
       end
-      p [:create_collection, collection]
+      #p [:create_collection, collection]
       collection
     end
     private :create_collection
@@ -35,22 +34,26 @@ class Doodle
     def resolve_collector_class
       # FIXME: collector - perhaps don't allow non-class collectors - should be resolved by this point
       # perhaps do this in init?
-      if !collector_class.kind_of?(Class)
-        self.collector_class = Doodle::Utils.const_resolve(collector_class)
+      collector_spec.each do |k, v|
+        if !v.kind_of?(Class)
+          collector_spec[k] = Doodle::Utils.const_resolve(v)
+        end
       end
     end
 
     def resolve_value(value)
+      klasses = collector_spec.values
       # FIXME: collector - find applicable collector class
-      if value.kind_of?(collector_class)
+      if klasses.any? { |x| value.kind_of?(x) }
         # no change required
         #p [:resolve_value, :value, value]
         value
-      elsif collector_class.__doodle__.conversions.key?(value.class)
+      elsif collector_class = klasses.select { |klass| klass.__doodle__.conversions.key?(value.class) }.first
         # if the collector_class has a specific conversion for this value class
         #p [:resolve_value, :collector_class_from, value]
         collector_class.from(value)
       else
+        collector_class = klasses.first
         # try to instantiate collector_class using raw value
         #p [:resolve_value, :collector_class_new, value]
         collector_class.new(value)
@@ -58,7 +61,7 @@ class Doodle
     end
 
     def initialize(*args, &block)
-      p [self.class, :initialize]
+      #p [self.class, :initialize]
       super
       define_collector
       from Hash do |hash|
@@ -117,6 +120,7 @@ if false
 else
   # version for ruby 1.8.6
   class Doodle
+
     # define collector methods for array-like attribute collectors
     class AppendableAttribute < AttributeCollector
       #    has :init, :init => DoodleArray.new
@@ -125,28 +129,29 @@ else
       # define a collector for appendable collections
       # - collection should provide a :<< method
       def define_collector
-        # FIXME: don't use eval in 1.9+
-        if collector_class.nil?
-          doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                   collection = self.#{name}
-                   args.unshift(block) if block_given?
-                   collection.<<(*args);
-                 end", __FILE__, __LINE__)
-        else
-          doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                          collection = self.send(:#{name})
-p [:collector, :#{collector_name}, collection]
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
-                            collection.<<(*args)
-                          else
-                            # FIXME: this is a wierd one - need name here - can't use collection directly...?
-                            #{name} << #{collector_class}.new(*args, &block)
-                            # this is OK
-                            #self.send(:#{name}) << #{collector_class}.new(*args, &block)
-                            # but this isn't
-                            #collection.<<(#{collector_class}.new(*args, &block))
-                          end
-                        end", __FILE__, __LINE__)
+        collector_spec.each do |collector_name, collector_class|
+          # FIXME: don't use eval in 1.9+
+          if collector_class.nil?
+            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                     collection = self.#{name}
+                     args.unshift(block) if block_given?
+                     collection.<<(*args);
+                   end", __FILE__, __LINE__)
+          else
+            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                            collection = self.send(:#{name})
+                            if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
+                              collection.<<(*args)
+                            else
+                              # FIXME: this is a wierd one - need name here - can't use collection directly...?
+                              #{name} << #{collector_class}.new(*args, &block)
+                              # this is OK
+                              #self.send(:#{name}) << #{collector_class}.new(*args, &block)
+                              # but this isn't
+                              #collection.<<(#{collector_class}.new(*args, &block))
+                            end
+                          end", __FILE__, __LINE__)
+          end
         end
       end
     end
@@ -156,27 +161,29 @@ p [:collector, :#{collector_name}, collection]
       # define a collector for keyed collections
       # - collection should provide :[], :clone and :replace methods
       def define_collector
-        # need to use string eval because passing block
-        # FIXME: don't use eval in 1.9+
-        if collector_class.nil?
-          doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                   collection = #{name}
-                   args.each do |arg|
-                     #{name}[arg.send(:#{key})] = arg
-                   end
-                 end", __FILE__, __LINE__)
-        else
-          doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                          collection = #{name}
-                          if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
-                            args.each do |arg|
-                              #{name}[arg.send(:#{key})] = arg
+        collector_spec.each do |collector_name, collector_class|
+          # need to use string eval because passing block
+          # FIXME: don't use eval in 1.9+
+          if collector_class.nil?
+            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                     collection = #{name}
+                     args.each do |arg|
+                       #{name}[arg.send(:#{key})] = arg
+                     end
+                   end", __FILE__, __LINE__)
+          else
+            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+                            collection = #{name}
+                            if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
+                              args.each do |arg|
+                                #{name}[arg.send(:#{key})] = arg
+                              end
+                            else
+                              obj = #{collector_class}.new(*args, &block)
+                              #{name}[obj.send(:#{key})] = obj
                             end
-                          else
-                            obj = #{collector_class}.new(*args, &block)
-                            #{name}[obj.send(:#{key})] = obj
-                          end
-                     end", __FILE__, __LINE__)
+                       end", __FILE__, __LINE__)
+          end
         end
       end
     end

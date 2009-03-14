@@ -31,15 +31,15 @@ module NormalizedArrayMethods
     #   end
 
     def initialize(*args, &block)
-      p [:init, 1, args, block]
+      #p [:init, 1, args, block]
       if block_given?
-        p [:init, 2]
+        #p [:init, 2]
         original_block = block
         block = proc { |index|
-          p [:init, 3, index]
+          #p [:init, 3, index]
           normalize_value(original_block[normalize_index(index)])
         }
-        p [:init, 4, block]
+        #p [:init, 4, block]
       end
       replace(super(*args, &block))
     end

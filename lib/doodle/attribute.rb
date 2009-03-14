@@ -49,28 +49,38 @@ class Doodle
           # collector from(Hash)
 
           # TODO: rework this to allow multiple classes and mappings
-          p [:collector, collector, params, params[:init].kind_of?(Class)]
+          #p [:collector, collector, params, params[:init].kind_of?(Class)]
           # FIXME: collector
           if collector.kind_of?(Hash)
-            collector_name, collector_class = collector.to_a[0]
+            collector_spec = collector
+            #collector_name, collector_class = collector.to_a[0]
+          elsif collector.kind_of?(Array) && collector.all? { |i| i.kind_of?(Hash) }
+            collector_spec = collector.inject(OrderedHash.new) { |hash, item|
+              item.keys.each do |key|
+                hash[key] = item[key]
+              end
+              hash
+            }
           else
-            # FIXME: collector could be array
-            # if Capitalized word given, treat as classname
-            # and create collector for specific class
-            collector_class = collector.to_s
-            #p [:collector_klass, collector_klass]
-            collector_name = Utils.snake_case(collector_class.split(/::/).last)
-            #p [:collector_name, collector_class, collector_name]
-            # FIXME: sanitize class name for 1.9 (make this a Utils function)
-            collector_class = collector_class.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
-            if collector_class !~ /^[A-Z]/
-              collector_class = nil
+            collectors = [collector].flatten
+            collector_spec = collectors.inject(OrderedHash.new) do |hash, klass|
+              collector_class = klass.to_s
+              #p [:collector_klass, collector_klass]
+              collector_name = Utils.snake_case(collector_class.split(/::/).last)
+              #p [:collector_name, collector_class, collector_name]
+              # FIXME: sanitize class name for 1.9 (make this a Utils function)
+              collector_class = collector_class.gsub(/#<Class:0x[a-fA-F0-9]+>::/, '')
+              # if Capitalized word given, treat as classname and create
+              # collector for specific class
+              if collector_class !~ /^[A-Z]/
+                collector_class = nil
+              end
+              hash[collector_name] = collector_class
+              hash
             end
             #!p [:collector_klass, collector_klass, params[:init]]
           end
-
-          params[:collector_class] = collector_class
-          params[:collector_name] = collector_name
+          params[:collector_spec] = collector_spec
         end
         params[:doodle_owner] = owner
         #p [:params, owner, params]

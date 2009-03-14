@@ -3,7 +3,7 @@ title: add from_yaml method
 desc: working the same way as the from_json method, i.e. if result is a Hash, try to initialise from that
 type: :feature
 component: extras
-release: r0.2.3
+release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-03-12 03:35:51.120905 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-14 16:03:11.094315 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.3.0 from r0.2.3
   - ""
