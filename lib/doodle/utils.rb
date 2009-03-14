@@ -1,8 +1,9 @@
-# doodle/utils.rb
+# Set of utility functions to avoid monkeypatching base classes
 class Doodle
   # Set of utility functions to avoid monkeypatching base classes
   module Utils
     module ClassMethods
+
       # unnest arrays by one level of nesting, e.g. [1, [[2], 3]] =>
       # [1, [2], 3].
       def flatten_first_level(enum)
@@ -15,7 +16,8 @@ class Doodle
         }
       end
 
-      # from facets/string/case.rb, line 80
+      # convert a CamelCasedWord to a snake_cased_word
+      # based on version in facets/string/case.rb, line 80
       def snake_case(camel_cased_word)
         # if all caps, just downcase it
         if camel_cased_word =~ /^[A-Z]+$/
@@ -38,9 +40,11 @@ class Doodle
         ::Marshal.load(::Marshal.dump(obj))
       end
 
-      # normalize hash keys using method (e.g. :to_sym, :to_s)
-      # - updates target hash
-      # - optionally recurse into child hashes
+      # normalize hash keys using method (e.g. +:to_sym+, +:to_s+)
+      #
+      # [+hash+] target hash to update
+      # [+recursive+] recurse into child hashes if +true+ (default is not to recurse)
+      # [+method+] method to apply to key (default is +:to_sym+)
       def normalize_keys!(hash, recursive = false, method = :to_sym)
         if hash.kind_of?(Hash)
           hash.keys.each do |key|
@@ -58,9 +62,11 @@ class Doodle
         end
         hash
       end
+
       # normalize hash keys using method (e.g. :to_sym, :to_s)
       # - returns copy of hash
       # - optionally recurse into child hashes
+      # see #normalize_keys! for details
       def normalize_keys(hash, recursive = false, method = :to_sym)
         if recursive
           h = deep_copy(hash)
@@ -69,30 +75,35 @@ class Doodle
         end
         normalize_keys!(h, recursive, method)
       end
+
       # convert keys to symbols
       # - updates target hash in place
       # - optionally recurse into child hashes
       def symbolize_keys!(hash, recursive = false)
         normalize_keys!(hash, recursive, :to_sym)
       end
+
       # convert keys to symbols
       # - returns copy of hash
       # - optionally recurse into child hashes
       def symbolize_keys(hash, recursive = false)
         normalize_keys(hash, recursive, :to_sym)
       end
+
       # convert keys to strings
       # - updates target hash in place
       # - optionally recurse into child hashes
       def stringify_keys!(hash, recursive = false)
         normalize_keys!(hash, recursive, :to_s)
       end
+
       # convert keys to strings
       # - returns copy of hash
       # - optionally recurse into child hashes
       def stringify_keys(hash, recursive = false)
         normalize_keys(hash, recursive, :to_s)
       end
+
       # simple (!) pluralization - if you want fancier, override this method
       def pluralize(string)
         s = string.to_s
@@ -121,8 +132,8 @@ class Doodle
         end
       end
 
-      # normalize a name to contain only legal characters for a Ruby
-      # constant
+      # normalize a name to contain only those characters which are
+      # valid for a Ruby constant
       def normalize_const(const)
         const.to_s.gsub(/[^A-Za-z_0-9]/, '')
       end
@@ -151,8 +162,11 @@ class Doodle
             break
           end
         end
-        raise NameError, "Uninitialized constant #{const} in context #{context}" if result.nil?
-        result
+        if result.nil?
+          raise NameError, "Uninitialized constant #{const} in context #{context}"
+        else
+          result
+        end
       end
     end
     extend ClassMethods
