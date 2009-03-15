@@ -1,6 +1,5 @@
 # RUBYLIB=lib xmpfilter
 #: requires
-require 'rubygems'
 require 'doodle'
 require 'doodle/xml'
 

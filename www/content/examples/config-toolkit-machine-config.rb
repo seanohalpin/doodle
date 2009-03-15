@@ -1,5 +1,5 @@
 # from http://configtoolkit.rubyforge.org/
-require 'rubygems'
+
 require 'configtoolkit'
 require 'uri'
 

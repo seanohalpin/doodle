@@ -1,7 +1,7 @@
 # provide the means to import source code into webby site
 # running through xmpfilter and selecting sections
 # with pre and post filters
-require 'rubygems'
+
 require 'wiki_creole'
 require 'coderay'
 require 'shellwords'

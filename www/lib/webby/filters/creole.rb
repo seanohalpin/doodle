@@ -1,4 +1,4 @@
-require 'rubygems'
+
 require 'wiki_creole'
 require File.expand_path(File.join(File.dirname(__FILE__), 'creole_coderay_plugin'))
 

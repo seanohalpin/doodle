@@ -1,4 +1,3 @@
-require 'rubygems'
 # some prob with different versions of libxml on different platforms
 # begin
 #   require 'nokogiri'

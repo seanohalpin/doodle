@@ -18,9 +18,9 @@ module ModNormalizedHash
           #p [:block, h, k]
           res = normalize_value(original_block[h, normalize_key(k)])
           #p [:block_self, self, res]
-          each do |k, v|
+          each do |k2, v2|
             #p [:init_block, k, v]
-            self[k] = normalize_value(v)
+            self[k2] = normalize_value(v2)
           end
           #p [:block_res, self, res]
           res

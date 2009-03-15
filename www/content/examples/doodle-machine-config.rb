@@ -1,5 +1,3 @@
-#: rubygems
-require 'rubygems'
 #: requires
 require 'doodle'
 require 'doodle/datatypes'

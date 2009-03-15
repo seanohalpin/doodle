@@ -1,4 +1,4 @@
-require 'rubygems'
+
 require 'configtoolkit'
 require 'configtoolkit/hashreader'
 require 'yaml'

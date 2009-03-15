@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'rubygems'
+
 require 'directory_watcher'
 
 dw = DirectoryWatcher.new(".", :glob => "**/*", :pre_load => true)

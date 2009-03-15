@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'yaml'
 
-describe 'Doodle', 'block initialization of scalar attributes' do
+describe 'Doodle', 'to_hash' do
   temporary_constant :Foo, :Bar, :Farm, :Barn, :Animal do
     before :each do
       class ::Animal < Doodle
@@ -31,8 +31,8 @@ describe 'Doodle', 'block initialization of scalar attributes' do
       farm.to_string_hash.should_be( {"barn"=>{"animals"=>[{"species"=>"pig"}]}} )
     end
 
-    it 'should do something sensible with Proc-valued attributes' do
-      pending
+    it 'should not nuke Proc-valued attributes' do
+      pending "rewrite of to_hash"
       source_block = proc { puts "hello" }
       b = Bar do
         block(&source_block)

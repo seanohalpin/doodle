@@ -1,5 +1,5 @@
 #:requires
-require 'rubygems'
+
 require 'configtoolkit'
 require 'configtoolkit/hashreader'
 require 'config-toolkit-machine-config'

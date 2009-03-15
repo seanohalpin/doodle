@@ -1,7 +1,6 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.join(File.dirname(__FILE__), '.'))
 
-require 'rubygems'
 require 'yaml'
 require 'doodle'
 require 'pp'
@@ -17,7 +16,7 @@ end
 
 yaml = %[
 ---
-:address: 
+:address:
 - Henry Wood House
 - London
 :name: Sean
@@ -29,11 +28,11 @@ yaml = person.to_yaml
 puts yaml
 
 yaml = %[
---- !ruby/object:Person 
-address: 
-- !ruby/object:AddressLine 
+--- !ruby/object:Person
+address:
+- !ruby/object:AddressLine
   text: Henry Wood House
-- !ruby/object:AddressLine 
+- !ruby/object:AddressLine
   text: London
 name: Sean
 ]

@@ -1,4 +1,4 @@
-require 'rubygems'
+
 require 'doodle'
 require 'pp'
 

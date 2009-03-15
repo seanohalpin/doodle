@@ -1,5 +1,5 @@
 #: requires
-require 'rubygems'
+
 require 'doodle'
 require 'event'
 #: use

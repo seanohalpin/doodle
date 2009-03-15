@@ -1,5 +1,4 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'rubygems'
 require 'date'
 require 'doodle'
 require "yaml"
@@ -27,7 +26,7 @@ class Event
     end
   end
   has :locations, :collect => {:place => :Location}
-end  
+end
 
 event = Event "Festival" do
   date '2018-04-01'
@@ -89,16 +88,16 @@ e = Event(hash_data)
 pp e
 
 __END__
---- !ruby/object:Event 
+--- !ruby/object:Event
 date: 2000-04-01
-locations: 
-- !ruby/object:Location 
+locations:
+- !ruby/object:Location
   events: []
 
   name: The muddy field
-- !ruby/object:Location 
-  events: 
-  - !ruby/object:Event 
+- !ruby/object:Location
+  events:
+  - !ruby/object:Event
     locations: []
 
     name: Drinking

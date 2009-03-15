@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'doodle/app'
 
 class Filter < Doodle::App

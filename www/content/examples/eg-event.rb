@@ -1,5 +1,5 @@
 #: requires
-require 'rubygems'
+
 require 'date'
 require 'pp'
 require 'doodle'

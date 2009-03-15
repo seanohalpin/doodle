@@ -1,10 +1,4 @@
-begin
-  require 'spec'
-rescue LoadError
-  require 'rubygems'
-  gem 'rspec'
-  require 'spec'
-end
+require 'spec'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'doodle'

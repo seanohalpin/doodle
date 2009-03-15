@@ -48,7 +48,7 @@ class Mail < Doodle
       end
     end
   end
-  
+
   def send_message
     if true
       puts msg
@@ -60,7 +60,6 @@ class Mail < Doodle
   end
 end
 
-require 'rubygems'
 require 'highline/import'
 def prompt_for_password
   ask("Enter your password:  ") { |q| q.echo = '*' }
@@ -78,15 +77,15 @@ class GMail < Mail
 #   end
   has :host, :default => 'localhost.localdomain'
   has :message_format, :default => 'plain'
-  
+
   def send_message
     puts msg
     return
-    ::Net::SMTP.start(mail_server, 
+    ::Net::SMTP.start(mail_server,
                       port,
-                      host, 
-                      username, 
-                      password, 
+                      host,
+                      username,
+                      password,
                       message_format) do |smtp|
       smtp.send_message(msg, from, to)
     end

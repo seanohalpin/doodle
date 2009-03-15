@@ -1,4 +1,4 @@
-require 'rubygems'
+
 #:requires
 require 'doodle'
 require 'doodle/json'

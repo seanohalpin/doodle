@@ -1,5 +1,5 @@
 #: requires
-require 'rubygems'
+
 require 'doodle'
 #: d1
 class Event < Doodle

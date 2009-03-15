@@ -1,6 +1,6 @@
 #: requires
 # $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'rubygems'
+
 require 'doodle'
 #: require_xml
 require 'doodle/xml'

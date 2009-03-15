@@ -1,5 +1,4 @@
 #: requires
-require "rubygems"
 require "doodle"
 require "yaml"
 #: all

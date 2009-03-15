@@ -1,4 +1,4 @@
-require 'rubygems'
+
 require 'doodle'
 
 class Life < Doodle
