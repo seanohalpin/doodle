@@ -7,28 +7,6 @@ class StringArray < NormalizedArray
   end
 end
 
-def BoundedArray(upper_bound)
-  typed_class = Class.new(NormalizedArray) do
-    define_method :normalize_index do |index|
-      raise IndexError, "index #{index} out of range" if !(0..upper_bound).include?(index)
-      index
-    end
-  end
-  typed_class
-end
-
-def TypedArray(*klasses)
-  typed_class = Class.new(NormalizedArray) do
-    define_method :normalize_value do |v|
-      if !klasses.any?{ |klass| v.kind_of?(klass) }
-        raise TypeError, "#{self.class}: #{v.class}(#{v.inspect}) is not a kind of #{klasses.map{ |c| c.to_s }.join(', ')}", [caller[-1]]
-      end
-      v
-    end
-  end
-  typed_class
-end
-
 describe NormalizedArray do
   before :each do
     @sa = StringArray.new(3) { |i|
@@ -65,12 +43,11 @@ describe NormalizedArray do
   end
 end
 
-
 describe NormalizedArray do
   temporary_constant :BoundedArray4, :TypedStringArray do
     before :each do
-      TypedStringArray = TypedArray(String)
-      BoundedArray4 = BoundedArray(4)
+      TypedStringArray = NormalizedArray::TypedArray(String)
+      BoundedArray4 = NormalizedArray::BoundedArray(4)
       @ca = BoundedArray4.new([1,2,3])
     end
 
@@ -94,8 +71,8 @@ end
 describe NormalizedArray do
   temporary_constants :TypedIntegerArray, :StringOrIntegerArray do
     before :each do
-      TypedIntegerArray = TypedArray(Integer)
-      StringOrIntegerArray = TypedArray(Integer, String)
+      TypedIntegerArray = NormalizedArray::TypedArray(Integer)
+      StringOrIntegerArray = NormalizedArray::TypedArray(Integer, String)
 
       @ia = TypedIntegerArray.new([1,2,3])
       @ma = StringOrIntegerArray.new([1,"2",3])

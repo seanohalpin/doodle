@@ -44,9 +44,9 @@ module NormalizedArrayMethods
       replace(super(*args, &block))
     end
 
-#     def initialize(*args, &block)
-#       replace(super)
-#     end
+    #     def initialize(*args, &block)
+    #       replace(super)
+    #     end
 
     def normalize_index(index)
       index
@@ -74,13 +74,13 @@ module NormalizedArrayMethods
       super(normalize_value(value))
     end
 
-#     def <=>(other)
-#       super(normalize_values(*other))
-#     end
+    #     def <=>(other)
+    #       super(normalize_values(*other))
+    #     end
 
-#     def ==(other)
-#       super(normalize_values(*other))
-#     end
+    #     def ==(other)
+    #       super(normalize_values(*other))
+    #     end
 
     def [](index)
       super(normalize_index(index))
@@ -146,9 +146,9 @@ module NormalizedArrayMethods
     #     super
     #   end
 
-#     def eql?(other)
-#       super(normalize_values(*other))
-#     end
+    #     def eql?(other)
+    #       super(normalize_values(*other))
+    #     end
 
     def fetch(index)
       super(normalize_index(index))
@@ -361,7 +361,30 @@ module NormalizedArrayMethods
     def [](*args)
       super.normalize_values
     end
+
+    def BoundedArray(upper_bound)
+      typed_class = Class.new(NormalizedArray) do
+        define_method :normalize_index do |index|
+          raise IndexError, "index #{index} out of range" if !(0..upper_bound).include?(index)
+          index
+        end
+      end
+      typed_class
+    end
+
+    def TypedArray(*klasses)
+      typed_class = Class.new(NormalizedArray) do
+        define_method :normalize_value do |v|
+          if !klasses.any?{ |klass| v.kind_of?(klass) }
+            raise TypeError, "#{self.class}: #{v.class}(#{v.inspect}) is not a kind of #{klasses.map{ |c| c.to_s }.join(', ')}", [caller[-1]]
+          end
+          v
+        end
+      end
+      typed_class
+    end
   end
+
 end
 
 class NormalizedArray < Array
@@ -369,145 +392,3 @@ class NormalizedArray < Array
   extend NormalizedArrayMethods::ClassMethods
 end
 
-if __FILE__ == $0
-  require 'rubygems'
-  require 'doodle/assertion'
-
-  class StringArray < NormalizedArray
-    def normalize_value(v)
-      #p [self.class, :normalize_value, v]
-      v.to_s
-    end
-  end
-
-  def BoundedArray(upper_bound)
-    typed_class = Class.new(NormalizedArray) do
-      define_method :normalize_index do |index|
-        raise IndexError, "index #{index} out of range" if !(0..upper_bound).include?(index)
-        index
-      end
-    end
-    typed_class
-  end
-
-  def TypedArray(*klasses)
-    typed_class = Class.new(NormalizedArray) do
-      define_method :normalize_value do |v|
-        if !klasses.any?{ |klass| v.kind_of?(klass) }
-          raise TypeError, "#{self.class}: #{v.class}(#{v.inspect}) is not a kind of #{klasses.map{ |c| c.to_s }.join(', ')}", [caller[-1]]
-        end
-        v
-      end
-    end
-    typed_class
-  end
-  TypedStringArray = TypedArray(String)
-
-#   na = Array.new(4) { |i|
-#     p [:in_block, i]
-#     42
-#   }
-#   p na[1]
-#   p na[1] == 42
-
-  sa = StringArray.new(3) { |i|
-    #p [:in_block, i]
-    42
-  }
-  assert { sa[1] == "42" }
-  assert_error { sa[1] == 42 }
-  assert_error { sa.values == ["42"] * 3 }
-  assert_error { sa.values == [42] }
-
-  sa = nil
-  assert_ok {  sa = StringArray.new([1,2,3]) }
-  assert { sa == ["1", "2", "3"] }
-  assert { (sa | ["4", "5", "6"]) == ["1", "2", "3", "4", "5", "6"] }
-  assert { (sa | [4, 5, 6]) == ["1", "2", "3", 4, 5, 6] }
-  assert { (sa | [4, 5, 6]).class == Array }
-
-  # equality
-  assert { sa == ["1", "2", "3"] }
-  assert { ["1", "2", "3"] == sa }
-
-  ## -FIXME: not sure about this coercion- FIXED
-  assert_error { sa.eql?( [1, 2, 3] )}
-
-  ## -FIXME: equality should not be non-commutative- FIXED
-  assert_error { sa == [1, 2, 3] }
-  assert_error { [1, 2, 3] == sa }
-
-  BoundedArray4 = BoundedArray(4)
-  ca = BoundedArray4.new([1,2,3])
-  assert { ca == [1, 2, 3] }
-  assert { ca[4] = 42 }
-  expect_error(IndexError) { ca[5] = 42 }
-  expect_error('out of range') { ca[5] = 42 }
-  expect_error { ca[5] = 42 }
-  #expect_ok { false }
-  #expect_error { true }
-  #assert_ok { true }
-
-  assert_ok { ca = BoundedArray4.new([1,2,3,4,5]) }
-  assert_error { ca = BoundedArray4.new([1,2,3,4,5,6]) }
-
-  assert_error { sa = TypedStringArray.new([1,2,3]) }
-  assert_ok { sa = TypedStringArray.new(["1","2","3"]) }
-
-  #   ca = BoundedArray.new([1,2,3,4,5])
-  #   pp ca
-
-  TypedIntegerArray = TypedArray(Integer)
-  ia = TypedIntegerArray.new([1,2,3])
-  expect_error { ia[1] = "hello" }
-
-  StringOrIntegerArray = TypedArray(Integer, String)
-  ma = nil
-  expect_ok { ma = StringOrIntegerArray.new([1,"2",3]) }
-  expect_ok { ma[0] = "hello" }
-  expect_error { ma[1] = Date.new }
-
-  assert {
-    ma = [].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == ""
-  }
-
-  assert {
-    ma = [nil].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == ""
-  }
-
-  assert {
-    ma = [nil, nil].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == " and "
-  }
-
-  assert {
-    ma = [nil, nil, nil].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == ",  and "
-  }
-
-  assert {
-    ma = [1].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == "1"
-  }
-
-  assert {
-    ma = [1, 2].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == "1 and 2"
-  }
-
-  assert {
-    ma = [1, 2, 3].extend(ArraySentence)
-    ma.join_with(', ', ' or ') == "1, 2 or 3"
-  }
-
-  assert {
-    ma = [1, 2, 3].extend(ArraySentence)
-    ma.join_with(', ', ' and ') == "1, 2 and 3"
-  }
-
-  expect_error("Fixnum(1) is not a kind of String") { TypedStringArray[1,2,3] }
-  expect_error(TypeError) { TypedStringArray[1,2,3] }
-
-end

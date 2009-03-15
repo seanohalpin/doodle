@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: move NormalizedArray, etc. into Doodle namespace
+desc: ""
+type: :task
+component: core
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-15 18:20:14.127806 Z
+references: []
+
+id: 19b87cd164390c1b288f80d750e40ec0a1d58b5d
+log_events: 
+- - 2009-03-15 18:20:14.503579 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
