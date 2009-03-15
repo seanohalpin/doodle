@@ -15,7 +15,7 @@ describe Doodle, 'typed collector' do
 
     it 'should accept convertible values in collector' do
       list = nil
-      no_error {
+      expect_ok {
         list = List do
           item "Hello"
           item "World"
@@ -27,7 +27,7 @@ describe Doodle, 'typed collector' do
 
     it 'should accept correctly typed values in collector' do
       list = nil
-      no_error {
+      expect_ok {
         list = List do
           item Item("Hello")
           item Item("World")
@@ -46,7 +46,7 @@ describe Doodle, 'typed collector' do
 
     it 'should accept valid values' do
       list = List.new
-      no_error {
+      expect_ok {
         list.items << Item("Hello")
       }
       list.items.size.should_be 1

@@ -45,16 +45,12 @@ class Doodle
               params[:using] = AppendableAttribute
             end
           end
-          # this in generic CollectorAttribute class
-          # collector from(Hash)
 
-          # TODO: rework this to allow multiple classes and mappings
-          #p [:collector, collector, params, params[:init].kind_of?(Class)]
-          # FIXME: collector
           if collector.kind_of?(Hash)
+            # {:circle => Circle, :square => Square}
             collector_spec = collector
-            #collector_name, collector_class = collector.to_a[0]
           elsif collector.kind_of?(Array) && collector.all? { |i| i.kind_of?(Hash) }
+            # [{:circle => Circle}, {:square => Square}]
             collector_spec = collector.inject(OrderedHash.new) { |hash, item|
               item.keys.each do |key|
                 hash[key] = item[key]
@@ -62,6 +58,9 @@ class Doodle
               hash
             }
           else
+            # :collect => [Circle, Square]
+            # :collect => Circle
+            # :collect => :circle
             collectors = [collector].flatten
             collector_spec = collectors.inject(OrderedHash.new) do |hash, klass|
               collector_class = klass.to_s

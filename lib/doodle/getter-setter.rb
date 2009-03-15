@@ -20,10 +20,10 @@ class Doodle
     # FIXME: init deferred blocks are not getting resolved in all cases
     def _getter(name, &block)
       begin
-        #p [:_getter, name]
+        Doodle::Debug.d { [:_getter, name] }
         ivar = "@#{name}"
         if instance_variable_defined?(ivar)
-          #p [:_getter, :instance_variable_defined, name, ivar, instance_variable_get(ivar)]
+          Doodle::Debug.d { [:_getter, :instance_variable_defined, name, ivar, instance_variable_get(ivar)] }
           instance_variable_get(ivar)
         else
           # handle default
@@ -33,18 +33,22 @@ class Doodle
           # special case for class/singleton :init
           if att && att.optional?
             optional_value = att.init_defined? ? att.init : att.default
-            #p [:optional_value, optional_value]
+            Doodle::Debug.d { [:optional_value, name, optional_value] }
             case optional_value
             when DeferredBlock
-              #p [:deferred_block]
+              Doodle::Debug.d { [:deferred_block, name] }
               v = instance_eval(&optional_value.block)
             when Proc
+              Doodle::Debug.d { [:proc] }
               v = instance_eval(&optional_value)
             else
+              Doodle::Debug.d { [:optional_value, name, optional_value] }
               v = optional_value
             end
+            Doodle::Debug.d { [:value, name, v] }
             if att.init_defined?
-              _setter(name, v)
+              Doodle::Debug.d { [:init_defined, name] }
+              v = _setter(name, v)
             end
             v
           else
@@ -69,19 +73,22 @@ class Doodle
       else
         old_value = nil
       end
+      #p [:ivar_set, 1, name, old_value, :args, *args]
       instance_variable_set(ivar, *args)
       new_value = instance_variable_get(ivar)
+      #p [:ivar_set, 1, name, old_value, :new_value, new_value, new_value.object_id, :args, *args]
       if new_value != old_value
         #pp [Doodle, :after_update, { :instance => self, :name => name, :old_value => old_value, :new_value => new_value }]
         after_update :instance => self, :name => name, :old_value => old_value, :new_value => new_value
       end
+      new_value
     end
     private :ivar_set
 
     # set an attribute by name - apply validation if defined
     # FIXME: move
     def _setter(name, *args, &block)
-      ##DBG: Doodle::Debug.d { [:_setter, name, args] }
+      Doodle::Debug.d { [:_setter, name, args] }
       #p [:_setter, name, *args]
       att = __doodle__.lookup_attribute(name)
       if att && __doodle__.validation_on && att.readonly
@@ -114,7 +121,7 @@ class Doodle
             end
           end
         end
-        #p [:_setter, :got_att1, name, ivar, *args]
+        #p [:_setter, :got_att1, name, args.map{ |x| x.object_id }, *args]
         v = ivar_set(name, att.validate(self, *args))
 
         #p [:_setter, :got_att2, name, ivar, :value, v]

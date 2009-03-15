@@ -252,7 +252,7 @@ end
 
 module ModNormalizedHash
   module ClassMethods
-    def MultiTypedHash(*klasses, &block)
+    def TypedHash(*klasses, &block)
       typed_class = Class.new(NormalizedHash) do
         # note: cannot take a block
         if block_given?
@@ -271,86 +271,3 @@ module ModNormalizedHash
   end
 end
 
-if __FILE__ == $0
-  require 'rubygems'
-  require 'assertion'
-  require 'date'
-
-  sh = StringKeyHash.new { |h,k| h[k] = 42 }
-  assert { sh[:a] == 42 }
-  assert { sh["a"] == 42 }
-  assert { sh.keys == ["a"] }
-
-  sh = StringKeyHash.new( { :a => 2 } )
-  assert { sh.keys == ["a"] }
-
-  yh = SymbolKeyHash.new { |h,k| h[k] = 42 }
-  assert { yh[:a] == 42 }
-  assert { yh["a"] == 42 }
-  assert { yh.keys == [:a] }
-
-  yh = SymbolKeyHash.new( { :a => 2 } )
-  assert { yh.keys == [:a] }
-
-  bh = StringKeyHash.new( { :a => 2 } ) { |h,k| h[k] = 42}
-  assert { bh[:b] == 42 }
-  assert { bh.keys.sort == ["a", "b"] }
-
-  sh = StringHash.new( { :a => 2 } ) { |h,k| h[k] = 42}
-  assert { sh[:b] == "42" }
-  assert { sh.keys.sort == ["a", "b"] }
-  assert { sh.values.sort == ["2", "42"] }
-
-  skh = SymbolKeyHash.new( { :a => 2 } ) { |h,k| h[k] = 42}
-  assert { skh.values == [2] }
-  skh['b'] = 42
-  assert { skh.key?(:a) && skh.key?(:b) }
-  #p skh.invert.keys
-  #p skh.invert
-  #p skh.invert.class
-  assert { skh.invert.keys == [2, 42] }
-  nskh = StringKeyHash.new(skh.invert)
-  #p nskh
-  assert { nskh.keys.sort == ["2", "42"] }
-  nsh = StringHash.new(skh.invert)
-  #p nsh
-  assert { nsh.keys.sort == ["2", "42"] }
-  assert { nsh.values.sort == ["a", "b"] }
-
-  StringIntegerHash = NormalizedHash::MultiTypedHash(String, Integer)
-
-  expect_ok { sih = StringIntegerHash[:a => 1, :b => "Hello"] }
-  expect_error(TypeError) { sih = StringIntegerHash[:a => 1, :b => Date.new] }
-
-  expect_ok {
-    sih = StringIntegerHash.new
-    sih[:a] = 1
-    sih[:b] = "hello"
-  }
-
-  expect_error(TypeError) {
-    sih = StringIntegerHash.new
-    sih[:c] = Date.new
-  }
-
-  ReverseStringHash = NormalizedHash::MultiTypedHash() do |v|
-    if v.kind_of?(String)
-      v.reverse
-    else
-      v
-    end
-  end
-
-  assert {
-    sih = ReverseStringHash[:a => 123, :b => "Hello"]
-    sih[:a] == 123 && sih[:b] == "Hello".reverse
-  }
-
-  assert {
-    sih = ReverseStringHash.new
-    sih[:a] = 123
-    sih[:b] = "Hello"
-    sih[:a] == 123 && sih[:b] == "Hello".reverse
-  }
-
-end

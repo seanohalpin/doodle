@@ -44,7 +44,7 @@ class Doodle
                            end
 
           if name =~ Factory::RX_IDENTIFIER && !method_defined && !parent_class.respond_to?(name) && !eval("respond_to?(:#{name})", TOPLEVEL_BINDING)
-            eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
+            eval("def #{ name }(*args, &block); ::#{name}.new(*args, &block); end;", ::TOPLEVEL_BINDING, __FILE__, __LINE__)
           end
         else
           #p [:factory, :other_level_class]

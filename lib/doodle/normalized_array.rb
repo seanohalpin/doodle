@@ -53,7 +53,7 @@ module NormalizedArrayMethods
     end
 
     def normalize_value(value)
-      p [self.class, :normalize_value, value]
+      #p [self.class, :normalize_value, value]
       value
     end
 
@@ -347,9 +347,9 @@ module NormalizedArrayMethods
     alias :indices :values_at
 
     # should this be normalized?
-    def zip(other)
-      super(normalize_values(*other))
-    end
+    #     def zip(other)
+    #       super(normalize_values(*other))
+    #     end
 
     #     def |(other)
     #       super(other.map{ |x| normalize_value(x)})
@@ -371,11 +371,11 @@ end
 
 if __FILE__ == $0
   require 'rubygems'
-  require 'assertion'
+  require 'doodle/assertion'
 
   class StringArray < NormalizedArray
     def normalize_value(v)
-      p [self.class, :normalize_value, v]
+      #p [self.class, :normalize_value, v]
       v.to_s
     end
   end
@@ -411,7 +411,7 @@ if __FILE__ == $0
 #   p na[1] == 42
 
   sa = StringArray.new(3) { |i|
-    p [:in_block, i]
+    #p [:in_block, i]
     42
   }
   assert { sa[1] == "42" }
@@ -428,11 +428,12 @@ if __FILE__ == $0
 
   # equality
   assert { sa == ["1", "2", "3"] }
+  assert { ["1", "2", "3"] == sa }
 
-  ## -FIXME: not sure about this coercion-
+  ## -FIXME: not sure about this coercion- FIXED
   assert_error { sa.eql?( [1, 2, 3] )}
 
-  ## -FIXME: equality should not be non-commutative-
+  ## -FIXME: equality should not be non-commutative- FIXED
   assert_error { sa == [1, 2, 3] }
   assert_error { [1, 2, 3] == sa }
 

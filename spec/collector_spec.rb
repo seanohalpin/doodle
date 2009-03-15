@@ -113,7 +113,7 @@ describe Doodle, "typed collector with specified collector name" do
     end
     it "should collect items into attribute :list" do
       event = nil
-      no_error {
+      expect_ok {
         event = Event do
           place "Stage 1"
           place "Stage 2"
@@ -150,7 +150,7 @@ describe Doodle, "typed collector with specified collector name initialized from
               :locations =>
               [ { :name => 'Backstage' } ] } ] }, { :name => "Stage 2" } ] }
       # note: wierd formatting above simply to pass coverage
-      no_error {
+      expect_ok {
         event = Event(data)
       }
       event.locations.map{|loc| loc.name}.should_be ["Stage 1", "Stage 2"]
@@ -256,7 +256,7 @@ describe Doodle, 'using String as collector' do
     end
 
     it 'should not raise an exception' do
-      no_error {
+      expect_ok {
         text = Text do
           line "line 1"
           line "line 2"
@@ -292,7 +292,7 @@ describe Doodle, 'collecting text values into non-String collector' do
     end
 
     it 'should not raise an exception' do
-      no_error {
+      expect_ok {
         signed_by = SignedBy do
           signature "Sean"
         end
@@ -324,7 +324,7 @@ describe Doodle, ':collect' do
     end
 
     it 'should allow adding items of specified type' do
-      no_error {
+      expect_ok {
         list = ItemList do
           item Item("one")
           item Item("two")
@@ -333,7 +333,7 @@ describe Doodle, ':collect' do
     end
 
     it 'should allow adding items of specified type via implicit type constructor' do
-      no_error {
+      expect_ok {
         list = ItemList do
           item "one"
           item "two"

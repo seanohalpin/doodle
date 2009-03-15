@@ -95,6 +95,11 @@ class Doodle
     end
   end
 
+  class AppendableAttribute < AttributeCollector
+    #    has :init, :init => DoodleArray.new
+    has :init, :init => []
+  end
+
   # define collector methods for hash-like attribute collectors
   class KeyedAttribute < AttributeCollector
     #    has :init, :init => DoodleHash.new
@@ -112,9 +117,8 @@ class Doodle
   end
 end
 
-if false
-  # not ready for primetime
-  #if RUBY_VERSION >= '1.8.7'
+# not ready for primetime
+if RUBY_VERSION >= '1.8.7' and true
   # load ruby 1.8.7+ version specific methods
   require 'doodle/collector-1.9'
 else
@@ -123,8 +127,6 @@ else
 
     # define collector methods for array-like attribute collectors
     class AppendableAttribute < AttributeCollector
-      #    has :init, :init => DoodleArray.new
-      has :init, :init => []
 
       # define a collector for appendable collections
       # - collection should provide a :<< method
@@ -133,22 +135,16 @@ else
           # FIXME: don't use eval in 1.9+
           if collector_class.nil?
             doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                     collection = self.#{name}
                      args.unshift(block) if block_given?
-                     collection.<<(*args);
+                     send(:#{name}).<<(*args)
                    end", __FILE__, __LINE__)
           else
             doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-                            collection = self.send(:#{name})
+                            collection = send(:#{name})
                             if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
                               collection.<<(*args)
                             else
-                              # FIXME: this is a wierd one - need name here - can't use collection directly...?
-                              #{name} << #{collector_class}.new(*args, &block)
-                              # this is OK
-                              #self.send(:#{name}) << #{collector_class}.new(*args, &block)
-                              # but this isn't
-                              #collection.<<(#{collector_class}.new(*args, &block))
+                              collection << #{collector_class}.new(*args, &block)
                             end
                           end", __FILE__, __LINE__)
           end

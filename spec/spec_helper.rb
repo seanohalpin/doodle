@@ -11,7 +11,7 @@ require 'doodle'
 require 'date'
 
 class Object
-  # try to get rid of those annoying warnings about useless ==
+  # get rid of those annoying warnings about useless ==
   def should_be(other)
     should == other
   end
@@ -59,10 +59,19 @@ def remove_ivars(*args)
   end
 end
 
-def no_error(&block)
+def expect_ok(&block)
   proc(&block).should_not raise_error
 end
+alias :no_error :expect_ok
 
 def expect_error(*args, &block)
   proc(&block).should raise_error(*args)
+end
+
+def expect(&block)
+  block.call.should_be true
+end
+
+def expect_not(&block)
+  block.call.should_be false
 end

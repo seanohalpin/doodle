@@ -46,7 +46,7 @@ end
 describe Doodle, "definitions in module_eval" do
   temporary_constant :Foo4, :Bar4 do
     before :each do
-      module Bar4
+      module ::Bar4
       end
       Bar4.module_eval do
         class Foo4 < Doodle
@@ -55,12 +55,12 @@ describe Doodle, "definitions in module_eval" do
       end
     end
     it 'should define a constructor function' do
-      pending "Figuring out how to make this work portably"
       no_error { foo = Bar4.send(:Foo4, "Bar") }
     end
     it 'should define a public constructor function' do
-      pending "Figuring out how to make this work at all"
+      pending "getting to work with 1.8.6"
       no_error { foo = Bar4.Foo4("Bar") }
+      no_error { foo = Bar4::Foo4("Bar") }
     end
   end
 end
