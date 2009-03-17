@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "BUG: cannot set readonly attribute with deferred block"
+desc: ""
+type: :bugfix
+component: core
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-16 01:04:17.991669 Z
+references: []
+
+id: fcb22e31876d1f0e475831e69c5e4dd4f8665c78
+log_events: 
+- - 2009-03-16 01:04:18.535505 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
