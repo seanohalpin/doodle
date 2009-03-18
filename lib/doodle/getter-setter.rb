@@ -136,26 +136,28 @@ class Doodle
     end
     private :_setter
 
-    # define a getter_setter
-    # fixme: move
-    def define_getter_setter(name, params = { }, &block)
-      # need to use string eval because passing block
-      sc_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
-      sc_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
+    if RUBY_VERSION < '1.8.7'
+      # define a getter_setter
+      # fixme: move
+      def define_getter_setter(name, params = { }, &block)
+        # need to use string eval because passing block
+        sc_eval "def #{name}(*args, &block); getter_setter(:#{name}, *args, &block); end", __FILE__, __LINE__
+        sc_eval "def #{name}=(*args, &block); _setter(:#{name}, *args); end", __FILE__, __LINE__
 
-      # this is how it should be done (in 1.9)
-      #       module_eval {
-      #         define_method name do |*args, &block|
-      #           getter_setter(name.to_sym, *args, &block)
-      #         end
-      #         define_method "#{name}=" do |*args, &block|
-      #           _setter(name.to_sym, *args, &block)
-      #         end
-      #       }
+        # this is how it should be done (in 1.9)
+        #       module_eval {
+        #         define_method name do |*args, &block|
+        #           getter_setter(name.to_sym, *args, &block)
+        #         end
+        #         define_method "#{name}=" do |*args, &block|
+        #           _setter(name.to_sym, *args, &block)
+        #         end
+        #       }
+      end
+      private :define_getter_setter
+    else
+      require 'doodle/define-getter-setter1.9'
     end
-    private :define_getter_setter
-
-
 
   end
 end
