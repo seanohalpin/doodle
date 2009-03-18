@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "add #hash method to Equality to enable doodles as keys"
+desc: ""
+type: :feature
+component: core
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-03-18 19:39:26.650921 Z
+references: []
+
+id: 74c8873db2e2e928ba63c20593966ac41820c3ac
+log_events: 
+- - 2009-03-18 19:39:27.762548 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
+- - 2009-03-18 19:39:48.146942 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to release r0.2.4 from r0.3.0
+  - ""
+- - 2009-03-18 20:24:16.867636 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - ""

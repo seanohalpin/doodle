@@ -81,3 +81,12 @@ releases:
         - example for every feature
       - full set of examples
       - rdoc-friendly
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: r0.2.4
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-03-18 19:39:36.266701 Z
+    - Sean O'Halpin <sean.ohalpin@gmail.com>
+    - created
+    - ""

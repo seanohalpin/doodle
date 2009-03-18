@@ -16,6 +16,9 @@ class Doodle
     def ==(o)
       eql?(o)
     end
+    def hash
+      doodle.key_values_without_defaults.hash
+    end
   end
 end
 
