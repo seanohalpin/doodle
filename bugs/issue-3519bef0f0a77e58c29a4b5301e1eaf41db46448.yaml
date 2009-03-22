@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: need spec for new from functionality
+desc: ""
+type: :task
+component: doodle
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-22 04:35:00.289389 Z
+references: []
+
+id: 3519bef0f0a77e58c29a4b5301e1eaf41db46448
+log_events: 
+- - 2009-03-22 04:35:01.193077 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
