@@ -212,9 +212,11 @@ class Doodle
 
         # this is ~very~ hacky
         if args.size == 1
+          Doodle::Debug.d { [:update, "trying class conversion", args] }
           #p [self.class, :doodle_update, :args, 1, args]
           arg = *args
           if conversion = self.class.__doodle__.conversions[arg.class]
+            Doodle::Debug.d { [:update, "found class conversion", args, conversion] }
             #p [:conversion, conversion, arg]
             args = [conversion.call(arg).to_hash]
             #p [:args, args]
@@ -251,6 +253,7 @@ class Doodle
 
         # create attributes
         key_values.keys.each do |key|
+          Doodle::Debug.d { [:update, "setting value", key, key_values[key]] }
           #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
           #p [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]]
           #p [:update, :setting, key, key_values[key], __doodle__.validation_on]

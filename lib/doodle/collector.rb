@@ -134,21 +134,25 @@ else
         collector_spec.each do |collector_name, collector_class|
           # FIXME: don't use eval in 1.9+
           if collector_class.nil?
-            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-#p [:#{collector_name}_1, args, block]
-                     args.unshift(block) if block_given?
-                     send(:#{name}).<<(*args)
-                   end", __FILE__, __LINE__)
+            doodle_owner.sc_eval(<<-EOT, __FILE__, __LINE__)
+              def #{collector_name}(*args, &block)
+                Doodle::Debug.d { [:#{collector_name}_1, args, block] }
+                args.unshift(block) if block_given?
+                send(:#{name}).<<(*args)
+              end
+            EOT
           else
-            doodle_owner.sc_eval("def #{collector_name}(*args, &block)
-#p [:#{collector_name}_2, args, block]
-                            collection = send(:#{name})
-                            if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
-                              collection.<<(*args)
-                            else
-                              collection << #{collector_class}.new(*args, &block)
-                            end
-                          end", __FILE__, __LINE__)
+            doodle_owner.sc_eval(<<-EOT, __FILE__, __LINE__)
+              def #{collector_name}(*args, &block)
+                Doodle::Debug.d { [:#{collector_name}_2, args, block] }
+                collection = send(:#{name})
+                if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
+                  collection.<<(*args)
+                else
+                  collection << #{collector_class}.new(*args, &block)
+                end
+              end
+            EOT
           end
         end
       end

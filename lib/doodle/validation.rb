@@ -38,9 +38,11 @@ class Doodle
     # validate that individual attribute args meet rules defined with +must+
     # fixme: move
     def validate(owner, *args)
+      Doodle::Debug.d { [:validate, 1, owner, args] }
       ##DBG: Doodle::Debug.d { [:validate, self, :owner, owner, :args, args ] }
       #p [:validate, 1, args]
       begin
+        Doodle::Debug.d { [:validate, 2] }
         value = convert(owner, *args)
       rescue Exception => e
         owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", Doodle::Utils.doodle_caller

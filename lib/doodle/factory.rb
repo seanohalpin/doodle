@@ -4,16 +4,16 @@ class Doodle
   #   Cat(:name => 'Ren')
   # is the same as:
   #   Cat.new(:name => 'Ren')
-  # As the notion of a factory function is somewhat contentious [xref
-  # ruby-talk], you need to explicitly ask for them by including Factory
-  # in your base class:
+  # also works in subclasses
   #   class Animal < Doodle
-  #     include Factory
   #   end
   #   class Dog < Animal
   #   end
   #   stimpy = Dog(:name => 'Stimpy')
   # etc.
+  #
+  # maybe should just call this a Constructor function
+  #
   module Factory
     RX_IDENTIFIER = /^[A-Za-z_][A-Za-z_0-9]+\??$/
     module ClassMethods
