@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: generate XSD from Doodle
+desc: easier than other way round!
+type: :feature
+component: doodle
+release: r1.0.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-21 16:42:30.590127 Z
+references: []
+
+id: 8bb289b038a0efe7b59685e8cf927a32321d3bc5
+log_events: 
+- - 2009-03-21 16:42:31.397660 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Cannot use Procs as kind to collect in collector interface
+desc: e.g. bugs out if you use :collect => { :filter => Proc }
+type: :bugfix
+component: core
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-21 18:52:51.714098 Z
+references: []
+
+id: 65a8415ee6a08fba8a9b260378e25148d5601458
+log_events: 
+- - 2009-03-21 18:52:52.321488 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

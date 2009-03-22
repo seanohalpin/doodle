@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue
+title: "class-level #from should be invoked when initializing from single argument of matching class"
+desc: this causes some trickiness in doodles derived from core types (see from_spec.rb) but worth it for convenience
+type: :feature
+component: core
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition:
+creation_time: 2009-03-22 04:30:42.265382 Z
+references: []
+
+id: cf433a4662d6b19c3360bc28aaa9778b11a35494
+log_events:
+- - 2009-03-22 04:30:43.529053 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

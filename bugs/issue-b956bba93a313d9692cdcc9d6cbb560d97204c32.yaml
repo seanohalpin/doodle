@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: interpret XSD into Doodle definition
+desc: ""
+type: :feature
+component: doodle
+release: r1.0.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-21 16:41:57.061829 Z
+references: []
+
+id: b956bba93a313d9692cdcc9d6cbb560d97204c32
+log_events: 
+- - 2009-03-21 16:41:58.197447 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
