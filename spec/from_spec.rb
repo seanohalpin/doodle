@@ -5,8 +5,11 @@ describe 'Doodle', 'from' do
     before :each do
       class Name < String
         include Doodle::Core
+        # this is fiddly - needed to avoid infinite regress
         from String do |s|
-          Name.new(s)
+          n = self.allocate
+          n.replace(s)
+          n.doodle.update
         end
         must "be > 3 chars long" do
           size > 3
