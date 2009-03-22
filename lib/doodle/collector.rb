@@ -48,7 +48,7 @@ class Doodle
         # no change required
         #p [:resolve_value, :value, value]
         value
-      elsif collector_class = klasses.select { |klass| klass.__doodle__.conversions.key?(value.class) }.first
+      elsif collector_class = klasses.select { |klass| klass.respond_to?(:__doodle__) && klass.__doodle__.conversions.key?(value.class) }.first
         # if the collector_class has a specific conversion for this value class
         #p [:resolve_value, :collector_class_from, value]
         collector_class.from(value)
@@ -135,11 +135,13 @@ else
           # FIXME: don't use eval in 1.9+
           if collector_class.nil?
             doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+#p [:#{collector_name}_1, args, block]
                      args.unshift(block) if block_given?
                      send(:#{name}).<<(*args)
                    end", __FILE__, __LINE__)
           else
             doodle_owner.sc_eval("def #{collector_name}(*args, &block)
+#p [:#{collector_name}_2, args, block]
                             collection = send(:#{name})
                             if args.size > 0 and args.all?{|x| x.kind_of?(#{collector_class})}
                               collection.<<(*args)
