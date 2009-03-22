@@ -209,6 +209,19 @@ class Doodle
     def update(*args, &block)
       # p [:doodle_initialize_from_hash, :args, *args]
       defer_validation do
+
+        # this is ~very~ hacky
+        if args.size == 1
+          #p [self.class, :doodle_update, :args, 1, args]
+          arg = *args
+          if conversion = self.class.__doodle__.conversions[arg.class]
+            #p [:conversion, conversion, arg]
+            args = [conversion.call(arg).to_hash]
+            #p [:args, args]
+            #return
+          end
+        end
+
         # hash initializer
         # separate into array of hashes of form [{:k1 => v1}, {:k2 => v2}] and positional args
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
@@ -234,7 +247,7 @@ class Doodle
         # convert keys to symbols (note not recursively - only first level == doodle keywords)
         Doodle::Utils.symbolize_keys!(key_values)
         #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
-        #!p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
+        #p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
 
         # create attributes
         key_values.keys.each do |key|
