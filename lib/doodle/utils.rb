@@ -28,6 +28,18 @@ class Doodle
       end
       alias :snakecase :snake_case
 
+      # convert a snake_cased_word to CamelCased
+      # pinched from #camelize in activesupport
+      def camel_case(lower_case_and_underscored_word, first_letter_in_uppercase = true)
+        if first_letter_in_uppercase
+          lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
+        else
+          lower_case_and_underscored_word.first + came_case(lower_case_and_underscored_word)[1..-1]
+        end
+      end
+      alias :camelcase :camel_case
+      alias :camelize :camel_case
+
       # resolve a constant of the form Some::Class::Or::Module -
       # doesn't work with constants defined in anonymous
       # classes/modules
