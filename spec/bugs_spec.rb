@@ -354,3 +354,9 @@ describe Doodle, 'if default specified before required attributes, they are igno
 
 end
 
+describe Doodle, 'conversion from Proc' do
+  it 'should not raise an error in conversion if kind is Proc' do
+    pending 'implementation of spec'
+  end
+
+end
