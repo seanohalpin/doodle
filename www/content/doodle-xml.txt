@@ -14,7 +14,7 @@ filter:
 * Doodle instances get their own CamelCase tag based on their class name
 * Doodle collections are listed as repeated tags
 * non-Doodle scalar values are represented as attributes
-* XML text has to be denoted as such by naming an attribute {{{_text_}}}
+* XML text has to be denoted as such by naming the first attribute {{{_text_}}} (but see also how TextValue is handled in example below)
 * You can override the output tag names by overriding @tag@ in your classes
 * You can get more control over output by overriding @format_tag@ and @format_attributes@
 
