@@ -117,8 +117,7 @@ class Doodle
   end
 end
 
-# not ready for primetime
-if RUBY_VERSION >= '1.8.7' and true
+if RUBY_VERSION >= '1.8.7'
   # load ruby 1.8.7+ version specific methods
   require 'doodle/collector-1.9'
 else
@@ -132,7 +131,6 @@ else
       # - collection should provide a :<< method
       def define_collector
         collector_spec.each do |collector_name, collector_class|
-          # FIXME: don't use eval in 1.9+
           if collector_class.nil?
             doodle_owner.sc_eval(<<-EOT, __FILE__, __LINE__)
               def #{collector_name}(*args, &block)
@@ -165,7 +163,6 @@ else
       def define_collector
         collector_spec.each do |collector_name, collector_class|
           # need to use string eval because passing block
-          # FIXME: don't use eval in 1.9+
           if collector_class.nil?
             doodle_owner.sc_eval("def #{collector_name}(*args, &block)
                      collection = #{name}
