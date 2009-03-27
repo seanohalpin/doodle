@@ -11,6 +11,5 @@ class Doodle
         end
       }
     end
-    private :define_getter_setter
   end
 end
