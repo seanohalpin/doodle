@@ -62,7 +62,7 @@ class Doodle
     end
     private :_getter
 
-    def after_update(params)
+    def after_update(*args)
     end
 
     # set an instance variable by symbolic name and call after_update if changed
@@ -179,20 +179,11 @@ class Doodle
             _setter(:#{name}, *args)
           end
         EOT
-        # this is how it should be done (in 1.9)
-        #       module_eval {
-        #         define_method name do |*args, &block|
-        #           getter_setter(name.to_sym, *args, &block)
-        #         end
-        #         define_method "#{name}=" do |*args, &block|
-        #           _setter(name.to_sym, *args, &block)
-        #         end
-        #       }
       end
-      private :define_getter_setter
     else
       require 'doodle/define-getter-setter1.9'
     end
+    private :define_getter_setter
 
   end
 end
