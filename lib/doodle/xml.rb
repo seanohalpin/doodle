@@ -28,6 +28,13 @@ class Doodle
     include Utils
     class Document < Doodle
       include Doodle::XML
+      def self.tag(value)
+        define_method :tag do
+          value
+        end
+      end
+    end
+    class Element < Document
     end
 
     # adapter module for REXML
@@ -98,7 +105,11 @@ class Doodle
         attributes = root.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
         text, children = root.children.partition{ |x| text_node?(x) }
         text = text.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
-        oroot = Utils.const_lookup(root.name, ctx).new(text, attributes) {
+        element_name = root.name
+        if element_name !~ /[A-Z]/
+          element_name = Doodle::Utils.camel_case(element_name)
+        end
+        oroot = Utils.const_lookup(element_name, ctx).new(text, attributes) {
           from_xml_elem(root)
         }
         oroot
@@ -110,8 +121,12 @@ class Doodle
       children = parent.children.reject{ |x| XML.text_node?(x) }
       children.each do |child|
         text = child.children.select{ |x| XML.text_node?(x) }.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
-        object = const_lookup(child.name)
-        method = Doodle::Utils.snake_case(Utils.normalize_const(child.name))
+        element_name = child.name
+        if element_name !~ /[A-Z]/
+          element_name = Doodle::Utils.camel_case(element_name)
+        end
+        object = const_lookup(element_name)
+        method = Doodle::Utils.snake_case(Utils.normalize_const(element_name))
         attributes = child.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
         send(method, object.new(text, attributes) {
                from_xml_elem(child)
