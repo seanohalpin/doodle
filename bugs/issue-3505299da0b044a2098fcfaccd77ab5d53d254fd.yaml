@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: make to_yaml, to_json, to_xml (and from_x) all use same signature
+desc: ""
+type: :task
+component: extras
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-23 10:32:05.961002 Z
+references: []
+
+id: 3505299da0b044a2098fcfaccd77ab5d53d254fd
+log_events: 
+- - 2009-03-23 10:32:06.840872 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

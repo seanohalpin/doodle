@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "applying class.new before attempting from conversion "
+desc: ""
+type: :bugfix
+component: core
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-03-22 14:56:25.484546 Z
+references: []
+
+id: cf7bc958975988d38d5f853247f4a23fdd7fddc1
+log_events: 
+- - 2009-03-22 14:56:26.254372 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
+- - 2009-03-22 14:56:35.036573 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - ""

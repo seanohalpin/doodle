@@ -17,7 +17,7 @@ require 'doodle'
 require 'doodle/datatypes'
 require 'time'
 require 'date'
-require 'pp'
+#require 'pp'
 
 # note that all the datatypes within doodle do ... end blocks are
 # doodle/datatypes - I then go on to define specialized option types
@@ -62,7 +62,7 @@ class Doodle
         has :match, :default => nil, :doc => "regex to match against"
       end
     end
-    # specialied Filename attribute
+    # specialised Filename attribute
     # - :existing => true|false (default = false)
     class Filename < Option
       doodle do
@@ -78,13 +78,13 @@ class Doodle
     class << self
       public
 
-      has :script_name, :default => File.basename($0)
-      has :doc, :default => $0
-      has :usage do
+      has :script_name, :default => File.basename($0), :doc => "base name of script"
+      has :script_path, :default => File.expand_path(File.dirname($0)), :doc => "directory from which script is executed"
+      has :doc, :default => $0, :doc => "documentation"
+      has :usage, :doc => "usage description" do
         default { "./#{script_name} #{required_args.map{ |a| %[-#{ a.flag } #{format_kind(a.kind)}]}.join(' ')}" + ((required_args.size - doodle.attributes.size) > 0 ? " [OPTIONS]" : '') }
       end
-      has :examples, :default => nil
-      alias :example :examples
+      has :examples, :collect => :example, :doc => "example(s) of use"
 
       def required
         @optional = false
@@ -379,7 +379,6 @@ class Doodle
       def from_argv(argv)
         params, args = params_args(argv)
         args << params
-        #pp [:args, args]
         new(*args)
       end
       def format_values(values)
@@ -452,7 +451,7 @@ class Doodle
          self.usage ? ["Usage: " + self.usage, "\n"] : [],
          required.size > 0 ? ["Required args:", required.map(&format_block), "\n"] : [],
          options.size > 0 ? ["Options:", options.map(&format_block), "\n"] : [],
-         (self.examples && self.examples.size > 0) ? "Examples:\n" + "  " + self.examples.join("\n  ") : [],
+         (self.examples && self.examples.size > 0) ? "Examples:\n" + "  " + [self.examples].flatten.join("\n  ") : [],
         ]
       end
     end
