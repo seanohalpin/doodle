@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: don't display help for normal doodle attributes in Doodle::App
+desc: ""
+type: :bugfix
+component: extras
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-03-29 01:08:48.525600 Z
+references: []
+
+id: 588d5f8fcae1af247db870fd8860119c6e81c1a7
+log_events: 
+- - 2009-03-29 01:08:49.157517 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
