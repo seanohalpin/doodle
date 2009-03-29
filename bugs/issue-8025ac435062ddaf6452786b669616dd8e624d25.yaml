@@ -5,8 +5,8 @@ type: :task
 component: core
 release: r0.2.4
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :reorg
 creation_time: 2009-03-18 20:58:36.409175 Z
 references: []
 
@@ -16,3 +16,7 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
   - ""
+- - 2009-03-29 01:00:20.922308 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition reorg
+  - only once case remaining - I'll close for now

@@ -5,8 +5,8 @@ type: :task
 component: doodle
 release: r0.2.4
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-03-22 04:35:00.289389 Z
 references: []
 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-03-22 04:35:01.193077 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-03-29 00:59:50.902385 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
   - ""
