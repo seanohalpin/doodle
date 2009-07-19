@@ -43,8 +43,16 @@ class Doodle
       # resolve a constant of the form Some::Class::Or::Module -
       # doesn't work with constants defined in anonymous
       # classes/modules
-      def const_resolve(constant)
-        constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
+#       def const_resolve(constant)
+#         constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
+#       end
+      # Rick de Natale's version: see ruby-talk:332670
+      def const_resolve(const_name)
+        const_name.to_s.
+          sub(/^::/,'').
+          split("::").
+          inject(Object) { |scope, name| scope.const_defined?(name) ?
+          scope.const_get(name) : scope.const_missing(name) }
       end
 
       # deep copy of object (unlike shallow copy dup or clone)
