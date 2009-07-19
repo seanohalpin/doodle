@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "BUG: can set readonly attribute with deferred validation block - no error on exit from block"
+desc: see spec/readonly_spec.rb
+type: :bugfix
+component: core
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-07-09 16:31:02.290067 Z
+references: []
+
+id: 42e95829fd7798089b1ff3cfd2b61ba2844954c4
+log_events: 
+- - 2009-07-09 16:31:05.417952 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""

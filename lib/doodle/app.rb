@@ -72,7 +72,8 @@ class Doodle
     end
 
     # regular expression for ISO date
-    RX_ISODATE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
+    RX_ISODATETIME = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
+    RX_ISODATE = /^\d{4}-\d{2}-\d{2}$/
 
     # App directives
     class << self
@@ -210,6 +211,7 @@ class Doodle
           end
         end
       end
+
       # whole number, e.g. -n 10
       # - you can use, e.g. :values => [1,2,3] or :values => (0..99) to restrict the range of valid values
       def integer(*args, &block)
@@ -222,9 +224,10 @@ class Doodle
           end
         end
       end
+
       # date: -d 2008-09-28
       def date(*args, &block)
-        args = [{ :using => Option, :kind => Date }, *args]
+        args = [{ :using => Option, :kind => Date, :doc => "ISO format date, e.g. 2008-09-28" }, *args]
         da = option(*args, &block)
         da.instance_eval do
           from String do |s|
@@ -232,9 +235,10 @@ class Doodle
           end
         end
       end
-      # time: -d 2008-09-28T18:00:00
+
+      # time: -t 2008-09-28T18:00:00
       def time(*args, &block)
-        args = [{ :using => Option, :kind => Time }, *args]
+        args = [{ :using => Option, :kind => Time, :doc => "quasi-ISO format localtime without timezone, e.g. 2008-09-28T18:00:00" }, *args]
         da = option(*args, &block)
         da.instance_eval do
           from String do |s|
@@ -242,17 +246,49 @@ class Doodle
           end
         end
       end
-      # utcdate: -d 2008-09-28T21:41:29Z
-      # - actually uses Time (so restricted range)
-      def utcdate(*args, &block)
-        args = [{ :using => Option, :kind => Time }, *args]
+
+      # utctime: -u 2008-09-28T21:41:29Z
+      def utctime(*args, &block)
+        args = [{ :using => Option, :kind => Time, :doc => "ISO format UTC time, e.g. 2008-09-28T18:00:00Z" }, *args]
         da = option(*args, &block)
         da.instance_eval do
           from String do |s|
-            if s !~ RX_ISODATE
-              raise ArgumentError, "date must be in ISO format (YYYY-MM-DDTHH:MM:SS, e.g. #{Time.now.utc.xmlschema})"
+            if s !~ RX_ISODATETIME
+              #p [:not_isodatetime]
+              if s !~ RX_ISODATE
+                #p [:not_isodate]
+                raise ArgumentError, "datetime must be in ISO format (YYYY-MM-DDTHH:MM:SS, e.g. #{Time.now.utc.xmlschema})"
+              else
+                #p [:isodate]
+                s = s + "T00:00:00Z"
+              end
+            else
+              #p [:isodatetime]
             end
             Time.parse(s)
+          end
+        end
+      end
+
+      # utcdate: -d 2008-09-28
+      def utcdate(*args, &block)
+        args = [{ :using => Option, :kind => Date }, *args]
+        da = option(*args, &block)
+        da.instance_eval do
+          from String do |s|
+            if s !~ RX_ISODATETIME
+              #p [args, :not_isodatetime]
+              if s !~ RX_ISODATE
+                #p [:not_isodate]
+                raise ArgumentError, "date must be in ISO format (YYYY-MM-DDTHH:MM:SS, e.g. #{Time.now.utc.xmlschema})"
+              else
+                #p [args, :isodate]
+                s = s + "T00:00:00Z"
+              end
+            else
+              #p [args, :isodatetime]
+            end
+            Date.parse(s)
           end
         end
       end
