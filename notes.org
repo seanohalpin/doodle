@@ -36,7 +36,7 @@ if no other value supplied.
 This came up as I was using generated ids - I had to do this:
 
   symbol :identifier
-  
+
   def initialize(*a, &b)
     self.identifier = "#{self.class}##{self.class.new_id}"
     super
@@ -70,7 +70,7 @@ right order
 Fix [[file:lib/doodle.rb::def%20parents][parents]] & [[file:lib/doodle.rb::def%20collect_inherited%20message][collect_inherited]] - they are a mess - need to tidy
 up/refactor/rethink/clarify/etc.
 === TODO Optional args																										:test:
-What to do about optional arguments? 
+What to do about optional arguments?
 
 ==== reject
 raise error if unrecognised arguments in init
@@ -90,8 +90,8 @@ do with this
 
 === TODO Benchmarking																								 :benchmark:
 
-Profiling and benchmarking 
-- how much does this cost? 
+Profiling and benchmarking
+- how much does this cost?
 - where can I improve it?
 
 Added profile task to rake:
@@ -237,7 +237,7 @@ You can specify :default => nil :init => nil if that is what you want.
 - [X] When handling defaults, want to be able to execute default block
       in context of instance, e.g.
 
-        class DateRange < Doodle::Root 
+        class DateRange < Doodle::Root
           has :start_date, :kind => Date do
             default { Date.today }
           end
@@ -271,7 +271,7 @@ datatype directives.)
 However, to see what can be done, see
 [[file:~/scratch/doodle/trunk/examples/datatype-defs.rb]],
 [[file:examples/datatypes.rb][file:~/scratch/doodle/trunk/examples/datatypes.rb]] and
-[[file:examples/application-model.rb][file:~/scratch/doodle/trunk/examples/application-model.rb]] 
+[[file:examples/application-model.rb][file:~/scratch/doodle/trunk/examples/application-model.rb]]
 
 == DONE Hide behind extension __doodle__
 
@@ -311,8 +311,10 @@ instance variable
 == Performance
 == Use cases
 === TODO Example real-world use cases
-
 = Thoughts about implementation
+== 2009-07-19 19:29:06
+- Union type - need some way to resolve when parsing, e.g. XML, to select which constructor to use
+- cf. parsing
 == 2008-04-07 04:19:14
 - The more I have to hack up dirty workarounds, the more I feel
   frustrated with the limitations of Ruby 1.8
@@ -326,7 +328,7 @@ instance variable
   String). The best solution I've come up with so far is to create an
   anonymous class which includes the extensions I want, then copy over
   the resulting Attributes. I also need to copy the accessors and
-  collectors too (not done yet). 
+  collectors too (not done yet).
 - I want to apply methods like #string inside a block, the result of
   which applies to the enclosing class definition, without extending
   the class to have a #string method.
@@ -369,7 +371,7 @@ instance variable
 
   2008-04-07 07:51:53 - see examples/datatypes.rb for current approach
   using a proxy object
-  
+
 == 2008-04-12 23:46:19
 - trying to discover context, e.g. class << self or singleton class,
   etc.
@@ -377,7 +379,7 @@ instance variable
 - seems like the whole way I'm doing class and singleton attributes is
   wrong - keep hitting problems - maybe time for a complete rethink
 
-  
+
 == 2008-04-18 03:31:00
 - well, using a simpler superclass-based version of parents has
   resulted in 9 specs failing, all to do with singletons in one way or
