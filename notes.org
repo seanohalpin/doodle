@@ -61,7 +61,7 @@ again... hmmm)
 Positional args should follow order in which attributes have been
 defined. Doesn't seem to be doing that at the moment. So I need tests
 
-Added =arg_order= to specify order of args in initialize()
+Added =arg_order= to specify order of args in =initialize()=
 
 Fixed [[file:lib/doodle.rb::def%20parents][parents]] & [[file:lib/doodle.rb::def%20collect_inherited%20message][collect_inherited]] to return inherited classes in
 right order
@@ -182,6 +182,12 @@ but
 etc.
 
 
+==== More ideas about factory functions
+
+Factory functions are not imported into current namespace when you include module.
+
+==== Perhaps should change name to Constructor functions
+
 === DONE Collector
 
   has :locations, :init => [], :collect => Location
@@ -282,13 +288,15 @@ i.e. the method :__doodle__ and access everything through that
 This gives access to a DoodleInfo object which is stored centrally
 inside the DoodleInfo::DOODLES hash (keyed by object_id).
 
+- 2009-07-20 23:35:57 - not any more - this was preventing garbage collection
+
 == DONE Attribute has :init => value as well as default
 
 this is different to default - this sets the value in initialization
 and so creates an instance variable whereas default never creates an
 instance variable
 
-=== TODO Specs
+=== DONE Specs
 
 = What to show
 == normal instance attributes
