@@ -10,6 +10,7 @@ TODO:
 - apply match ~before~ from
   - add match to core doodle (as 'pattern' a la XMLSchema?)
 - handle config files
+- fix duplication
 
 =end
 

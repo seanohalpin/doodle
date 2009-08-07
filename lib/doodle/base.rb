@@ -1,4 +1,10 @@
 class Doodle
+
+  # match a class signature
+  def self.match_sig(desired, actual)
+    actual.zip(desired).all?{ |a, d| a <= d}
+  end
+
   # the core module of Doodle - however, to get most facilities
   # provided by Doodle without inheriting from Doodle, include
   # Doodle::Core, not this module
@@ -158,9 +164,16 @@ class Doodle
       ivar_defined?(name)
     end
 
+    # provide a hook to re-order or massage arguments before being
+    # processed by Doodle#initialize
+    def preprocess_args(*a)
+      a
+    end
+
     # object can be initialized from a mixture of positional arguments,
     # hash of keyword value pairs and a block which is instance_eval'd
     def initialize(*args, &block)
+      args = preprocess_args(*args)
       built_in = Doodle::BuiltIns::BUILTINS.select{ |x| self.kind_of?(x) }.first
       if built_in
         super
