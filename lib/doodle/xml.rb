@@ -34,6 +34,7 @@ class Doodle
         end
       end
     end
+
     class Element < Document
     end
 
@@ -139,6 +140,7 @@ class Doodle
 
     # override this to define a tag name for output - the default is
     # to use the classname (wthout namespacing)
+    # TODO: namespaces
     def tag
       #self.class.to_s.split(/::/)[-1].downcase
       self.class.to_s.split(/::/)[-1]
@@ -167,18 +169,30 @@ class Doodle
       body = []
       attributes = []
       self.doodle.attributes.map do |k, attr|
+        # don't store defaults
         next if self.default?(k)
-        # arbitrary
+        # arbitrary - could be CDATA?
         if k == :_text_
           body << self._text_
           next
         end
         v = send(k)
+        # note: can't use polymorphism here because we don't know if object has to_xml method
         if v.kind_of?(Doodle)
+          # if value is a Doodle, call its to_xml method
           body << v.to_xml
         elsif v.kind_of?(Array)
+          # if it's an Array, map each to_xml
+          # TODO: handle case when object does not have a to_xml method
           body << v.map{ |x| x.to_xml }
         else
+          # it's an attribute
+          # TODO: allow opting in to being an XML attribute (by adding option to #has?)
+          # e.g. has :name, :xml_options => {:attribute => true}
+          # or   has :name, :is_xml_attribute => true
+          # or   has :name, :xml => :attr
+          # or   has :name, :xml => {:attribute => true, :ns => :default}
+          # or   xml_attr :name
           attributes << [k, EscapeXML.escape(v)]
         end
       end
