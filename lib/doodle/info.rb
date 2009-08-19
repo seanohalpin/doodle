@@ -207,9 +207,8 @@ class Doodle
     # after initialization (validate! is called if this method is
     # called after initialization)
     def update(*args, &block)
-      # p [:doodle_initialize_from_hash, :args, *args]
+      # p [:doodle_initialize_from_hash, :args, args, block]
       defer_validation do
-
         # this is ~very~ hacky
         if args.size == 1
           Doodle::Debug.d { [:update, "trying class conversion", args] }
@@ -250,8 +249,8 @@ class Doodle
         Doodle::Utils.symbolize_keys!(key_values)
         #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :key_values2, key_values, :args2, args] }
         #p [self.class, :doodle_initialize_from_hash, :key_values3, key_values]
-
         # create attributes
+        #p [:key_values, key_values]
         key_values.keys.each do |key|
           Doodle::Debug.d { [:update, "setting value", key, key_values[key]] }
           #DBG: Doodle::Debug.d { [self.class, :doodle_initialize_from_hash, :setting, key, key_values[key]] }
