@@ -103,6 +103,7 @@ class Doodle
 
       # helper function to handle recursion
       def from_xml_elem(ctx, root)
+        #p [:from_xml_elem, :ctx, root]
         attributes = root.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
         text, children = root.children.partition{ |x| text_node?(x) }
         text = text.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
@@ -110,15 +111,28 @@ class Doodle
         if element_name !~ /[A-Z]/
           element_name = Doodle::Utils.camel_case(element_name)
         end
-        oroot = Utils.const_lookup(element_name, ctx).new(text, attributes) {
+        klass = Utils.const_lookup(element_name, ctx)
+        #p [:creating_new, klass, text, attributes]
+        #p [:root1, root]
+        # don't pass in empty text - screws up when class has only
+        # child elements (and no attributes) because tries to
+        # instantiate child element from empty string ""
+        if text == ""
+          text = nil
+        end
+        args = [text, attributes].compact
+        oroot = klass.new(*args) {
+          #p [:in_block]
           from_xml_elem(root)
         }
+        #p [:oroot, oroot]
         oroot
       end
       private :from_xml_elem
     end
 
     def from_xml_elem(parent)
+      #p [:from_xml_elem, :parent, parent]
       children = parent.children.reject{ |x| XML.text_node?(x) }
       children.each do |child|
         text = child.children.select{ |x| XML.text_node?(x) }.map{ |x| x.to_s}.reject{ |s| s =~ /^\s*$/}.join('')
@@ -126,10 +140,16 @@ class Doodle
         if element_name !~ /[A-Z]/
           element_name = Doodle::Utils.camel_case(element_name)
         end
-        object = const_lookup(element_name)
         method = Doodle::Utils.snake_case(Utils.normalize_const(element_name))
+        #p [:method, method]
+        object = const_lookup(element_name)
         attributes = child.attributes.inject({ }) { |hash, (k, v)| hash[k] = EscapeXML.unescape(v.to_s); hash}
-        send(method, object.new(text, attributes) {
+        if text == ""
+          text = nil
+        end
+        args = [text, attributes].compact
+        #p [:from_xml_elem, object, text, attributes]
+        send(method, object.new(*args) {
                from_xml_elem(child)
              })
       end
@@ -142,7 +162,6 @@ class Doodle
     # to use the classname (wthout namespacing)
     # TODO: namespaces
     def tag
-      #self.class.to_s.split(/::/)[-1].downcase
       self.class.to_s.split(/::/)[-1]
     end
 
