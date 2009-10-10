@@ -1,8 +1,11 @@
-== 0.2.4 / 2009-03-24
+== 0.2.4 / 2009-10-10
 
 - Features:
   - Doodle::XML::Element
     - defines class level #tag method to specify output tag name
+  - Refactored into separate files
+  - More specs (improved coverage)
+  - fixed some errors in datatypes
 
 == 0.2.3 / 2009-03-06
 

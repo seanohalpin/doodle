@@ -26,7 +26,7 @@ doodle is eco-friendly - it does not globally modify Object, Class or Module, no
 * link[collectors] to help in defining simple DSLs
 * works for [[classes_and_singletons.html|classes, instances and singletons]]
 
-Doodle also supports link[reflection], serialization to and from [[yaml.html|YAML]] and [[doodle-xml.html|XML]], and [[doodle-app.html|command line argument processing]].
+Doodle also supports link[reflection], serialization to and from [[doodle-json.html|JSON]], [[yaml.html|YAML]] and [[doodle-xml.html|XML]], and [[doodle-app.html|command line argument processing]].
 
 == example
 

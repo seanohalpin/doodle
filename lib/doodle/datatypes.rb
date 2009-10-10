@@ -1,11 +1,9 @@
-$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$:.unshift(File.join(File.dirname(__FILE__), '.'))
-
+base_path = File.dirname(__FILE__)
 require 'doodle'
-
 require 'date'
+require 'time'
 require 'uri'
-require 'rfc822'
+require File.join(base_path, 'rfc822')
 
 # note: this doesn't have to be in Doodle namespace
 class Doodle
@@ -43,6 +41,7 @@ class Doodle
     end
 
     def integer(name, params = { }, &block)
+      params = params.dup
       if params.key?(:max)
         max = params.delete(:max)
       end
@@ -59,12 +58,12 @@ class Doodle
         end
         if max
           must "be <= #{max}" do |s|
-            s.size <= max
+            s <= max
           end
         end
         if min
           must "be >= #{min}" do |s|
-            s.size >= min
+            s >= max
           end
         end
       end
@@ -88,7 +87,8 @@ class Doodle
           when /^(no|false|off|0)$/
             false
           else
-            v
+            # empty string "" is false by this definition
+            !v.empty?
           end
         end
       end
@@ -105,8 +105,12 @@ class Doodle
     def string(name, params = { }, &block)
       # must extract non-standard attributes before processing with
       # datatype otherwise causes UnknownAttribute error in Attribute definition
+      params = params.dup
       if params.key?(:max)
         max = params.delete(:max)
+      end
+      if params.key?(:min)
+        min = params.delete(:min)
       end
       if params.key?(:size)
         size = params.delete(:size)
@@ -128,8 +132,13 @@ class Doodle
             s.size <= max
           end
         end
+        if min
+          must "be >= #{min} characters" do |s|
+            s.size >= min
+          end
+        end
         if size
-          must "have size from #{size} characters" do |s|
+          must "have size of #{size} characters" do |s|
             size.include?(s.size)
           end
         end
@@ -171,6 +180,7 @@ class Doodle
     # defaults to UTC if passed an array
     # use :timezone => :local if you want local time
     def time(name, params = { }, &block)
+      params = params.dup
       timezone_method = params.delete(:timezone) || :utc
       if timezone_method == :local
         timezone_method = :mktime
@@ -179,7 +189,7 @@ class Doodle
         from String do |s|
           Time.parse(s)
         end
-        from Array do |*args|
+        from Array do |args|
           Time.send(timezone_method, *args)
         end
         # seconds since Thu Jan 01 00:00:00 UTC 1970
@@ -189,7 +199,7 @@ class Doodle
       end
     end
 
-    RX_ISODATE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
+    RX_ISODATE = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?)? ?Z?$/
 
     def utc(name, params = { }, &block)
       da = time( name, { :kind => Time }.merge(params))
@@ -197,7 +207,7 @@ class Doodle
         # override time from String
         from String do |s|
           if s !~ RX_ISODATE
-            raise ArgumentError, "date must be in ISO format (YYYY-MM-DDTHH:MM:SS, e.g. #{Time.now.utc.xmlschema})"
+            raise ArgumentError, "date must be in ISO format yyyy-mm-ddThh:mm:ss (e.g. #{Time.now.utc.xmlschema})"
           end
           Time.parse(s)
         end

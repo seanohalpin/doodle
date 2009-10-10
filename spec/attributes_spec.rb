@@ -139,3 +139,23 @@ describe Doodle::DoodleAttribute, 'attribute order' do
     end
   end
 end
+
+describe Doodle::DoodleAttribute, 'attribute order' do
+  it 'should reject attributes without names' do
+    proc { Doodle::DoodleAttribute.params_from_args(:kind => String) }.should raise_error(ArgumentError)
+  end
+
+  it 'should not allow changing name' do
+    proc { Doodle::DoodleAttribute.new(:name => "foo")}.should_not raise_error(ArgumentError)
+    d = Doodle::DoodleAttribute.new(:name => "foo")
+    d.name.should_be :foo
+    proc { d.name = :bar }.should raise_error(Doodle::ReadOnlyError)
+  end
+
+  it 'should ensure that attribute name is readonly' do
+    d = Doodle::DoodleAttribute.new(:name => "foo", :readonly => true)
+    d.name.should_be :foo
+    proc { d.name = "foo" }.should raise_error(Doodle::ReadOnlyError)
+  end
+end
+

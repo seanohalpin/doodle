@@ -29,7 +29,6 @@ class Doodle
         #DBG: Doodle::Debug.d { [:has, self, self.class, params] }
         if !params.key?(:name)
           __doodle__.handle_error name, ArgumentError, "#{self.class} must have a name", Doodle::Utils.doodle_caller
-          params[:name] = :__ERROR_missing_name__
         else
           # ensure that :name is a symbol
           params[:name] = params[:name].to_sym
@@ -135,12 +134,12 @@ class Doodle
     end
 
     # temporarily fake existence of readonly attribute
-    def readonly
-      false
+    def readonly(tf)
+      @readonly = tf
     end
 
     # name of attribute
-    has :name, :kind => Symbol do
+    has :name, :kind => Symbol, :readonly => true do
       from String do |s|
         s.to_sym
       end
