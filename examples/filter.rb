@@ -5,6 +5,7 @@ class Filter < Doodle::App
     :doc => "name of existing input file"
   filename :output, :doc => "name of output file"
   std_flags # help, verbose, debug
+
   def run
     puts "input: #{input} => output: #{output}"
   end

@@ -164,6 +164,13 @@ class Doodle
       ivar_defined?(name)
     end
 
+    # clear instance variable by removing it
+    def clear!(name)
+      if ivar_defined?(name)
+        remove_instance_variable("@#{name}")
+      end
+    end
+
     # provide a hook to re-order or massage arguments before being
     # processed by Doodle#initialize
     def preprocess_args(*a)
