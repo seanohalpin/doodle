@@ -189,5 +189,16 @@ class Doodle
       #p [:doodle, __doodle__.attributes]
       #p [:doodle_parent, __doodle__.parent]
     end
+
+    def to_a
+      doodle.key_values.map{ |key, value|
+        value = if value.kind_of?(Enumerable) && !value.kind_of?(String)
+          value.map{ |y| y.to_a }
+        else
+          value
+        end
+        [key, value]
+      }
+    end
   end
 end
