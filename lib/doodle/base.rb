@@ -151,6 +151,15 @@ class Doodle
     def ivar_get(name)
       instance_variable_get("@#{name}")
     end
+    private :ivar_get
+
+    # remove an instance variable by symbolic name
+    def ivar_remove(name)
+      if ivar_defined?(name)
+        remove_instance_variable("@#{name}")
+      end
+    end
+    private :ivar_remove
 
     # return true if attribute has default defined and not yet been
     # assigned to (i.e. still has default value)
@@ -164,11 +173,11 @@ class Doodle
       ivar_defined?(name)
     end
 
-    # clear instance variable by removing it
+    # clear instance variable by removing it. This has the effect of
+    # returning the attribute to its default value. Note that this can
+    # leave the object in an invalid state. Caveat emptor (hence the !).
     def clear!(name)
-      if ivar_defined?(name)
-        remove_instance_variable("@#{name}")
-      end
+      ivar_remove(name)
     end
 
     # provide a hook to re-order or massage arguments before being
