@@ -6,8 +6,5 @@ class Doodle
       arg_block = block if block_given?
       @block = arg_block
     end
-    def call(*a, &b)
-      block.call(*a, &b)
-    end
   end
 end
