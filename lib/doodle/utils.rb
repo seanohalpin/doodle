@@ -34,7 +34,7 @@ class Doodle
         if first_letter_in_uppercase
           lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
         else
-          lower_case_and_underscored_word.first + came_case(lower_case_and_underscored_word)[1..-1]
+          lower_case_and_underscored_word[0..0] + camel_case(lower_case_and_underscored_word)[1..-1]
         end
       end
       alias :camelcase :camel_case
@@ -127,8 +127,10 @@ class Doodle
       # simple (!) pluralization - if you want fancier, override this method
       def pluralize(string)
         s = string.to_s
-        if s =~ /s$/
+        if s =~ /[sx]$/
           s + 'es'
+        elsif s =~ /[y]$/
+          s[0..-2] + 'ies'
         else
           s + 's'
         end
