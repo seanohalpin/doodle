@@ -3,6 +3,7 @@
 - Features:
   - Doodle::XML::Element
     - defines class level #tag method to specify output tag name
+  - added #to_a - creates a (nested) array of [key, value] pairs
   - Refactored into separate files
   - More specs (improved coverage)
   - fixed some errors in datatypes
