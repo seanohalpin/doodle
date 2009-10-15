@@ -1,3 +1,5 @@
+#: require
+require 'doodle'
 #: definition
 class Dude < Doodle
   # the attribute has an ~attribute~ validation, i.e. it must be a

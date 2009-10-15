@@ -10,13 +10,15 @@ dude = Dude("Dude", true)
 # values which would invalidate the object
 #: eg1
 dude.doodle.update do
+  cool false
   name "Bozo"
-  name "The Dude"
 end
+# or
+dude.doodle.update :cool => false, :name => "Bozo"
 dude # =>
 
 dude.doodle.update do
-  cool false
+  name "The Dude"
   name "Bozo"
 end
 dude # =>
