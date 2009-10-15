@@ -206,6 +206,7 @@ class Doodle
       #p [:doodle_parent, __doodle__.parent]
     end
 
+    # output doodle attributes as (nested) array of [key, value] pairs
     def to_a
       doodle.key_values.map{ |key, value|
         value = if value.kind_of?(Enumerable) && !value.kind_of?(String)
