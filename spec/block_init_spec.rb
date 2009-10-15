@@ -20,7 +20,7 @@ describe 'Doodle', 'block initialization of scalar attributes' do
         has :block, :kind => Proc
       end
     end
-    
+
     it 'should initialize an scalar attribute from a block' do
       farm = Farm do
         barn do
@@ -30,11 +30,9 @@ describe 'Doodle', 'block initialization of scalar attributes' do
       farm.barn.animals[0].species.should_be "pig"
     end
     it 'should fail trying to initialize an inappropriate attribute (not a Doodle or Proc) from a block' do
-      proc { 
+      proc {
         foo = Foo do
-          ivar1 do
-            "hello"
-          end
+          ivar1 { "hello" }
         end
       }.should raise_error(ArgumentError)
     end

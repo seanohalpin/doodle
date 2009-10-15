@@ -33,11 +33,7 @@ EOT
           has :template
         end
         class Slideshow < Base
-          has :id, :kind => Integer do
-            from String do |s|
-              s.to_i
-            end
-          end
+          has :id, :kind => Integer
           has :name, :kind => String
           has Layout
         end
@@ -88,11 +84,7 @@ EOT
         has :template
       end
       class ::Slideshow < Base
-        has :id, :kind => Integer do
-          from String do |s|
-            s.to_i
-          end
-        end
+        has :id, :kind => Integer
         has :name, :kind => String
         has Layout
       end

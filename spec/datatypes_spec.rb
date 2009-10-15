@@ -341,7 +341,7 @@ describe Doodle, 'datatypes' do
           string :name
           has :key
           from String do |s|
-            s
+            Foo.new(*s.split(";"))
           end
           must "have key != name" do
             name != key
@@ -350,6 +350,8 @@ describe Doodle, 'datatypes' do
           doc "Hello"
         end
       end
+      foo = Foo.from("hello;world")
+      foo.validate!
     end
 
   end

@@ -79,9 +79,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
       foo = nil
       proc {
         foo = Foo do
-          bar :name => 1 do
-            count "hello"
-          end
+          bar(:name => 1) { count "hello" }
         end
       }.should raise_error(Doodle::ValidationError)
     end
@@ -111,9 +109,7 @@ describe 'Doodle', 'initialization of scalar attributes from hash' do
       proc {
         foo = Foo do
           bar :name => "hello", :count => 1
-          v2 do
-            "Hello"
-          end
+          v2 { "Hello" }
         end
       }.should raise_error(ArgumentError)
     end
