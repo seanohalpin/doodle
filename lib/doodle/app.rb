@@ -72,8 +72,9 @@ class Doodle
       end
     end
 
-    # regular expression for ISO date
+    # regular expression for ISO datetime
     RX_ISODATETIME = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
+    # regular expression for ISO date
     RX_ISODATE = /^\d{4}-\d{2}-\d{2}$/
 
     # App directives
@@ -88,15 +89,19 @@ class Doodle
       end
       has :examples, :collect => :example, :doc => "example(s) of use"
 
+      # specify that this argument is required
       def required
         @optional = false
       end
+      # specify that this argument is optional
       def optional
         @optional = true
       end
+      # returns true if argument is optional, false otherwise
       def optional?
         instance_variable_defined?("@optional") ? @optional : false
       end
+      # return list of required attributes
       def required_args
         doodle.attributes.select{ |k, v| v.required?}.map{ |k,v| v}
       end
