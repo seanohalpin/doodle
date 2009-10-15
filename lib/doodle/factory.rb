@@ -25,6 +25,7 @@ else
           #p [:factory, :ancestors, konst, konst.ancestors]
           #p [:factory, :lookup, Module.nesting]
           name = konst.to_s
+          return if name =~ /^Doodle$/
           #p [:factory, :name, name]
           anon_class = false
           if name =~ /#<Class:0x[a-fA-F0-9]+>::/
