@@ -5,8 +5,8 @@ type: :bugfix
 component: core
 release: r0.2.4
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-03-22 14:39:37.834457 Z
 references: []
 
@@ -16,3 +16,13 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
   - ""
+- - 2009-10-21 17:31:07.649269 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - commented
+  - see experiments/init_values_in_block.rb
+- - 2009-10-21 17:51:30.405337 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
+  - |-
+    see spec/init_values_in_block_spec.rb
+    changed lib/doodle/info.rb DoodleInfo#update

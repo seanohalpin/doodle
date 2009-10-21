@@ -267,16 +267,30 @@ class Doodle
         # depend on user supplied values
         # - don't reset values which are supplied in args
         #p [:getting_init_values, instance_variables]
-        __doodle__.initial_values.each do |key, value|
-          if !key_values.key?(key) && respond_to?(key)
-            #p [:initial_values, key, value]
-            __send__(key, value)
+        begin
+          __doodle__.initial_values.each do |key, value|
+            if !key_values.key?(key) && respond_to?(key)
+              #p [:initial_values, key, value]
+              __send__(key, value)
+            end
           end
+        rescue Doodle::NoDefaultError => e
+          # see bugs:core-28 - set init values from values set in block
         end
         if block_given?
           #p [:update, block, __doodle__.validation_on]
           #p [:this, self]
           instance_eval(&block)
+        end
+        # see bugs:core-28 - set init values from values set in block
+        #p [:initial_values, __doodle__.initial_values]
+        __doodle__.initial_values.each do |key, value|
+          #p [:respond_to?, respond_to?(key), assigned?(key)]
+          #p [:ivar, ivar_get(key)]
+          if respond_to?(key) && !assigned?(key)
+            #p [:initial_values, key, value]
+            __send__(key, value)
+          end
         end
       end
       @this

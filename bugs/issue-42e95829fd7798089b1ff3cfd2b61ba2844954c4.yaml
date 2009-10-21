@@ -16,3 +16,7 @@ log_events:
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
   - ""
+- - 2009-10-21 17:25:52.658702 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - commented
+  - not sure about this - I'm using the same mechanism for initializing and updating so would be tricky to fix. Perhaps all readonly attributes to readers after init?
