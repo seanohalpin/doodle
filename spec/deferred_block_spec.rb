@@ -5,15 +5,22 @@ describe Doodle::DeferredBlock do
 
     before :each do
       class Foo < Doodle
-        has :name do
-          init { `uname`.chomp }
+        class << self
+          has :base, :init => 1
+        end
+        has :value do
+          init { Foo.base + 1 }
         end
       end
     end
 
-    it 'should dynamically assign name' do
+    it 'should dynamically assign attribute' do
       foo = Foo.new
-      foo.name.should_be `uname`.chomp
+      foo.value.should_be 2
+      Foo.base = 41
+      bar = Foo.new
+      bar.value.should_be 42
+      foo.value.should_be 2
     end
 
   end
