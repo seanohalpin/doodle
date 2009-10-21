@@ -133,7 +133,7 @@ class Doodle
           end
           __doodle__.arg_order = args
         rescue Exception => e
-          __doodle__.handle_error :arg_order, InvalidOrderError, e.to_s, Doodle::Utils.doodle_caller
+          __doodle__.handle_error :arg_order, InvalidOrderError, e.to_s, Doodle::Utils.doodle_caller(e)
         end
       else
         __doodle__.arg_order + (__doodle__.attributes.keys - __doodle__.arg_order)

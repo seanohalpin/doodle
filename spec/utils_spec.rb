@@ -59,9 +59,11 @@ describe Doodle::Utils do
     it 'should show the caller' do
       old_debug = $DEBUG
       $DEBUG = false
-      Doodle::Utils.doodle_caller.size.should_be 1
+      e = Exception.new("dummy")
+      e.set_backtrace(["hello", "/doodle/lib/utils.rb", "world"])
+      Doodle::Utils.doodle_caller(e).size.should_be 2
       $DEBUG = true
-      Doodle::Utils.doodle_caller.size.should be_greater_than_one
+      Doodle::Utils.doodle_caller(e).size.should_be 3
       $DEBUG = old_debug
     end
 

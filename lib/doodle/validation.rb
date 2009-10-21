@@ -45,7 +45,7 @@ class Doodle
         Doodle::Debug.d { [:validate, 2] }
         value = convert(owner, *args)
       rescue Exception => e
-        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", Doodle::Utils.doodle_caller
+        owner.__doodle__.handle_error name, ConversionError, "#{owner.kind_of?(Class) ? owner : owner.class}.#{ name } - #{e.message}", Doodle::Utils.doodle_caller(e)
       end
       #
       # Note to self: these validations are not affected by
@@ -112,7 +112,7 @@ class Doodle
               __doodle__.handle_error self, ValidationError, "#{ self.class } must #{ v.message }", Doodle::Utils.doodle_caller
             end
           rescue Exception => e
-            __doodle__.handle_error self, ValidationError, e.to_s, Doodle::Utils.doodle_caller
+            __doodle__.handle_error self, ValidationError, e.to_s, Doodle::Utils.doodle_caller(e)
           end
         end
       end

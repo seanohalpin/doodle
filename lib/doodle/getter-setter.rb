@@ -57,7 +57,7 @@ class Doodle
           end
         end
       rescue Object => e
-        __doodle__.handle_error name, e, e.to_s, Doodle::Utils.doodle_caller
+        __doodle__.handle_error name, e, e.to_s, Doodle::Utils.doodle_caller(e)
       end
     end
     private :_getter
@@ -138,7 +138,7 @@ class Doodle
               end
             rescue Object => e
               Doodle::Debug.d { [:_setter, 14] }
-              __doodle__.handle_error att.name, e.class, e.to_s, Doodle::Utils.doodle_caller
+              __doodle__.handle_error att.name, e.class, e.to_s, Doodle::Utils.doodle_caller(e)
             end
           end
         else

@@ -3,9 +3,13 @@
 - Features:
   - Doodle::XML::Element
     - defines class level #tag method to specify output tag name
-  - added #to_a - creates a (nested) array of [key, value] pairs
-  - Refactored into separate files
-  - More specs (improved coverage)
+  - obj.to_a - creates a (nested) array of [key, value] pairs
+  - obj.assigned?(:name) returns true if attribute :name has a user-assigned value
+  - obj.default?(:name) returns true if attribute :name has default value
+  - obj.clear!(:name) resets attribute :name to default value
+  - improved error reporting
+  - refactored into separate files
+  - more specs (improved coverage)
   - fixed some errors in datatypes
 
 == 0.2.3 / 2009-03-06

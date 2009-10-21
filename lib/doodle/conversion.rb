@@ -68,8 +68,8 @@ class Doodle
           value
         end
       rescue Exception => e
-        Doodle::Debug.d { [:convert, 19] }
-        owner.__doodle__.handle_error name, ConversionError, "#{e.message}", Doodle::Utils.doodle_caller
+        Doodle::Debug.d { [:convert, 19, :exception] }
+        owner.__doodle__.handle_error name, ConversionError, "#{e.message}", Doodle::Utils.doodle_caller(e)
       end
       if args.size > 1
         Doodle::Debug.d { [:convert, 20] }

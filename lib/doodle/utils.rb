@@ -137,11 +137,17 @@ class Doodle
       end
 
       # caller
-      def doodle_caller
-        if $DEBUG
-          caller
+      def doodle_caller(e = nil)
+        # TODO: tidy this up - use backtrace as arg?
+        if e.nil?
+          res = caller
         else
-          [caller[-1]]
+          res = e.backtrace
+        end
+        if $DEBUG
+          res
+        else
+          res.reject{ |x| x =~ %r{/doodle/lib}}
         end
       end
 

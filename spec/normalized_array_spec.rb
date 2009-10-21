@@ -55,7 +55,8 @@ describe NormalizedArray do
       expect { @ca == [1, 2, 3] }
       expect_ok { @ca[4] = 42 }
       expect_error(IndexError) { @ca[5] = 42 }
-      expect_error(/out of range/) { @ca[5] = 42 }
+      #expect_ok(/out of range/) { @ca[5] = 42 }
+      expect_error(IndexError) { @ca[5] = 42 }
 
       expect_ok { ca = BoundedArray4.new([1,2,3,4,5]) }
       expect_error { ca = BoundedArray4.new([1,2,3,4,5,6]) }

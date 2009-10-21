@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: better line reporting in error messages
+desc: at the moment, error reports in constructor blocks report where the block started, not where the error occurred - need to work out how to report at the level the error occurred
+type: :feature
+component: core
+release: r0.3.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-10-21 04:07:18.926474 Z
+references: []
+
+id: 5f6b9be2b2cf56a67c7617670e9e27fe83179d4f
+log_events: 
+- - 2009-10-21 04:07:20.781838 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
