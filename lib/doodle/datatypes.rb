@@ -145,10 +145,19 @@ class Doodle
       end
     end
 
+    module DecorateURI
+      def to_yaml(*opts)
+        to_s.to_yaml(*opts)
+      end
+    end
+
     def uri(name, params = { }, &block)
       datatype name, params, block, { :kind => URI } do
         from String do |s|
-          URI.parse(s)
+          URI.parse(s).extend(DecorateURI)
+        end
+        from URI do |u|
+          u.extend(DecorateURI)
         end
       end
     end
@@ -199,7 +208,7 @@ class Doodle
       end
     end
 
-    RX_ISODATE = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?)? ?Z?$/
+    RX_ISODATE = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?)?(( ?Z)|([+-]\d{2}:\d{2}))?$/
 
     def utc(name, params = { }, &block)
       da = time( name, { :kind => Time }.merge(params))

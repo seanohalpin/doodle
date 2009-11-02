@@ -147,6 +147,15 @@ class Doodle
         if $DEBUG
           res
         else
+          # pp [:res, res]
+          # result = []
+          # res.reverse_each do |r|
+          #   if r =~ %r{/doodle/lib}
+          #     break
+          #   end
+          #   result << r
+          # end
+          # result.reverse
           res.reject{ |x| x =~ %r{/doodle/lib}}
         end
       end
