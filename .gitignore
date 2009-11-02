@@ -2,13 +2,12 @@ coverage.html
 coverage/*
 experiments/*
 pkg/*
+regem
+*.gem
 doc/*
 log/*
 tmp/*
-rote/*.rake_cache
-rote/tidy.log
 gitlog
-regem
 TAGS
 semantic.cache
 /www/output/
