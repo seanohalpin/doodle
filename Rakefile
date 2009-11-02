@@ -2,6 +2,7 @@
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
+    gemspec.rubyforge_project = "doodle"
     gemspec.name = "doodle"
     gemspec.summary = %q{Doodle is a gem for simplifying the \
 definition of Ruby classes by making attributes and their \
@@ -20,7 +21,7 @@ globally modify Object, Class or Module.}
                "doodle.gemspec",
                "lib/**/*",
                "examples/**/*",
-               "spec/**/*"
+               "spec/**/*",
                "COPYING",
                "CREDITS",
                "History.txt",
@@ -31,6 +32,16 @@ globally modify Object, Class or Module.}
                "VERSION",
               ]
     gemspec.test_files = ["spec/*_spec.rb"]
+
+    gemspec.extra_rdoc_files = %w[
+History.txt
+License.txt
+Manifest.txt
+PostInstall.txt
+README.txt
+]
+    gemspec.rdoc_options = ["--charset=UTF-8 --line-numbers", "--inline-source", "--title", "Doodle", "--main", "README.txt"]
+    gemspec.add_development_dependency('jeweler')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
