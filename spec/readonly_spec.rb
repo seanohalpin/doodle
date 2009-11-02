@@ -59,6 +59,7 @@ describe 'Doodle', 'readonly attributes #2' do
     end
 
     # core-30: BUG: can set readonly attribute with deferred validation block - no error on exit from block
+    # but does this matter?
     it 'should not allow setting readonly attribute after initialization' do
       pending
       foo = Foo do
