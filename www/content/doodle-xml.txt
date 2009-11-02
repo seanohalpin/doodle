@@ -54,7 +54,7 @@ and its output:
 
 <<< xmp filename: castor-example-use-order.rb, sections: output, after: ["sed 's/# >> //g' | tidy -xml -i"], lang: xml >>>
 
-For more details see the [[doc/Doodle/Xml.html|rubydocs]].
+For more details see the [[doc/Doodle/XML.html|rubydocs]].
 
 === Shortcomings
 
