@@ -2,8 +2,8 @@
 title: don't display help for normal doodle attributes in Doodle::App
 desc: ""
 type: :bugfix
-component: extras
-release: r0.2.4
+component: doodle-app
+release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,12 @@ log_events:
 - - 2009-03-29 01:08:49.157517 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 17:56:11.020934 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - unassigned from release r0.2.4
+  - need to do complete overhaul of Doodle::App (merge with datatypes, etc.) so defer till then
+- - 2009-10-21 18:02:41.927845 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component doodle-app from extras
   - ""

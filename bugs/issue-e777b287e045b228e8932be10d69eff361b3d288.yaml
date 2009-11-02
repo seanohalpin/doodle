@@ -1,10 +1,10 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: Loses Proc-valued attribute in to_hash
+title: "BUG: Loses Proc-valued attribute in to_hash"
 desc: |-
   the current (hacky) implementation of to_hash uses to_yaml under the hood. This causes references to Procs & lambdas to be lost in translation. to_hash should not blow away procs
   the fix is to do to_hash properly - that means a generalized doodle visitor (which could be used by to_xml, to_json, etc.)
 type: :bugfix
-component: core
+component: to_hash
 release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -17,4 +17,12 @@ log_events:
 - - 2009-02-24 23:58:27.280122 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 18:10:04.480607 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - edited title
+  - ""
+- - 2009-10-21 19:28:16.841111 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component to_hash from core
   - ""

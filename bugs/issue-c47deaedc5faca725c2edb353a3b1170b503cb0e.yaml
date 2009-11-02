@@ -6,7 +6,7 @@ desc: |-
   - and how to enable them
   doodle do ... end is just a little annoying
 type: :task
-component: extras
+component: doodle-app
 release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -19,4 +19,8 @@ log_events:
 - - 2009-02-24 10:43:11.671204 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 18:00:22.651837 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component doodle-app from extras
   - ""

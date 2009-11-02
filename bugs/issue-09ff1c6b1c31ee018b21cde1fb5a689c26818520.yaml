@@ -4,7 +4,7 @@ desc: |-
   if a config file specified (or exists by some convention), then use it to override the existing default values
   command line options specifically set override config options
 type: :feature
-component: extras
+component: doodle-app
 release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -17,4 +17,8 @@ log_events:
 - - 2009-03-06 00:59:31.445656 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 17:58:34.743705 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component doodle-app from extras
   - ""

@@ -5,8 +5,8 @@ type: :feature
 component: core
 release: r0.3.0
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-10-21 04:07:18.926474 Z
 references: []
 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-10-21 04:07:20.781838 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 18:01:46.854250 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - closed with disposition fixed
   - ""

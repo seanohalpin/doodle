@@ -2,7 +2,7 @@
 title: move over remaining todo items from todo.org to ditz
 desc: ""
 type: :task
-component: doodle
+component: project
 release: 
 reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
 status: :unstarted
@@ -15,4 +15,8 @@ log_events:
 - - 2009-03-02 10:55:14.385909 Z
   - Sean O'Halpin <sean.ohalpin@gmail.com>
   - created
+  - ""
+- - 2009-10-21 20:29:59.420568 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - assigned to component project from doodle
   - ""
