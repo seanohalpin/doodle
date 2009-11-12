@@ -1,3 +1,5 @@
+require 'pp'
+
 class Doodle
 
   # place to stash bookkeeping info
@@ -269,23 +271,31 @@ class Doodle
         #p [:getting_init_values, instance_variables]
         begin
           __doodle__.initial_values.each do |key, value|
+            #p [:test1, respond_to?(key) && !assigned?(key)]
             if !key_values.key?(key) && respond_to?(key)
               #p [:initial_values, key, value]
+              #p [:ivar, ivar_get(key)]
               __send__(key, value)
+              #p [:assigned?, assigned?(key)]
+              #p [:ivar_2, ivar_get(key)]
             end
           end
         rescue Doodle::NoDefaultError => e
           # see bugs:core-28 - set init values from values set in block
+          #p [:init, :doodle_no_default]
         end
         if block_given?
           #p [:update, block, __doodle__.validation_on]
           #p [:this, self]
+          #p [:init, :instance_eval, caller]
+          #p [:init, :instance_eval]
           instance_eval(&block)
         end
         # see bugs:core-28 - set init values from values set in block
         #p [:initial_values, __doodle__.initial_values]
         __doodle__.initial_values.each do |key, value|
-          #p [:respond_to?, respond_to?(key), assigned?(key)]
+          #p [:respond_to?, respond_to?(key), :assigned?, assigned?(key)]
+          #p [:test2, respond_to?(key) && !assigned?(key)]
           #p [:ivar, ivar_get(key)]
           if respond_to?(key) && !assigned?(key)
             #p [:initial_values, key, value]
