@@ -158,11 +158,15 @@ class Doodle
         end
         da
       end
+
+      # SPECIFIC OPTION TYPES
+
       # expect a string
       def string(*args, &block)
         args = [{ :using => Option, :kind => String }, *args]
         da = option(*args, &block)
       end
+
       # expect a symbol (and convert from String)
       def symbol(*args, &block)
         args = [{ :using => Option, :kind => Symbol }, *args]
@@ -173,6 +177,7 @@ class Doodle
           end
         end
       end
+
       # expect a filename - set <tt>:existing => true</tt> to specify that the file must exist
       #   filename :input, :existing => true, :flag => "i", :doc => "input file name"
       def filename(*args, &block)
@@ -191,6 +196,7 @@ class Doodle
           end
         end
       end
+
       # expect an on/off flag, e.g. -b
       # - doesn't take any arguments (mere presence sets it to true)
       # - booleans are false by default
@@ -344,12 +350,13 @@ class Doodle
         end
         a.first
       end
+
       def key_value(arg, argv)
         value = nil
-        if arg[0] == ?-
+        if arg[0..0] == "-"
           # got flag
           #p [:a, 1, arg]
-          if arg[1] == ?-
+          if arg[1..1] == "-"
             # got --flag
             # --key value
             key = arg[2..-1]
@@ -403,6 +410,7 @@ class Doodle
         end
         [key, value]
       end
+
       def params_args(argv)
         argv = argv.dup
         params = { }
@@ -418,11 +426,13 @@ class Doodle
         end
         [params, args]
       end
+
       def from_argv(argv)
         params, args = params_args(argv)
         args << params
         new(*args)
       end
+
       def format_values(values)
         case values
         when Array
@@ -433,6 +443,7 @@ class Doodle
           values.inspect
         end
       end
+
       def format_doc(attr)
         #p [:doc, attr.doc]
         doc = attr.doc
@@ -451,6 +462,7 @@ class Doodle
         end
         doc
       end
+
       def format_kind(kind)
         if (kind & [TrueClass, FalseClass, NilClass]).size > 0
           "Boolean"
@@ -458,6 +470,7 @@ class Doodle
           kind.map{ |k| k.to_s }.join(', ')
         end.upcase
       end
+
       def help_attributes
         options, args = doodle.attributes.partition { |key, attr| attr.respond_to?(:flag)}
         args = args.map { |key, attr|
@@ -480,7 +493,9 @@ class Doodle
         }
         args + options
       end
+
       public
+
       # defines the help text displayed when option --help passed
       def help_text
         format_block = proc {|key, flag, doc, required, kind|
