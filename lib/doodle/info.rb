@@ -1,5 +1,3 @@
-require 'pp'
-
 class Doodle
 
   # place to stash bookkeeping info
