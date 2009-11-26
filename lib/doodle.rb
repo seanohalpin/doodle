@@ -54,6 +54,10 @@ require 'doodle/normalized_array'
 require 'doodle/normalized_hash'
 require 'doodle/collector'
 
+class Doodle
+  VERSION = "0.2.4"
+end
+
 ############################################################
 # and we're bootstrapped! :)
 ############################################################
