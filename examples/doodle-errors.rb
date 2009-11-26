@@ -12,14 +12,14 @@ params = {
   :extra => 42
 }
 
-rv = try {
+rv = Doodle::Utils.try {
   foo = Foo(params)
 }
 pp rv
 
-rv = try {
+rv = Doodle::Utils.try {
   Doodle.raise_exception_on_error = false
   foo = Foo(params)
-  foo.errors
+  foo.doodle.errors
 }
 pp rv

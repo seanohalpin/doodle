@@ -5,7 +5,7 @@ require 'doodle'
 require 'doodle/datatypes'
 require 'net/smtp'
 require 'time'
-require 'datatypes'
+# require 'datatypes'
 require 'smtp_tls'
 
 # note: translated from Florian Frank's example in dslkit [http://dslkit.rubyforge.org/]
@@ -62,6 +62,7 @@ end
 
 require 'highline/import'
 def prompt_for_password
+  p [:pfp, caller]
   ask("Enter your password:  ") { |q| q.echo = '*' }
 end
 
@@ -69,12 +70,12 @@ class GMail < Mail
   has :mail_server, :default => 'smtp.gmail.com'
   has :port, :default => 587
   has :username, :default => 'sean.ohalpin@gmail.com'
-  has :password, :default => 'sesame'
-#   has :password do
-#     init do
-#       prompt_for_password
-#     end
-#   end
+#  has :password, :default => 'sesame'
+  has :password do
+    init do
+      prompt_for_password
+    end
+  end
   has :host, :default => 'localhost.localdomain'
   has :message_format, :default => 'plain'
 
