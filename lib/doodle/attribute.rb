@@ -159,5 +159,7 @@ class Doodle
     has :abstract, :default => false
     remove_method(:readonly) # because we faked it earlier - remove to avoid redefinition warning
     has :readonly, :default => false
+
+    has :namespace, :default => nil
   end
 end

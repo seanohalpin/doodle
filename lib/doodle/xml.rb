@@ -159,16 +159,16 @@ class Doodle
     private :from_xml_elem
 
     # override this to define a tag name for output - the default is
-    # to use the classname (wthout namespacing)
+    # to use the classname (without namespacing)
     # TODO: namespaces
-    def tag
-      self.class.to_s.split(/::/)[-1]
+    def tag(namespace = '')
+      namespace + self.class.to_s.split(/::/).last
     end
 
     # override this to define a specialised attributes format
     def format_attributes(attributes)
       if attributes.size > 0
-        " " + attributes.map{ |k, v| %[#{ k }="#{ v }"]}.join(" ")
+        " " + attributes.map{ |k, v, attr| %[#{attr.namespace ? attr.namespace + ':' : '' }#{ k }="#{ v }"]}.join(" ")
       else
         ""
       end
@@ -184,7 +184,8 @@ class Doodle
     end
 
     # output Doodle object graph as xml
-    def to_xml
+    def to_xml(*a)
+      parent_key, parent_attr = *a
       body = []
       attributes = []
       self.doodle.attributes.map do |k, attr|
@@ -199,7 +200,7 @@ class Doodle
         # note: can't use polymorphism here because we don't know if object has to_xml method
         if v.kind_of?(Doodle)
           # if value is a Doodle, call its to_xml method
-          body << v.to_xml
+          body << v.to_xml(k, attr)
         elsif v.kind_of?(Array)
           # if it's an Array, map each to_xml
           # TODO: handle case when object does not have a to_xml method
@@ -212,10 +213,15 @@ class Doodle
           # or   has :name, :xml => :attr
           # or   has :name, :xml => {:attribute => true, :ns => :default}
           # or   xml_attr :name
-          attributes << [k, EscapeXML.escape(v)]
+          attributes << [k, EscapeXML.escape(v), attr]
         end
       end
-      format_tag(tag, attributes, body)
+      if parent_attr && parent_attr.namespace
+        ns = parent_attr.namespace + ':'
+      else
+        ns = ''
+      end
+      format_tag(tag(ns), attributes, body)
     end
   end
 end
