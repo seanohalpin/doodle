@@ -165,10 +165,14 @@ class Doodle
       namespace + self.class.to_s.split(/::/).last
     end
 
+    def format_attribute(k, v, attr)
+      %[#{attr.namespace ? attr.namespace + ':' : '' }#{ k }="#{ v }"]
+    end
+
     # override this to define a specialised attributes format
     def format_attributes(attributes)
       if attributes.size > 0
-        " " + attributes.map{ |k, v, attr| %[#{attr.namespace ? attr.namespace + ':' : '' }#{ k }="#{ v }"]}.join(" ")
+        " " + attributes.map{ |k, v, attr| format_attribute(k, v, attr)}.join(" ")
       else
         ""
       end
