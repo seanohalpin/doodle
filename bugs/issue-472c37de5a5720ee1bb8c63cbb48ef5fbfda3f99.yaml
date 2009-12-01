@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: complains about arity in doodle/app.rb
+desc: see ~/scratch/example-doodle-app.rb
+type: :bugfix
+component: doodle-app
+release: 
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-12-01 14:27:08.413382 Z
+references: []
+
+id: 472c37de5a5720ee1bb8c63cbb48ef5fbfda3f99
+log_events: 
+- - 2009-12-01 14:27:09.397081 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
