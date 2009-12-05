@@ -331,5 +331,19 @@ class Doodle
     def key_values_without_defaults(tf = true)
       keys(tf).reject{|k| @this.default?(k) }.map{ |k, a| [k, @this.send(k)]}
     end
+
+    # output doodle attributes as (nested) array of [key, value] pairs
+    def to_a
+      key_values.map{ |key, value|
+        value = if value.kind_of?(Doodle)
+                  value.doodle.to_a
+                elsif value.kind_of?(Enumerable) && !value.kind_of?(String)
+                  value.map{ |y| y.kind_of?(Doodle) ? y.doodle.to_a : y.to_a }
+                else
+                  value
+                end
+        [key, value]
+      }
+    end
   end
 end
