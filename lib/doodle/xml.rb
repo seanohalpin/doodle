@@ -160,7 +160,7 @@ class Doodle
 
     # override this to define a tag name for output - the default is
     # to use the classname (without namespacing)
-    # TODO: namespaces
+    # TODO: interpreting namespaces
     def tag(namespace = '')
       namespace + self.class.to_s.split(/::/).last
     end
