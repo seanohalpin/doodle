@@ -17,7 +17,7 @@ describe Doodle, "to_a" do
       end
     end
     it "should serialize nested doodles to array" do
-      @event.to_a.should_be [[:locations, [[[:name, "Stage 1"]], [[:name, "Stage 2"]]]]]
+      @event.doodle.to_a.should_be [[:locations, [[[:name, "Stage 1"]], [[:name, "Stage 2"]]]]]
     end
   end
 end
