@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 describe Doodle::Utils do
   temporary_constant :Foo do
     before do
-      class Foo
+      class ::Foo
       end
     end
     it "should flatten arrays to one level only" do
@@ -29,9 +29,9 @@ describe Doodle::Utils do
     end
 
     it 'should resolve constants' do
-      Doodle::Utils.const_resolve(Foo).should_be Foo
-      Doodle::Utils.const_resolve(:Foo).should_be Foo
-      Doodle::Utils.const_resolve("Foo").should_be Foo
+      Doodle::Utils.const_resolve(::Foo).should_be ::Foo
+      Doodle::Utils.const_resolve(:Foo).should_be ::Foo
+      Doodle::Utils.const_resolve("Foo").should_be ::Foo
       proc { Doodle::Utils.const_resolve("Bar") }.should raise_error(NameError)
     end
 
@@ -82,7 +82,7 @@ end
 describe Doodle::Utils, "normalize hash" do
   temporary_constants :Foo, :Bar, :Baz do
     before do
-      module Foo
+      module ::Foo
         A = 1
         class Bar
           A = 2
@@ -93,10 +93,10 @@ describe Doodle::Utils, "normalize hash" do
       end
     end
     it 'should resolve a constant along the module nesting path' do
-      Doodle::Utils.const_lookup(:A, Foo).should_be 1
-      Doodle::Utils.const_lookup(:A, Foo::Bar).should_be 2
-      Doodle::Utils.const_lookup(:A, Foo::Bar::Baz).should_be 3
-      proc { Doodle::Utils.const_lookup(:B, Foo::Bar::Baz) }.should raise_error(NameError)
+      Doodle::Utils.const_lookup(:A, ::Foo).should_be 1
+      Doodle::Utils.const_lookup(:A, ::Foo::Bar).should_be 2
+      Doodle::Utils.const_lookup(:A, ::Foo::Bar::Baz).should_be 3
+      proc { Doodle::Utils.const_lookup(:B, ::Foo::Bar::Baz) }.should raise_error(NameError)
     end
   end
 end

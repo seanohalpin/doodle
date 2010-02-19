@@ -297,17 +297,17 @@ describe Doodle, 'datatypes' do
     end
 
     it "should create a list attribute with list" do
-      class Foo < Doodle
+      class ::Foo < Doodle
         doodle do
           string :name
         end
       end
-      class Bar < Doodle
+      class ::Bar < Doodle
         doodle do
-          list Foo
+          list ::Foo
         end
       end
-      Bar.doodle.attributes[:foos].kind.should_be []
+      ::Bar.doodle.attributes[:foos].kind.should_be []
       bar = Bar do
         foo "hello"
         foo "world"
@@ -317,14 +317,14 @@ describe Doodle, 'datatypes' do
     end
 
     it "should create a list attribute with list" do
-      class Foo < Doodle
+      class ::Foo < Doodle
         doodle do
           string :name
         end
       end
-      class Bar < Doodle
+      class ::Bar < Doodle
         doodle do
-          dictionary Foo, :key => :name
+          dictionary ::Foo, :key => :name
         end
       end
       Bar.doodle.attributes[:foos].kind.should_be []
@@ -336,12 +336,12 @@ describe Doodle, 'datatypes' do
     end
 
     it "should allow all doodle directives inside doodle block" do
-      class Foo < Doodle
+      class ::Foo < Doodle
         doodle do
           string :name
           has :key
           from String do |s|
-            Foo.new(*s.split(";"))
+            ::Foo.new(*s.split(";"))
           end
           must "have key != name" do
             name != key

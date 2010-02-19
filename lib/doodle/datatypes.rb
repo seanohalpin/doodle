@@ -154,10 +154,10 @@ class Doodle
     def uri(name, params = { }, &block)
       datatype name, params, block, { :kind => URI } do
         from String do |s|
-          URI.parse(s).extend(DecorateURI)
+          URI.parse(s).extend(Doodle::DataTypes::DecorateURI)
         end
         from URI do |u|
-          u.extend(DecorateURI)
+          u.extend(Doodle::DataTypes::DecorateURI)
         end
       end
     end
@@ -181,7 +181,7 @@ class Doodle
           Date.new(y, m, d)
         end
         from Integer do |jd|
-          Date.new(*Date.jd_to_civil(jd))
+          Date.new(*Date.send(:jd_to_civil, jd))
         end
       end
     end
