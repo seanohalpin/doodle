@@ -15,8 +15,20 @@ class Doodle
       end
     end
 
+    class Proxy < Proc
+      attr_accessor :owner
+      def initialize(owner, &block)
+        @owner = owner
+        super(&block)
+      end
+    end
+
+    def apply_conversion(owner, converter, value)
+      converter[value]
+    end
+
     # convert a value according to conversion rules
-    # FIXME: move
+    # FIXME: move & review scope (e.g. instance eval in owning object?)
     def convert(owner, *args)
       Doodle::Debug.d { [:convert, 1, owner, args] }
       begin
@@ -24,7 +36,7 @@ class Doodle
           Doodle::Debug.d { [:convert, 2, value, value.class, __doodle__.conversions.keys] }
           if (converter = __doodle__.conversions[value.class])
             Doodle::Debug.d { [:convert, 3, converter] }
-            value = converter[value]
+            value = apply_conversion(owner, converter, value)
             Doodle::Debug.d { [:convert, 4, value] }
           else
             Doodle::Debug.d { [:convert, 5, value] }
@@ -41,7 +53,7 @@ class Doodle
               Doodle::Debug.d { [:convert, 10, converter_class] }
               if converter = __doodle__.conversions[converter_class]
                 Doodle::Debug.d { [:convert, 11, converter] }
-                value = converter[value]
+                value = apply_conversion(owner, converter, value)
                 Doodle::Debug.d { [:convert, 12, value] }
               end
             else
@@ -53,7 +65,7 @@ class Doodle
                   Doodle::Debug.d { [:convert, 14, :kind_is_a_doodle, value.class, mappable_kind, mappable_kind.doodle.conversions, args] }
                   if converter = mappable_kind.doodle.conversions[value.class]
                     Doodle::Debug.d { [:convert, 15, value, mappable_kind, args] }
-                    value = converter[value]
+                    value = apply_conversion(owner, converter, value)
                     break
                   else
                     Doodle::Debug.d { [:convert, 16, :no_conversion_for, value.class] }
