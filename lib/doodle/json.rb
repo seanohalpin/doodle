@@ -3,6 +3,13 @@ require 'pp'
 
 class Doodle
   module JSON
+    # main one
+    def self.parse(*a, &b)
+      ::JSON.parse(*a, &b)
+    end
+    def self.method_missing(*a, &b)
+      ::JSON.send(*a, &b)
+    end
     module InstanceMethods
       def to_json(*a)
         # don't include default values
