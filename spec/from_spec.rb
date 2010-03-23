@@ -5,7 +5,7 @@ describe 'Doodle', 'from' do
     before :each do
       class Name < String
         include Doodle::Core
-        # this is fiddly - needed to avoid infinite regress
+        # this is fiddly - needed to avoid infinite regress from trying to do Name.new
         from String do |s|
           n = self.allocate
           n.replace(s)
@@ -50,7 +50,7 @@ describe 'Doodle', 'from' do
     before :each do
     end
 
-    it 'should allow specifying from in has params' do
+    it 'should allow specifying from in #has params' do
       class Answer < Doodle
         has :value, :from => { Integer => proc {|i| i.to_s }}
       end
@@ -58,7 +58,7 @@ describe 'Doodle', 'from' do
       name.value.should_be "42"
     end
 
-    it 'should allow specifying from in has params with kind specified' do
+    it 'should allow specifying from in #has params with :kind specified' do
       class Answer < Doodle
         has :value, :kind => String, :from => { Integer => proc {|i| i.to_s }}
       end
@@ -66,7 +66,7 @@ describe 'Doodle', 'from' do
       name.value.should_be "42"
     end
 
-    it 'should override from clause in has params with one defined in block' do
+    it 'should override from clause in #has params with one defined in block' do
       class Answer < Doodle
         has :value, :kind => String, :from => { Integer => proc {|i| i.to_s }} do
           # this should override :from clause in has params
