@@ -7,7 +7,7 @@ require 'rexml/document'
 
 class Doodle
   module EscapeXML
-    ESCAPE = { '&' => '&amp;', '"' => '&quot;', '>' => '&gt;', '<' => '&lt;' }
+    ESCAPE = { '&' => '&amp;', '"' => '&quot;', '>' => '&gt;', '<' => '&lt;', "'" => "&apos;" }
 
     def self.escape(s)
       s.to_s.gsub(/[&"><]/) { |special| ESCAPE[special] }
