@@ -25,9 +25,126 @@ require 'date'
 # with many of the same names but they are not the same - could be
 # confusing :)
 
+## command line option handling DSL implemented using Doodle
 class Doodle
-  # command line option handling DSL implemented using Doodle
   class App < Doodle
+
+    ## helper functions
+    module Helpers
+
+      ### flag_to_attribute(flag)
+      def flag_to_attribute(flag)
+        a = doodle.attributes.select do |key, attr|
+          (key.to_s == flag.to_s) || (attr.respond_to?(:flag) && attr.flag.to_s == flag.to_s)
+        end
+        if a.size == 0
+          raise ArgumentError, "Unknown option: #{flag}"
+        elsif a.size > 1
+          #raise ArgumentError, "More than one option matches: #{flag}"
+        end
+        a.first
+      end
+
+      ### key_value(arg, argv)
+      def key_value(arg, argv)
+        value = nil
+        if arg[0..0] == "-"
+          # got flag
+          #p [:a, 1, arg]
+          if arg[1..1] == "-"
+            # got --flag
+            # --key value
+            key = arg[2..-1]
+            #p [:a, 2, arg, key]
+            if key == ""
+              key = "--"
+            end
+          else
+            key = arg[1].chr
+            #p [:a, 4, key]
+            if arg[2]
+              # -kvalue
+              value = arg[2..-1]
+              #p [:a, 5, key, value]
+            end
+          end
+          pkey, attr = flag_to_attribute(key)
+          if pkey.nil?
+            raise Exception, "Internal error: #{key} does not match attribute"
+          end
+          #p [:flag_to_attribute, key, value, pkey, attr]
+          if value.nil?
+            if attr.arity == 0
+              value = true
+            else
+              #p [:args, 5, :getting_args, attr.arity]
+              value = []
+              1.upto(attr.arity) do
+                a = argv.shift
+                break if a.nil?
+                #p [:a, 6, key, value]
+                if a =~ /^-/
+                  # got a switch - break? (what should happen here?)
+                  #p [:a, 7, key, value]
+                  argv.unshift a
+                  break
+                else
+                  value << a
+                end
+              end
+              if attr.arity == 1
+                value = value.first
+              end
+            end
+          end
+          if key.size == 1
+            #p [:finding, key]
+            #p [:found, pkey, attr]
+            key = pkey.to_s
+          end
+        end
+        [key, value]
+      end
+
+      ### params_args(argv)
+      def params_args(argv)
+        argv = argv.dup
+        params = { }
+        args = []
+        while arg = argv.shift
+          key, value = key_value(arg, argv)
+          if key.nil?
+            args << arg
+          else
+            #p [:setting, key,  value]
+            params[key] = value
+          end
+        end
+        [params, args]
+      end
+
+      ### from_argv(argv)
+      def from_argv(argv)
+        params, args = params_args(argv)
+        # p [:params, params, :args, args]
+        args << params
+        new(*args)
+      end
+
+      ### format_values(values)
+      def format_values(values)
+        case values
+        when Array
+          values.map{ |s| s.to_s }.join(', ')
+        when Range
+          values.inspect
+        else
+          values.inspect
+        end
+      end
+
+    end
+
     class HelpExit < ::Exception
     end
     # specialised classes for handling attributes
@@ -37,7 +154,7 @@ class Doodle
       path.to_s.gsub(Regexp.new("^#{ Regexp.escape(Dir.pwd) }/"), './')
     end
 
-    # class representing a generic option
+    ## class representing a generic option
     class Option < Doodle::DoodleAttribute
       doodle do
         string :flag, :max => 1, :doc => "one character abbreviation" do
@@ -63,7 +180,8 @@ class Doodle
         has :match, :default => nil, :doc => "regex to match against"
       end
     end
-    # specialised Filename attribute
+
+    ## specialised Filename attribute
     # - :existing => true|false (default = false)
     class Filename < Option
       doodle do
@@ -72,12 +190,12 @@ class Doodle
       end
     end
 
-    # regular expression for ISO datetime
+    ## regular expression for ISO datetime
     RX_ISODATETIME = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)? ?Z$/
     # regular expression for ISO date
     RX_ISODATE = /^\d{4}-\d{2}-\d{2}$/
 
-    # App directives
+    ## App directives
     class << self
       public
 
@@ -89,25 +207,28 @@ class Doodle
       end
       has :examples, :collect => :example, :doc => "example(s) of use"
 
-      # specify that this argument is required
+      ## specify that this argument is required
       def required
         @optional = false
       end
-      # specify that this argument is optional
+
+      ## specify that this argument is optional
       def optional
         @optional = true
       end
-      # returns true if argument is optional, false otherwise
+
+      ## returns true if argument is optional, false otherwise
       def optional?
         instance_variable_defined?("@optional") ? @optional : false
       end
-      # return list of required attributes
+
+      ## return list of required attributes
       def required_args
         doodle.attributes.select{ |k, v| v.required?}.map{ |k,v| v}
       end
       alias :options :optional
 
-      # the generic option - can be any type
+      ## the generic option - can be any type
       def option(*args, &block)
         #p [:option, args, :optional, optional?]
         key_values, args = args.partition{ |x| x.kind_of?(Hash)}
@@ -159,15 +280,15 @@ class Doodle
         da
       end
 
-      # SPECIFIC OPTION TYPES
+      ## SPECIFIC OPTION TYPES
 
-      # expect a string
+      ## expect a string
       def string(*args, &block)
         args = [{ :using => Option, :kind => String }, *args]
         da = option(*args, &block)
       end
 
-      # expect a symbol (and convert from String)
+      ## expect a symbol (and convert from String)
       def symbol(*args, &block)
         args = [{ :using => Option, :kind => Symbol }, *args]
         da = option(*args, &block)
@@ -178,7 +299,7 @@ class Doodle
         end
       end
 
-      # expect a filename - set <tt>:existing => true</tt> to specify that the file must exist
+      ## expect a filename - set <tt>:existing => true</tt> to specify that the file must exist
       #   filename :input, :existing => true, :flag => "i", :doc => "input file name"
       def filename(*args, &block)
         args = [{ :using => Filename, :kind => String }, *args ]
@@ -197,7 +318,7 @@ class Doodle
         end
       end
 
-      # expect an on/off flag, e.g. -b
+      ## expect an on/off flag, e.g. -b
       # - doesn't take any arguments (mere presence sets it to true)
       # - booleans are false by default
       def boolean(*args, &block)
@@ -224,7 +345,7 @@ class Doodle
         end
       end
 
-      # whole number, e.g. -n 10
+      ## whole number, e.g. -n 10
       # - you can use, e.g. :values => [1,2,3] or :values => (0..99) to restrict the range of valid values
       def integer(*args, &block)
         args = [{ :using => Option, :kind => Integer }, *args]
@@ -237,7 +358,7 @@ class Doodle
         end
       end
 
-      # date: -d 2008-09-28
+      ## date: -d 2008-09-28
       def date(*args, &block)
         args = [{ :using => Option, :kind => Date, :doc => "ISO format date, e.g. 2008-09-28" }, *args]
         da = option(*args, &block)
@@ -248,7 +369,7 @@ class Doodle
         end
       end
 
-      # time: -t 2008-09-28T18:00:00
+      ## time: -t 2008-09-28T18:00:00
       def time(*args, &block)
         args = [{ :using => Option, :kind => Time, :doc => "quasi-ISO format localtime without timezone, e.g. 2008-09-28T18:00:00" }, *args]
         da = option(*args, &block)
@@ -259,7 +380,7 @@ class Doodle
         end
       end
 
-      # utctime: -u 2008-09-28T21:41:29Z
+      ## utctime: -u 2008-09-28T21:41:29Z
       def utctime(*args, &block)
         args = [{ :using => Option, :kind => Time, :doc => "ISO format UTC time, e.g. 2008-09-28T18:00:00Z" }, *args]
         da = option(*args, &block)
@@ -282,7 +403,7 @@ class Doodle
         end
       end
 
-      # utcdate: -d 2008-09-28
+      ## utcdate: -d 2008-09-28
       def utcdate(*args, &block)
         args = [{ :using => Option, :kind => Date }, *args]
         da = option(*args, &block)
@@ -305,7 +426,7 @@ class Doodle
         end
       end
 
-      # use this to include 'standard' flags: help (-h, --help), verbose (-v, --verbose) and debug (-d, --debug)
+      ## use this to include 'standard' flags: help (-h, --help), verbose (-v, --verbose) and debug (-d, --debug)
       def std_flags
         # FIXME: this is bogus
         m = method(:help_text)
@@ -316,8 +437,9 @@ class Doodle
 
       has :exit_status, :default => 0
 
-      # call App.run to start your application (calls instance.run)
+      ## call App.run to start your application (calls instance.run)
       def run(argv = ARGV)
+        #p [:argv, argv]
         begin
           # cheating
           if argv.include?('-h') or argv.include?('--help')
@@ -338,112 +460,10 @@ class Doodle
 
       private
 
-      # helpers
-      def flag_to_attribute(flag)
-        a = doodle.attributes.select do |key, attr|
-          (key.to_s == flag.to_s) || (attr.respond_to?(:flag) && attr.flag.to_s == flag.to_s)
-        end
-        if a.size == 0
-          raise ArgumentError, "Unknown option: #{flag}"
-        elsif a.size > 1
-          #raise ArgumentError, "More than one option matches: #{flag}"
-        end
-        a.first
-      end
+      ## helpers
+      include Helpers
 
-      def key_value(arg, argv)
-        value = nil
-        if arg[0..0] == "-"
-          # got flag
-          #p [:a, 1, arg]
-          if arg[1..1] == "-"
-            # got --flag
-            # --key value
-            key = arg[2..-1]
-            #p [:a, 2, arg, key]
-            if key == ""
-              key = "--"
-            end
-          else
-            key = arg[1].chr
-            #p [:a, 4, key]
-            if arg[2]
-              # -kvalue
-              value = arg[2..-1]
-              #p [:a, 5, key, value]
-            end
-          end
-          pkey, attr = flag_to_attribute(key)
-          if pkey.nil?
-            raise Exception, "Internal error: #{key} does not match attribute"
-          end
-          #p [:flag_to_attribute, key, value, pkey, attr]
-          if value.nil?
-            if attr.arity == 0
-              value = true
-            else
-              #p [:args, 5, :getting_args, attr.arity]
-              value = []
-              1.upto(attr.arity) do
-                a = argv.shift
-                break if a.nil?
-                #p [:a, 6, key, value]
-                if a =~ /^-/
-                  # got a switch - break? (what should happen here?)
-                  #p [:a, 7, key, value]
-                  argv.unshift a
-                  break
-                else
-                  value << a
-                end
-              end
-              if attr.arity == 1
-                value = *value
-              end
-            end
-          end
-          if key.size == 1
-            #p [:finding, key]
-            #p [:found, pkey, attr]
-            key = pkey.to_s
-          end
-        end
-        [key, value]
-      end
-
-      def params_args(argv)
-        argv = argv.dup
-        params = { }
-        args = []
-        while arg = argv.shift
-          key, value = key_value(arg, argv)
-          if key.nil?
-            args << arg
-          else
-            #p [:setting, key,  value]
-            params[key] = value
-          end
-        end
-        [params, args]
-      end
-
-      def from_argv(argv)
-        params, args = params_args(argv)
-        args << params
-        new(*args)
-      end
-
-      def format_values(values)
-        case values
-        when Array
-          values.map{ |s| s.to_s }.join(', ')
-        when Range
-          values.inspect
-        else
-          values.inspect
-        end
-      end
-
+      ### format_doc(attr)
       def format_doc(attr)
         #p [:doc, attr.doc]
         doc = attr.doc
@@ -463,6 +483,7 @@ class Doodle
         doc
       end
 
+      ### format_kind(kind)
       def format_kind(kind)
         if (kind & [TrueClass, FalseClass, NilClass]).size > 0
           "Boolean"
@@ -471,6 +492,7 @@ class Doodle
         end.upcase
       end
 
+      ### help_attributes
       def help_attributes
         options, args = doodle.attributes.partition { |key, attr| attr.respond_to?(:flag)}
         args = args.map { |key, attr|
@@ -496,6 +518,7 @@ class Doodle
 
       public
 
+      ### help_text
       # defines the help text displayed when option --help passed
       def help_text
         format_block = proc {|key, flag, doc, required, kind|

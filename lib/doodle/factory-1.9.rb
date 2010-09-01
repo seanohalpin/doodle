@@ -30,6 +30,7 @@ class Doodle
         end
         names = name.split(/::/)
         name = names.pop
+        #p [:name, name, :nesting, Module.nesting]
         # TODO: the code below is almost the same - refactor
         #p [:factory, :names, names, name]
         if names.empty? && !anon_class

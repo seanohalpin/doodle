@@ -1,8 +1,8 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 
 describe :DateRange, 'validation & conversions' do
   temporary_constants :DateRange do
-    
+
     before :each do
 
       class ::DateRange < Doodle
@@ -43,11 +43,11 @@ describe :DateRange, 'validation & conversions' do
         end
       end
     end
-  
+
     it 'should not raise an exception if end_date >= start_date' do
       proc { DateRange.new('2007-01-01', '2007-01-02') }.should_not raise_error
     end
-  
+
     it 'should raise an exception if end_date < start_date' do
       proc { DateRange.new('2007-01-02', '2007-01-01') }.should raise_error
     end
@@ -63,13 +63,13 @@ describe :DateRange, 'validation & conversions' do
 
     it 'should have two validations' do
       d = DateRange.new
-      d.doodle.attributes[:start_date].doodle.validations.size.should_be 2    
+      d.doodle.attributes[:start_date].doodle.validations.size.should_be 2
       d.doodle.attributes[:start_date].doodle.validations(false).size.should_be 2
     end
 
     it 'should have two conversions' do
       d = DateRange.new
-      d.doodle.attributes[:start_date].doodle.conversions.size.should_be 3    
+      d.doodle.attributes[:start_date].doodle.conversions.size.should_be 3
       d.doodle.attributes[:start_date].doodle.conversions(false).size.should_be 3
     end
 
@@ -78,7 +78,7 @@ describe :DateRange, 'validation & conversions' do
       d.start_date.should_be Date.new(2007,01,01)
       d.end_date.should_be Date.new(2007,01,02)
     end
-  
+
     it 'should convert Integer representing Julian date to Date' do
       d = DateRange.new 2454428, 2454429
       d.start_date.should_be Date.new(2007,11,23)

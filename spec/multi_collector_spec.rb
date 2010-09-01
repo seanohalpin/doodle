@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 
 describe Doodle, 'multiple collector' do
-  temporary_constants :Text, :Item, :List do
+  temporary_constants :Text, :Item, :ItemList do
     before :each do
       #: definition
       class ::Item < Doodle
@@ -10,7 +10,7 @@ describe Doodle, 'multiple collector' do
       class ::Text < Doodle
         has :body, :kind => String
       end
-      class ::List < Doodle
+      class ::ItemList < Doodle
         has :items, :collect => [Item, Text]
       end
     end
@@ -18,7 +18,7 @@ describe Doodle, 'multiple collector' do
     it 'should accept convertible values in collector' do
       list = nil
       no_error {
-        list = List do
+        list = ItemList do
           item "Hello"
           text "World"
         end
@@ -31,7 +31,7 @@ describe Doodle, 'multiple collector' do
 end
 
 describe Doodle, 'multiple collector' do
-  temporary_constants :Text, :Item, :List do
+  temporary_constants :Text, :Item, :ItemList do
     before :each do
       #: definition
       class ::Item < Doodle
@@ -40,7 +40,7 @@ describe Doodle, 'multiple collector' do
       class ::Text < Doodle
         has :body, :kind => String
       end
-      class ::List < Doodle
+      class ::ItemList < Doodle
         has :items, :collect => [ { :foo => Item }, { :bar => Text } ]
       end
     end
@@ -48,7 +48,7 @@ describe Doodle, 'multiple collector' do
     it 'should accept convertible values in collector using specified collector methods' do
       list = nil
       no_error {
-        list = List do
+        list = ItemList do
           foo "Hello"
           bar "World"
         end
@@ -61,7 +61,7 @@ describe Doodle, 'multiple collector' do
 end
 
 describe Doodle, 'multiple collector' do
-  temporary_constants :Text, :Item, :List do
+  temporary_constants :Text, :Item, :ItemList do
     before :each do
       #: definition
       class ::Item < Doodle
@@ -70,7 +70,7 @@ describe Doodle, 'multiple collector' do
       class ::Text < Doodle
         has :body, :kind => String
       end
-      class ::List < Doodle
+      class ::ItemList < Doodle
         has :items, :collect => { :foo => Item, :bar => Text }
       end
     end
@@ -78,7 +78,7 @@ describe Doodle, 'multiple collector' do
     it 'should accept convertible values in collector using specified collector methods' do
       list = nil
       no_error {
-        list = List do
+        list = ItemList do
           foo "Hello"
           bar "World"
         end

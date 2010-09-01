@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 
 describe Doodle, "definitions within rspec" do
   temporary_constant :Foo1 do

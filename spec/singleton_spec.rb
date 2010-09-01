@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + "/spec_helper.rb"
+require File.expand_path(File.join(File.dirname(__FILE__), "spec_helper.rb"))
 
 describe Doodle, "singletons" do
-  temporary_constant :Foo do    
+  temporary_constant :Foo do
     it "should allow creating attributes on classes via inheritance" do
       class Foo < Doodle
         class << self

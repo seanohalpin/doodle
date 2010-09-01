@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 require 'yaml'
 
 # TODO: add more complex (e.g. nested doodles) scenarios here

@@ -1,7 +1,7 @@
 # this file is frankly a bit of a mess - trying to do too many things
 # at once
 
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 
 shared_code = proc do
   class ::DateRange < Doodle

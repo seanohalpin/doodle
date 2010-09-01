@@ -1,13 +1,13 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 
 describe Doodle, 'typed collector' do
-  temporary_constants :Item, :List do
+  temporary_constants :Item, :ItemList do
     before :each do
       #: definition
       class ::Item < Doodle
         has :name, :kind => String
       end
-      class ::List < Doodle
+      class ::ItemList < Doodle
         has :items, :init => Doodle::TypedArray(Item), :collect => Item
         #has :items, :collect => Item
       end
@@ -16,7 +16,7 @@ describe Doodle, 'typed collector' do
     it 'should accept convertible values in collector' do
       list = nil
       expect_ok {
-        list = List do
+        list = ItemList do
           item "Hello"
           item "World"
         end
@@ -28,7 +28,7 @@ describe Doodle, 'typed collector' do
     it 'should accept correctly typed values in collector' do
       list = nil
       expect_ok {
-        list = List do
+        list = ItemList do
           item Item("Hello")
           item Item("World")
         end
@@ -38,14 +38,14 @@ describe Doodle, 'typed collector' do
     end
 
     it 'should prevent adding invalid values' do
-      list = List.new
+      list = ItemList.new
       expect_error(TypeError) {
         list.items << "Hello"
       }
     end
 
     it 'should accept valid values' do
-      list = List.new
+      list = ItemList.new
       expect_ok {
         list.items << Item("Hello")
       }

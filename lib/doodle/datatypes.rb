@@ -228,7 +228,7 @@ class Doodle
     def version(name, params = { }, &block)
       datatype name, params, block, { :kind => String } do
         must "be of form n.n.n" do |str|
-          str =~ /\d+\.\d+.\d+/
+          str =~ /^\d+\.\d+.\d+$/
         end
         from Array do |a|
           a.size == 3 or raise ArgumentError, "#{name}: version array argument must contain exactly 3 elements", [caller[-1]]
@@ -236,6 +236,32 @@ class Doodle
         end
       end
     end
+
+    def host_address(name, params = { }, &block)
+      datatype name, params, block, { :kind => String } do
+        must "be a hostname or dotted quad of form n.n.n.n" do |str|
+          if str =~ /^(\d+\.){1,}\d+$/
+            if str =~ /^(\d+\.){3}\d+$/
+              true
+            else
+              __doodle__.handle_error name, ArgumentError, "'#{str[0..20]}' is not a dotted quad", [caller[-1]]
+            end
+          else
+            begin
+              URI.parse(str)
+            rescue => e
+              __doodle__.handle_error name, e.class, e.to_s, [caller[-1]]
+            end
+            true
+          end
+        end
+        from Array do |a|
+          a.size == 4 or raise ArgumentError, "#{name}: version array argument must contain exactly 3 elements", [caller[-1]]
+          a.join('.')
+        end
+      end
+    end
+    alias :dotted_quad :host_address
 
     def list(name, params = { }, &block)
       if name.kind_of?(Class)
