@@ -1,13 +1,13 @@
-= doodle to do list
-== Specs to add [/]
+* doodle to do list
+** Specs to add [/]
 - attr do ... end initialization
-== TODO documentation [0/3]
+** TODO documentation [0/3]
 - [ ] cover all features
   - reference doc
 - [ ] tutorial
   - more & better examples
 - [ ] redo website as multiple pages
-== DONE less intrusiveness [1/2]
+** DONE less intrusiveness [1/2]
 - [ ] move more things into __doodle__
   - e.g. all methods which could be functions can be class methods
     - ones which don't rely on instance variables
@@ -17,22 +17,22 @@
 - could use arg checking trick for doodle
   - if no args, return DoodleInfo
   - if block, enter doodle context
-== TODO equivalence [4/4]
+** TODO equivalence [4/4]
 - [X] sorting
 - [X] comparison
 - [X] equality
 
 See Facets compare_on
 - [X] could compare attributes in arg_order by default
-== DONE pretty_print [1/1]
+** DONE pretty_print [1/1]
 - [X] pp doesn't seem to like Doodle anymore
-== DONE collect [2/2]
+** DONE collect [2/2]
 - [X] Hash version
       has :list, :collect => Item, :key => :name
 - [X] create spec for bug in validate! with loading YAML when default
   defined
   - see spec/bugs_spec.rb 'loading bad data from yaml with default defined'
-== DONE has + Attribute [2/2]
+** DONE has + Attribute [2/2]
 - [X] redefine has as a protocol so you can pass in other classes to
       use other than Doodle::Attribute
 
@@ -41,7 +41,7 @@ See Facets compare_on
       I could then use this to define other specialised directives
       which use subclasses of Doodle::Attribute, e.g. Doodle::CommandLineOption
 - [X] refactor has to use specialized attribute classes for collections
-== TODO Documentation [2/10]
+** TODO Documentation [2/10]
 - [ ] better examples (and better running example)
 - [ ] more in tutorial fashion (cf. presentation) - from simple to
       more complex
@@ -61,7 +61,7 @@ See Facets compare_on
     i.e. I could use the information gathered to generate a source file
 - could also be in other language (e.g. Java, SQL DDL, etc.)
   (see SQL tables definition example)
-== TODO Specs [0/6]
+** TODO Specs [0/6]
 - [ ] write spec for new #parents
 - [ ] Want specs for both flavours of use (e.g. class C < Doodle
       and include Doodle::Core)
@@ -71,14 +71,14 @@ See Facets compare_on
       also, make sure I know exactly how I want this to work :)
 - [ ] 1.9 review specs for 1.9 - seems like Object is getting updated somehow
 - [ ] 1.9 also check discarding inherited method
-== TODO Fixes
-=== TODO fix messy code [1/4]
+** TODO Fixes
+*** TODO fix messy code [1/4]
 - [X] parents
 - [ ] collect_inherited
   - this is pretty slow too
 - [ ] embrace - maybe replace?
   - perhaps use Ara Howard's Mixin? Or similar
-=== DONE simplify usage
+*** DONE simplify usage
 class Foo < Doodle
 end
 class Bar
@@ -86,9 +86,9 @@ class Bar
 end
 
 i.e. have a top-level class rather than
-== TODO Fix errors collection [0/1]
+** TODO Fix errors collection [0/1]
 - [ ] document it (when working properly)
-=== TODO should be simpler way of getting to errors collection [0/0]
+*** TODO should be simpler way of getting to errors collection [0/0]
 - the errors collection is for collecting all errors on an instance
   rather than raising an exception on the first error
 - current way of collecting errors is not satisfactory
@@ -98,48 +98,48 @@ i.e. have a top-level class rather than
 - compare with AR
 - errors on attributes should be collected at the instance level
 - now not sure that Attributes should be Doodles - perhaps simpler
-=== TODO formalize content of errors collection [1/2]
+*** TODO formalize content of errors collection [1/2]
 - [X] include attribute name
 - [ ] do I want to save the call stack? probably
-=== DONE Fixes [1/1]
+*** DONE Fixes [1/1]
 - compatibility with AR? do I need/want that?
 - [X] make raise exception on invalid values optional
-== DONE Profile performance against plain old attributes [4/4]]
+** DONE Profile performance against plain old attributes [4/4]]
 and compare with:
 - [X] attr_accessor
 - [X] attributes
 - [X] traits
 - [X] fattr
 No surprise - doodle is ~much~ slower
-== DONE Reorganize library layout to follow newgem
+** DONE Reorganize library layout to follow newgem
 - only because this seems to be emerging standard (but ~don't~ use web
   page generation)
-== Compatibility
-=== TODO check compatibility with ActiveRecord
+** Compatibility
+*** TODO check compatibility with ActiveRecord
 - may need to rename :attributes to :doodles or something similar to
   avoid name clash
   - changed #parent to #doodle_parent to avoid clash with ActiveSupport
 - or to access through __doodle__ method
 - also, validate! method, e
-=== TODO Sequel
+*** TODO Sequel
 - doesn't work with sequel_model at moment - conflict over initialization
-=== TODO compare with moose
-== Write proper pretty printer (to_doodle)
+*** TODO compare with moose
+** Write proper pretty printer (to_doodle)
 - is this pointless? can I ever get full coverage?
 - need to know instance variables in same way as yaml, etc.
 - maybe could use yaml as intermediate representation?
-== DONE Fix up half-assed features [1/1]
+** DONE Fix up half-assed features [1/1]
 or get rid of them
 - [X] to_doodle - gone
-== DONE Fix inspect [2/2]
+** DONE Fix inspect [2/2]
 - [X] don't include @__doodle__ in inspect string
 - [X] don't break built-ins
-== DONE Known bugs [3/3]
+** DONE Known bugs [3/3]
 - [X] loading from yaml should apply conversions 2008-03-24
 - [X] sort out duplication of errors when calling validate! after
       setting incorrect value has already generated entry 2008-03-26
 - [X] validate! sets instance variables with defaults
-== DONE Need some way of accessing containing object from attribute
+** DONE Need some way of accessing containing object from attribute
 - why?
   - to put errors on instance
 - though this is somewhat tricky - can't use simple reference to
@@ -148,7 +148,7 @@ or get rid of them
 - 2008-04-06 22:12:22 use Doodle.parent (inside initialization only)
 - 2008-04-17 15:57:15 use #parent instead of Doodle.parent
   (doesn't seem to affect memory usage)
-== DONE Fix singleton & class init
+** DONE Fix singleton & class init
 - I'm not happy using the class_init directive
 - may be better to treat singleton attributes differently, e.g. to
   interpret the init at definition time rather than on object
@@ -158,19 +158,19 @@ or get rid of them
   you become it
 - solution: done on first access
   - this isn't perfect however
-== DONE Add typedef methods (e.g. date :name, string :name, etc.)
+** DONE Add typedef methods (e.g. date :name, string :name, etc.)
 - [X] how should this be presented?
   - class level directives (at attr_accessor level)
   - [X] within block? to avoid too much namespace pollution
     - e.g. doodle do ... end
 - see examples/datatypes.rb
-== DONE Check memory usage
+** DONE Check memory usage
 - all those closures - are they leaking?
 - and DOODLES hash (are objects being finalised?)
 - check garbage collection of attributes
 - 2008-04-06 22:12:18 - used ruby-bleak-house - doesn't look good :(
 - fixed - used @__doodle__ instead of DOODLES in DoodleInfo
-== TODO New features [0/0]
+** TODO New features [0/0]
 - add :match from doodle/app to core
   - apply before :from
   - or include in :from, e.g
@@ -198,5 +198,5 @@ or get rid of them
   - list_of
   - dict, map_of
 - type-safe collections (check type when adding to list - trickier than it seems)
-== TODO reorganize todo.org list into ditz
-== TODO move speculative stuff out of todo.org
+** TODO reorganize todo.org list into ditz
+** TODO move speculative stuff out of todo.org
