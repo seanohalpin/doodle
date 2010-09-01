@@ -16,6 +16,16 @@ class Doodle
         }
       end
 
+      # convert an array of key,value pairs into hash
+      def to_hash(ary)
+        Hash[*flatten_first_level(ary)]
+      end
+
+      # convert an array of key,value pairs into hash
+      def to_ordered_hash(ary)
+        OrderedHash[*flatten_first_level(ary)]
+      end
+
       # convert a CamelCasedWord to a snake_cased_word
       # based on version in facets/string/case.rb, line 80
       def snake_case(camel_cased_word)
