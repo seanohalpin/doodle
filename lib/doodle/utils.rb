@@ -53,9 +53,9 @@ class Doodle
       # resolve a constant of the form Some::Class::Or::Module -
       # doesn't work with constants defined in anonymous
       # classes/modules
-#       def const_resolve(constant)
-#         constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
-#       end
+      #       def const_resolve(constant)
+      #         constant.to_s.split(/::/).reject{|x| x.empty?}.inject(Object) { |prev, this| prev.const_get(this) }
+      #       end
       # Rick de Natale's version: see ruby-talk:332670
       def const_resolve(const_name)
         const_name.to_s.
@@ -214,6 +214,13 @@ class Doodle
         else
           result
         end
+      end
+
+      # separate args into key_values hash and positional args
+      def key_values_from_args(*args)
+        key_values, args = args.partition{ |x| x.kind_of?(Hash)}
+        key_values = key_values.inject({ }){ |hash, kv| hash.merge(kv)}
+        [key_values, args]
       end
     end
     extend ClassMethods
