@@ -14,6 +14,8 @@ class Doodle
         has :match, :default => nil, :doc => "regex to match against"
       end
     end
+
+    # values and match should go into base
     def datatype(name, params, block, type_params, &type_block)
       define name, params, block, { :using => DataType }.merge(type_params) do
         #p [:self, __doodle__.__inspect__]
