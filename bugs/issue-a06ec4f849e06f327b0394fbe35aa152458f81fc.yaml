@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Remove use of Jeweler
+desc: Remove dependence on Jeweler
+type: :task
+component: core
+release: r0.2.4
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-11-27 13:15:01.109205 Z
+references: []
+
+id: a06ec4f849e06f327b0394fbe35aa152458f81fc
+log_events: 
+- - 2010-11-27 13:15:02.436426 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
