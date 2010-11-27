@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make compatible with JSONSchema
+desc: ""
+type: :feature
+component: core
+release: r1.0.0
+reporter: Sean O'Halpin <sean.ohalpin@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-11-27 13:25:50.800607 Z
+references: []
+
+id: e7df0e955cd9318e0a64a6eb647fb336e1063b43
+log_events: 
+- - 2010-11-27 13:25:51.552465 Z
+  - Sean O'Halpin <sean.ohalpin@gmail.com>
+  - created
+  - ""
