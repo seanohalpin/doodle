@@ -1,5 +1,4 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
-require 'yaml'
 
 describe 'Doodle', 'block initialization of scalar attributes' do
   temporary_constant :Foo, :Bar, :Farm, :Barn, :Animal do
@@ -22,7 +21,7 @@ describe 'Doodle', 'block initialization of scalar attributes' do
     end
 
     it 'should initialize an scalar attribute from a block' do
-      farm = Farm do
+      farm = Farm.new do
         barn do
           animal "pig"
         end
@@ -31,13 +30,13 @@ describe 'Doodle', 'block initialization of scalar attributes' do
     end
     it 'should fail trying to initialize an inappropriate attribute (not a Doodle or Proc) from a block' do
       proc {
-        foo = Foo do
+        foo = Foo.new do
           ivar1 { "hello" }
         end
       }.should raise_error(ArgumentError)
     end
     it 'should initialize a Proc attribute from a block' do
-      bar = Bar do
+      bar = Bar.new do
         block do
           "hello"
         end
